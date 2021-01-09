@@ -23,8 +23,6 @@ class JtInv : JtClass {
         $This.ClassName = "Report"
         $This.FolderBase = $JtConfig.Get_JtIoFolder_Base()
         $This.DoLogRepoStart()
-
-
         $This.DoIt()
     }
     
