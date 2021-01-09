@@ -1,0 +1,4 @@
+<config>
+	<folder source="d:\Seafile\al-apps\apps\inventory\common" target="c:\_inventory\common">common</folder>
+</config>
+

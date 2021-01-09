@@ -15,11 +15,13 @@ using module JtTool
 
 class JtInv : JtClass {
 
-    [JtIoFolder]$FolderBase 
+    [JtIoFolder]$FolderBase
+    [JtIoFolder]$FolderReport
     [String]$SystemId = ""
 
     JtInv([JtConfig]$JtConfig) {
         $This.ClassName = "Report"
+        $This.FolderReport = $JtConfig.Get_JtIoFolder_Report()
         $This.FolderBase = $JtConfig.Get_JtIoFolder_Base()
         $This.DoLogRepoStart()
         $This.DoIt()
@@ -33,11 +35,6 @@ class JtInv : JtClass {
         Write-JtLog -Text ( -join ("Starting in ", $This.ClassName, " REPORT: ", $This.GetReportLabel()))
     }
 
-    [JtIoFolder]Get_JtIoFolder_Report() {
-        [JtIoFolder]$JtIoFolderReport = New-JtIoFolderReport
-        return $JtIoFolderReport
-    }
-
     [String]GetConfigName() {
         Write-JtError -Text ("Function GetConfigName should be overwritten!!!")
         Throw("Function GetConfigName should be overwritten!!!")
@@ -45,7 +42,7 @@ class JtInv : JtClass {
     }
 
     [JtIoFolder]GetFolderTarget() {
-        [JtIoFolder]$Result = $This.Get_JtIoFolder_Report()
+        [JtIoFolder]$Result = $This.FolderReport
         if ($This.GetReportLabel().Length -gt 0) {
             $Result = $Result.GetSubfolder($This.GetReportLabel(), $True)
         }
@@ -100,28 +97,24 @@ function New-JtInvClient {
     [JtInvClientReport]::new([JtConfig]$JtConfig) 
     [JtInvClientCsvs]::new([JtConfig]$JtConfig) 
     [JtInvClientExport]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "report"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "report"
 }
-
-
-
 
 class JtInvClientChoco : JtInv {
 
     JtInvClientChoco([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvClientChoco"
         # Output goes directly to "c:\_inventory\report"
-        [JtIoFolder]$This.Source = New-JtIoFolderReport
-        [JtIoFolder]$This.Target = $This.Source.GetSubfolder("choco", $True)
     }
-
+    
     [boolean] DoIt() {
         $This.DoLogRepoStart()
-
+        
         [String]$MyCommand = ""
         [String]$Label = "choco"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [JtIoFolder]$MyTarget = $This.FolderReport.GetSubfolder("choco", $True)
+        [String]$Out = $MyTarget.GetFilePath($Filename)
         if ($env:ChocolateyInstall -eq "c:\ProgramData\chocolatey" ) {
             $MyCommand = -join ('cmd.exe /C ', '"', 'choco list -li', '"', ' > ', '"', $Out, '"')
             Invoke-Expression -Command:$MyCommand  
@@ -159,7 +152,6 @@ class JtInvClientClean : JtInv {
 
     JtInvClientClean([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvClientClean"
-        $This.FolderReport = New-JtIoFolderReport
     }
 
     [Boolean]DoIt() {
@@ -203,7 +195,7 @@ Function New-JtInvClientClean {
         [JtConfig]$JtConfig = New-JtConfig
         [JtInvClientClean]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "clean"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "clean"
 }
 
 
@@ -244,7 +236,7 @@ function New-JtInvClientConfig {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvClientConfig]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "config"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "config"
 }
 
 class JtInvClientCsvs : JtInv {
@@ -257,7 +249,7 @@ class JtInvClientCsvs : JtInv {
     [boolean]DoIt() {
         $This.DoLogRepoStart()
 
-        New-JtCsvGenerator -JtIoFolder $This.Get_JtIoFolder_Report() -Label $This.ClassName
+        New-JtCsvGenerator -JtIoFolder $This.FolderReport -Label $This.ClassName
 
         return $True
     }
@@ -281,7 +273,7 @@ function New-JtInvClientCsvs {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvClientCsvs]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "csv"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "csv"
 }
 
 
@@ -295,7 +287,7 @@ class JtInvClientErrors : JtInv {
 
     [Boolean]DoCleanErrorFiles() {
         [String]$MyFilter = -join ("*", [JtIo]::JtInvSuffix_Errors, [JtIo]::FilenameExtension_Meta)
-        $This.Get_JtIoFolder_Report().DoDeleteAllFiles($MyFilter)
+        $This.FolderReport.DoDeleteAllFiles($MyFilter)
 
         return $true
     }
@@ -306,7 +298,7 @@ class JtInvClientErrors : JtInv {
         $This.DoCleanErrorFiles()
 
         [String]$Content = [JtLog]::CounterError
-        [String]$FileLabel = -join ([JtIo]::JtInvPrefix_Report, ".", $Content, ".", [JtIo]::JtInvSuffix_Errors)
+        [String]$FileLabel = -join ([JtIo]::FilenamePrefix_Report, ".", $Content, ".", [JtIo]::JtInvSuffix_Errors)
         [String]$OutputFilePath = $This.GetFolderTarget().GetPath()
 
         New-JtIoFileMeta -Path $OutputFilePath -Label $FileLabel -Content $Content
@@ -334,7 +326,7 @@ function New-JtInvClientErrors {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvClientErrors]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "errors"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "errors"
 }
 
 
@@ -342,7 +334,7 @@ class JtInvClientExport  : JtInv {
 
 
     JtInvClientExport ([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvJtSnapshot"
+        $This.ClassName = "JtInvClientExport"
     }
 
     [Boolean]DoIt() {
@@ -377,7 +369,7 @@ class JtInvClientExport  : JtInv {
             [JtIoFolder]$JtIoFolderTargetSys = $FolderExport.GetSubfolder($SystemId, $True)
         
             [String]$MyInfo = ( -join ("DoExport in ", $This.ClassName))
-            New-JtRobocopyIo -IoSource $This.Get_JtIoFolder_Report() -IoTarget $JtIoFolderTargetSys -Info $MyInfo
+            New-JtRobocopyIo -IoSource $This.FolderReport -IoTarget $JtIoFolderTargetSys -Info $MyInfo
             return $True
         }
         return $True
@@ -402,7 +394,7 @@ function New-JtInvClientExport  {
 
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvClientExport ]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "JtExport"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "export"
 }
 
 
@@ -519,7 +511,7 @@ function New-JtInvClientObjects {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvClientObjects]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "objects"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "objects"
 }
 
 class JtInvClientReport : JtInv {
@@ -529,7 +521,6 @@ class JtInvClientReport : JtInv {
 
     JtInvClientReport([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvClientReport"
-        $This.FolderReport = $JtConfig.Get_JtIoFolder_Report()
     }
 
     [boolean]DoCreateBcdeditMeta() {
@@ -537,8 +528,8 @@ class JtInvClientReport : JtInv {
         [String]$Label = ""
 
         [String]$Label = "systemid"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', 'bcdedit', [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', 'bcdedit', [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('bcdedit.exe /enum ', ' > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
@@ -581,77 +572,77 @@ class JtInvClientReport : JtInv {
         [String]$Label = ""
 
         [String]$Content = "hello world!"
-        [String]$C_Inventory_Report = $This.Get_JtIoFolder_Report().GetPath()
+        [String]$C_Inventory_Report = $This.FolderReport.GetPath()
 
         [String]$Label = "version"
         [String]$MyVersion = $This.GetVersion()
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $MyVersion, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $MyVersion, '.', $Label, [JtIo]::FilenameExtension_Meta)
         [String]$FilterVersion = -join ("*", '.', $Label, [JtIo]::FilenameExtension_Meta)
-        $This.Get_JtIoFolder_Report().DoDeleteAllFiles($FilterVersion)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        $This.FolderReport.DoDeleteAllFiles($FilterVersion)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         Set-Content -Path $Out -Value $Content
 
         $MyIpInfo = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object { $null -ne $_.DefaultIPGateway }).IPAddress | select-object -first 1 
         [String]$MyIp = $MyIpInfo
         [String]$Content = $MyIP
         [String]$Label = "ip"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         Set-Content -Path $Out -Value $Content
 
         [String]$Label = "obj"
         [String]$MyIp3 = $MyIp
         [String]$Content = $MyIP
         [String]$Filename = -join ('ip', '.', $MyIp3, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         Set-Content -Path $Out -Value $Content
 
         [String]$Label = "set"
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'set', '"', ' > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "win"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'ver', '"', ' > ' , '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "user"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'echo %username%', '"', ' > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "systemid"
         [String]$SystemId = [JtIo]::GetSystemId()
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $systemId, ".", $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $systemId, ".", $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'echo %username%', '"', ' > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "obj"
         [String]$Computername = [JtIo]::GetComputername()
         [String]$Filename = -join ("computer", '.', $Computername, ".", $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'echo ', $Computername, '"', ' > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "ipconfig"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'ipconfig /all', '"', '   > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "w32tm"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         $MyCommand = -join ('cmd.exe /C ', '"', 'w32tm /stripchart /computer:130.75.1.32 /samples:1', '"', '   > ', '"', $Out, '"')
         Invoke-Expression -Command:$MyCommand
 
         [String]$Label = "wsus"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         try {
             $MyCommand = -join ('reg query ', '"', 'hklm\software\policies\microsoft\windows\windowsupdate', '"', ' /v ', '"', 'wuserver', '"', ' > ', '"', $Out, '"')
             Invoke-Expression -Command:$MyCommand   
@@ -662,8 +653,8 @@ class JtInvClientReport : JtInv {
         }
 
         [String]$Label = "choco"
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         if ($env:ChocolateyInstall -eq "c:\ProgramData\chocolatey" ) {
             $MyCommand = -join ('cmd.exe /C ', '"', 'choco list -li', '"', ' > ', '"', $Out, '"')
             Invoke-Expression -Command:$MyCommand  
@@ -691,9 +682,6 @@ class JtInvClientReport : JtInv {
         return $true
     }
 
-    [JtIoFolder]Get_JtIoFolder_Report() {
-        return New-JtIoFolderReport
-    }
 
     [String]GetConfigName() {
         return "JtInvClientReport"
@@ -711,8 +699,8 @@ class JtInvClientReport : JtInv {
     [String]GetDirCommand([String]$Path) {
         [String]$Result = ""
         [String]$Label = [JtIo]::ConvertPathToLabel($Path)
-        [String]$Filename = -join ([JtIo]::JtInvPrefix_Report, '.', $Label, '.', 'dir', [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.Get_JtIoFolder_Report().GetFilePath($Filename)
+        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, '.', 'dir', [JtIo]::FilenameExtension_Meta)
+        [String]$Out = $This.FolderReport.GetFilePath($Filename)
         [String]$Result = -join ('cmd.exe /C ', '"', 'dir ', $Path, ' > ', $Out, '"')
         return $Result
     }
@@ -728,9 +716,141 @@ function New-JtInvClientReport {
     
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvClientReport]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "report"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "report"
 }
 
+class JtInvClientSoftware : JtInv {
+
+    [JtIoFolder]$Target = $Null
+    [JtIoFolder]$Source = $Null
+
+    JtInvClientSoftware([JtConfig]$JtConfig) : Base($JtConfig) {
+        $This.ClassName = "JtInvClientSoftware"
+        # output goes directly to c:\_inventory\report
+    }
+
+    [boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        $MyObject = $NUll
+        $MyObject = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort-Object DisplayName 
+        $MyClass = "Uninstall64"
+        [String]$FileNameXml = -join ($MyClass.ToLower(), ".xml")
+        [String]$FileNameTxt = -join ($MyClass.ToLower(), ".txt")
+
+        $FilePathXml = $This.GetFolderTarget().GetFilePath($FileNameXml)
+        $FilePathTxt = $This.GetFolderTarget().GetFilePath($FileNameTxt)
+
+        Write-JtIo -Text ( -join ("Writing TXT-File: ", $FilePathTxt))
+        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -Filepath $FilePathTxt
+
+        Write-JtIo -Text ( -join ("Writing XML-File: ", $FilePathXml))
+        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
+        
+        $MyObject = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort-Object DisplayName 	
+        $MyClass = "Uninstall32"
+        [String]$FileNameXml = -join ($MyClass.ToLower(), ".xml")
+        [String]$FileNameTxt = -join ($MyClass.ToLower(), ".txt")
+        
+        $FilePathXml = $This.GetFolderTarget().GetFilePath($FileNameXml)
+        $FilePathTxt = $This.GetFolderTarget().GetFilePath($FileNameTxt)
+
+        Write-JtIo -Text ( -join ("Writing TXT-File: ", $FilePathTxt))
+        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -Filepath $FilePathTxt
+
+        Write-JtIo -Text ( -join ("Writing XML-File: ", $FilePathXml))
+        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
+
+        return $True
+    }
+
+
+    [String]GetConfigName() {
+        return ""
+    }
+
+    [String]GetReportLabel() {
+        return "software"
+    }
+}
+
+function New-JtInvClientSoftware {
+
+    Param (
+        [Parameter(Mandatory = $false)]
+        [JtConfig]$JtConfig
+    )
+
+    [JtConfig]$JtConfig = New-JtConfig
+    [JtInvClientSoftware]::new([JtConfig]$JtConfig) 
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "software"
+}
+
+
+class JtInvClientTimestamp : JtInv {
+    
+    [String]$MetaLabel
+    
+    JtInvClientTimestamp([JtConfig]$JtConfig, [String]$MyLabel) : Base($JtConfig) {
+        $This.ClassName = "JtInvClientTimestamp"
+        $This.MetaLabel = $MyLabel
+        # Output goes directly to c:\_inventory\report
+
+        $This.DoCreateMetaFile()
+    }
+
+    [boolean]DoIt() {
+        return $true
+    }
+    
+    [boolean]DoCreateMetaFile() {
+        $This.DoLogRepoStart()
+        [String]$Timestamp = Get-JtTimestamp
+        
+        [String]$Content = "Hello world!"
+        [String]$TheLabel = $This.MetaLabel
+        [String]$FileLabel = -join ([JtIo]::FilenamePrefix_Report, ".", $Timestamp, ".", $TheLabel, ".", [JtIo]::FilenameSuffix_Time)
+
+        [JtIoFolder]$FolderTimestamp = $This.FolderReport.GetSubfolder("timestamp", $True)
+        [String]$TargetPath = $FolderTimestamp.GetPath()
+
+        New-JtIoFileMeta -Path $TargetPath -Label $FileLabel -Content $Content
+        return $true
+    }
+ 
+    [Boolean]DoCleanTimestamps() {
+        [String]$MyFilter = -join ("*", ".", $This.Label, ".", [JtIo]::FilenameSuffix_Time, [JtIo]::FilenameExtension_Meta)
+        Write-Host "DoCleanTimestamps"        
+        $This.FolderReport.DoDeleteAllFiles($MyFilter)
+        return $true
+    }
+
+    [String]GetConfigName() {
+        return ""
+    }
+
+    [String]GetReportLabel() {
+        return "timestamp"
+    }
+}
+
+
+Function New-JtInvClientTimestamp {
+
+    Param (
+        [Parameter(Mandatory = $false)]
+        [JtConfig]$JtConfig,
+        [Parameter(Mandatory = $true)]
+        [String]$Label
+    )
+
+    [JtConfig]$JtConfig = New-JtConfig
+    [JtInvClientTimestamp]::new($JtConfig, $Label)
+}
+
+
+
+# $mySoftware = Get-JtInstalledSoftware $env:COMPUTERNAME
 
 
 
@@ -798,137 +918,8 @@ function New-JtInvClientUpdate {
 
     [JtInvClientUpdate]::new([JtConfig]$JtConfig) 
     
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "update"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "update"
 }
-
-
-# $mySoftware = Get-JtInstalledSoftware $env:COMPUTERNAME
-
-class JtInvClientSoftware : JtInv {
-
-    [JtIoFolder]$Target = $Null
-    [JtIoFolder]$Source = $Null
-
-    JtInvClientSoftware([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvClientSoftware"
-        # output goes directly to c:\_inventory\report
-
-        [JtIoFolder]$This.Source = New-JtIoFolderReport
-        [JtIoFolder]$This.Target = $This.Source.GetSubfolder("csv", $True)
-    }
-
-    [boolean]DoIt() {
-        $This.DoLogRepoStart()
-
-        $MyObject = $NUll
-        $MyObject = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort-Object DisplayName 
-        $MyClass = "Uninstall64"
-        [String]$FileNameXml = -join ($MyClass.ToLower(), ".xml")
-        [String]$FileNameTxt = -join ($MyClass.ToLower(), ".txt")
-
-        $FilePathXml = $This.GetFolderTarget().GetFilePath($FileNameXml)
-        $FilePathTxt = $This.GetFolderTarget().GetFilePath($FileNameTxt)
-
-        Write-JtIo -Text ( -join ("Writing TXT-File: ", $FilePathTxt))
-        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -Filepath $FilePathTxt
-
-        Write-JtIo -Text ( -join ("Writing XML-File: ", $FilePathXml))
-        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
-        
-        $MyObject = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort-Object DisplayName 	
-        $MyClass = "Uninstall32"
-        [String]$FileNameXml = -join ($MyClass.ToLower(), ".xml")
-        [String]$FileNameTxt = -join ($MyClass.ToLower(), ".txt")
-        
-        $FilePathXml = $This.GetFolderTarget().GetFilePath($FileNameXml)
-        $FilePathTxt = $This.GetFolderTarget().GetFilePath($FileNameTxt)
-
-        Write-JtIo -Text ( -join ("Writing TXT-File: ", $FilePathTxt))
-        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -Filepath $FilePathTxt
-
-        Write-JtIo -Text ( -join ("Writing XML-File: ", $FilePathXml))
-        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
-
-        return $True
-    }
-
-
-    [String]GetConfigName() {
-        return ""
-    }
-
-    [String]GetReportLabel() {
-        return "software"
-    }
-}
-
-function New-JtInvClientSoftware {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientSoftware]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "software"
-}
-
-
-class JtInvTimestamp : JtInv {
-    
-    [String]$Label
-    
-    JtInvTimestamp([JtConfig]$JtConfig, [String]$MyLabel) : Base($JtConfig) {
-        $This.ClassName = "JtInvTimestamp"
-        $This.Label = $MyLabel
-        # Output goes directly to c:\_inventory\report
-    }
-
-    [boolean]DoIt() {
-        $This.DoLogRepoStart()
-
-        [String]$Timestamp = ""
-        
-        $Timestamp = Get-JtTimestamp
-        
-        [String]$Content = "Hello world!"
-        [String]$FileLabel = -join ([JtIo]::JtInvPrefix_Report, ".", $Timestamp, ".", $This.Label, ".", [JtIo]::JtInvSuffix_Time)
-
-        [String]$TargetPath = $This.Get_JtIoFolder_Report().GetPath()
-        New-JtIoFileMeta -Path $TargetPath -Label $FileLabel -Content $Content
-        return $true
-    }
- 
-    [Boolean]DoCleanTimestamps() {
-        [String]$MyFilter = -join ("*", ".", $This.Label, ".", [JtIo]::JtInvSuffix_Time, [JtIo]::FilenameExtension_Meta)
-        Write-Host "DoCleanTimestamps"        
-        $This.Get_JtIoFolder_Report().DoDeleteAllFiles($MyFilter)
-        return $true
-    }
-
-    [String]GetConfigName() {
-        return ""
-    }
-
-    [String]GetReportLabel() {
-        return "timestamp"
-    }
-}
-
-
-Function New-JtInvTimestamp {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig,
-        [Parameter(Mandatory = $false)]
-        [String]$Label
-    )
-
-    [JtInvTimestamp]::new($JtConfig, $Label)
-}
-
 
 
 class JtInvData : JtInv {
@@ -1051,7 +1042,7 @@ function New-JtInvData {
 
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvData]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "data"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "data"
 }
 
 
@@ -1109,15 +1100,13 @@ function New-JtInvDownload {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvDownload]::new([JtConfig]$JtConfig) 
     
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "download"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "download"
 }
 
 
 
 
 class JtInvFiles : JtInv {
-
-    static [String]$JtInvPrefix_Files = "files"
 
     JtInvFiles ([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvFiles"
@@ -1219,7 +1208,6 @@ class JtInvFiles : JtInv {
             [String]$MyLabel = ""
             if ($Label.Length -lt 1) {
                 $MyLabel = $FolderSource.GetLabelForName()
-                # [String]$CsvLabel = -join ([JtIo]::JtInvPrefix_Files, ".", $MyFolder.GetName())
             }
             else {
                 $MyLabel = $Label
@@ -1282,7 +1270,7 @@ function New-JtInvFiles {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvFiles]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "files"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "files"
 }
 
 
@@ -1370,7 +1358,7 @@ function New-JtInvFolders {
 
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvFolders]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "folders"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "folders"
 
 }
 
@@ -1475,7 +1463,7 @@ function New-JtInvLengths {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvLengths]::new([JtConfig]$JtConfig) 
     
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "lengths"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "lengths"
 }
 
 class JtInvLines : JtInv {
@@ -1557,7 +1545,7 @@ function New-JtInvLines {
 
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvLines]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "lines"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "lines"
 
 }
 
@@ -1646,7 +1634,7 @@ function New-JtInvJtMd {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvJtMd]::new([JtConfig]$JtConfig) 
     
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "JtMd"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "JtMd"
 }
 
 
@@ -1734,7 +1722,7 @@ function New-JtInvMiete {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvMiete]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "miete"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "miete"
 }
 
 
@@ -1792,7 +1780,7 @@ function New-JtInvMirror {
 
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvMirror]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "mirror"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "mirror"
 
 }
 
@@ -1884,12 +1872,11 @@ function New-JtInvPoster {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvPoster]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "poster"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "poster"
 }
 
 class JtInvRecover : JtInv {
 
-    [JtIoFolder]$Folder_Common
     [JtIoFolder]$Folder_C_Inv
 
     JtInvRecover([JtConfig]$JtConfig) : Base($JtConfig) {
@@ -1958,12 +1945,11 @@ function New-JtInvRecover {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvRecover]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "recover"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "recover"
 }
 
 class JtInvRename : JtInv {
 
-    [JtIoFolder]$Folder_Common
     [JtIoFolder]$Folder_C_Inv
 
     JtInvRename([JtConfig]$JtConfig) : Base($JtConfig) {
@@ -2131,7 +2117,7 @@ function New-JtInvRename {
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvRename]::new([JtConfig]$JtConfig) 
 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "rename"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "rename"
 }
 
 
@@ -2139,12 +2125,10 @@ function New-JtInvRename {
 
 class JtInvJtSnapshot : JtInv {
 
-    [JtIoFolder]$Folder_Common
     [JtIoFolder]$Folder_C_Inv
 
     JtInvJtSnapshot([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvJtSnapshot"
-        $This.Folder_Common = $JtConfig.Get_JtIoFolder_Common()
         $This.Folder_C_Inv = $JtConfig.Get_JtIoFolder_Inv()
     }
 
@@ -2199,7 +2183,7 @@ function New-JtInvJtSnapshot {
 
     [JtConfig]$JtConfig = New-JtConfig
     [JtInvJtSnapshot]::new([JtConfig]$JtConfig) 
-    New-JtInvTimestamp -JtConfig $JtConfig -Label "JtSnapshot"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "JtSnapshot"
 }
 
 
@@ -2272,7 +2256,7 @@ function New-JtInvWol {
 
     [JtInvWol]::new([JtConfig]$JtConfig) 
 
-New-JtInvTimestamp -JtConfig $JtConfig -Label "wol"
+New-JtInvClientTimestamp -JtConfig $JtConfig -Label "wol"
 
 }
 

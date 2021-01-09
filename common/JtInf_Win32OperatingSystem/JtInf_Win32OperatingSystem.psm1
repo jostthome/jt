@@ -32,7 +32,6 @@ Function New-JtInit_Inf_Win32OperatingSystem {
     [JtInf_Win32OperatingSystem]$JtInf = New-JtInf_Win32OperatingSystem    
     [String]$Name = "Win32_OperatingSystem"
 
-    $JtIoFolder = New-JtIoFolderReport
     [System.Object]$JtObj = Get-JtXmlReportObject -JtIoFolder $JtIoFolder -Name $Name
 
     $JtInf.OSCaption.SetValue($JtObj.Caption)

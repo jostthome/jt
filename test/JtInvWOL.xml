@@ -1,0 +1,5 @@
+<config>
+	<device name="g13-al-pc-dell" mac="aa:bb:cc:dd:ee:ff">PC Jost</device>
+	<device name="al-dek-nb-dek05" mac="aa:bb:cc:dd:ee:ff">NB Thome</device>
+</config>
+

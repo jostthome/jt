@@ -1,0 +1,5 @@
+<config>
+	<folder source="d:\Seafile\al-apps\apps\Documents\miete" target="d:\Seafile\al-apps\apps\Documents\miete"></folder>
+	<folder source="c:\temp\test1" target="c:\temp\test2"></folder>
+</config>
+

@@ -1,0 +1,7 @@
+<config>
+	<folder label="c.onedrive" source="C:\Users\jostt\OneDrive"></folder>
+	<folder label="d.backup" source="D:\backup"></folder>
+	<folder label="e.backup" source="E:\backup"></folder>
+	<folder label="c.jost" source="C:\_jost"></folder>
+	<folder label="c.users" source="C:\Users"></folder>
+</config>

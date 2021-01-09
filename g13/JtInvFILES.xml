@@ -1,0 +1,5 @@
+<config>
+	<folder label="D_SEAFILE_AL-APPS" filter="*.*" source="D:\Seafile\al-apps" target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></folder>
+	<folder label="FOLDER-Files_in_ONEDRIVE" filter="*.folder" source="%OneDrive%" target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></folder>
+	<folder label="FOLDER-Files_in_ONEDRIVE" filter="*.folder" source="%OneDrive%" target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></folder>
+</config>

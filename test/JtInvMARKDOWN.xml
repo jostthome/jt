@@ -1,0 +1,4 @@
+<config>
+	<folder filter="*.md" source="c:\apps\Documents"></folder>
+</config>
+

@@ -309,16 +309,8 @@ Function New-JtInf_Soft {
 Function New-JtInit_Inf_Soft {
 
     Param (
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [JtIoFolder]$JtIoFolder)
-
-    [JtIoFolder]$IoFolder = $Null
-    if (!($JtIoFolder)) {
-        [JtIoFolder]$IoFolder = New-JtIoFolderReport
-    }
-    else {
-        [JtIoFolder]$IoFolder = $JtIoFolder
-    }        
 
     [String]$Name = "soft"
     [String]$FilterProperty32 = "DisplayName"
@@ -327,8 +319,8 @@ Function New-JtInit_Inf_Soft {
     [String]$FilterProperty64 = "DisplayName"
     [String]$VersionProperty64 = "DisplayVersion"
 
-    [System.Object]$JtObjXml32 = Get-XmlReportSoftware -JtIoFolder $IoFolder -Name "Uninstall32"
-    [System.Object]$JtObjXml64 = Get-XmlReportSoftware -JtIoFolder $IoFolder -Name "Uninstall64"
+    [System.Object]$JtObjXml32 = Get-XmlReportSoftware -JtIoFolder $JtIoFolder -Name "Uninstall32"
+    [System.Object]$JtObjXml64 = Get-XmlReportSoftware -JtIoFolder $JtIoFolder -Name "Uninstall64"
     
     # [System.Object]$JtObjXml32
     # [System.Object]$JtObjXml64
@@ -415,15 +407,8 @@ Function New-JtInf_Soft_InstalledSoftware {
 
 Function New-JtInit_Inf_Soft_InstalledSoftware {
     Param (
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $True)]
         [JtIoFolder]$JtIoFolder)
-
-    if (!($JtIoFolder)) {
-        [JtIoFolder]$IoFolder = $JtIoFolder
-    }
-    else {
-        [JtIoFolder]$IoFolder = New-JtIoFolderReport
-    }
 
     [JtInf_Soft_InstalledSoftware]$Inf = New-JtInf_Soft_InstalledSoftware 
     [String]$Name = "InstalledSoftware"
@@ -438,7 +423,7 @@ Function New-JtInit_Inf_Soft_InstalledSoftware {
     [JtSearchSet_Software]$JtSearchSet = [JtSearchSet_Software]::new()
     $JtSearchSet
             
-    $JtInf = [JtObj]::GetInit($Inf, $Name, $IoFolder, $JtSearchSet, $FilterProperty, $VersionProperty)
+    $JtInf = [JtObj]::GetInit($Inf, $Name, $JtIoFolder, $JtSearchSet, $FilterProperty, $VersionProperty)
     return [JtInf_Soft_InstalledSoftware]$JtInf
 }
 

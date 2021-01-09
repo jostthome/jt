@@ -25,19 +25,12 @@ function New-JtInit_Inf_Win32NetworkAdapter {
     Param (
         [Parameter(Mandatory = $false)]
         [JtIoFolder]$JtIoFolder) 
-    
-        [JtIoFolder]$IoFolder = $Null
-        if(!($JtIoFolder)) {
-            $IoFolder = New-JtIoFolderReport
-        } else {
-            $IoFolder = $JtIoFolder
-        }
         
     [JtInf_Win32NetworkAdapter]$JtInf = New-JtInf_Win32NetworkAdapter
 
     [String]$Name = "Win32_NetworkAdapter"
 
-    [System.Object]$JtObj = Get-JtXmlReportObject -JtIoFolder $IoFolder -Name $Name
+    [System.Object]$JtObj = Get-JtXmlReportObject -JtIoFolder $JtIoFolder -Name $Name
     
     # [String]$Ip = $JtInfi.GetJtInf_AFolder().Ip
  #   [String]$Ip = "130.75.66.999"

@@ -1,13 +1,14 @@
 Set-StrictMode -version latest
 $ErrorActionPreference = "Stop"
 
+New-JtInvClientTimestamp -Label "Hallo"
+exit
 New-JtInvPoster
 exit
 New-JtInvFolders
 
 New-JtInvLines
 exit
-
 
 New-JtInvClientClean
 New-JtInvClientExport 

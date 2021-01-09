@@ -1,0 +1,4 @@
+<config>
+	<folder source="C:\Users\jostt\ccnet\logs" target="d:\Seafile\al-admin\log\seafile\%COMPUTERNAME%">common</folder>
+</config>
+

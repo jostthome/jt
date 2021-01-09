@@ -30,7 +30,6 @@ Function New-JtInit_Inf_Win32Processor {
     [JtInf_Win32Processor]$JtInf = New-JtInf_Win32Processor
     [String]$Name = "Win32_Processor"
 
-    $JtIoFolder = New-JtIoFolderReport
     [System.Object]$JtObj = Get-JtXmlReportObject -JtIoFolder $JtIoFolder -Name $Name
     # $JtObj
     $JtInf.Cpu.SetValue($JtObj.Name)

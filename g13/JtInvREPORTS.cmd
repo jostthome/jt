@@ -1,0 +1,1 @@
+powershell -executionpolicy bypass New-JtInvReports
