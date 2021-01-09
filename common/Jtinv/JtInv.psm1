@@ -18,7 +18,6 @@ class JtInv : JtClass {
     [JtIoFolder]$FolderBase 
     [String]$SystemId = ""
 
-
     JtInv([JtConfig]$JtConfig) {
         $This.ClassName = "Report"
         $This.FolderBase = $JtConfig.Get_JtIoFolder_Base()
