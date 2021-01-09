@@ -5,136 +5,6 @@ using module JtTbl
 using module JtRep
 using module JtReps
 
-class JtCsvTool : JtClass {
-
-    [JtIoFolder]$FolderReports
-    [JtIoFolder]$FoldercombineTarget
-    [System.Collections.ArrayList]$Selection
-
-
-    static [Boolean]IsJtIoFolderInSelection([JtIoFolder]$TheFolder, [System.Collections.ArrayList]$Sel) {
-        if ($Null -eq $Sel) {
-            return $False
-        }
-        [Boolean]$Result = $False
-        foreach ($Element in $Sel) {
-            [String]$TheName = $Element.ToString()
-            [String]$Search = -join ("*", $TheName, "*")
-
-            [String]$FullPath = $TheFolder.GetPath()
-
-            if ($FullPath -like $Search) {
-                return $True
-            }
-        }
-        return $Result
-    }
-
-    static [System.Collections.ArrayList]GetSelectedJtIoFiles([System.Array]$Folders, [System.Collections.ArrayList]$MySelection) {
-        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]@()
-        foreach ($Folder in $Folders) {
-            [JtIoFolder]$JtIoFolder = $Folder
-            $FullPath = $JtIoFolder.GetPath()
-            if ($Null -eq $MySelection) {
-                [JtIoFile]$JtIoFile = New-JtIoFile -Path $FullPath
-                $Result.Add($FullPath)
-            }
-            else {
-                [Boolean]$Compare = [JtCsvTool]::IsJtIoFolderInSelection($JtIoFolder, $MySelection)
-                if ($True -eq $Compare) {
-                    [JtIoFile]$JtIoFile = New-JtIoFile -Path $FullPath
-                    $Result.Add($FullPath)
-                }
-            } 
-        }
-        return $Result
-    }
-
-    static [System.Collections.ArrayList]GetSelectedJtIoFolders([System.Array]$Folders, [System.Collections.ArrayList]$MySelection) {
-        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]@()
-        foreach ($Folder in $Folders) {
-            [JtIoFolder]$JtIoFolder = $Folder
-            if ($Null -eq $MySelection) {
-                $Result.Add($JtIoFolder)
-            }
-            else {
-                [Boolean]$Compare = [JtCsvTool]::IsJtIoFolderInSelection($JtIoFolder, $MySelection)
-                if ($True -eq $Compare) {
-                    $Result.Add($JtIoFolder)
-                }
-            } 
-        }
-        return $Result
-    }
-
-    JtCsvTool([JtIoFolder]$FolderSource, [JtIoFolder]$FolderTarget, [String]$SelectionLabel, [System.Collections.ArrayList]$MySelection) {
-        $This.ClassName = "JtCsvTool"
-        $This.FolderReports = $FolderSource
-        $This.FoldercombineTarget = $FolderTarget.GetSubfolder($SelectionLabel, $True)
-        [System.Collections.ArrayList]$This.Selection = $MySelection
-    }
-    
-    JtCsvTool([JtIoFolder]$FolderSource, [JtIoFolder]$FolderTarget) {
-        $This.ClassName = "JtCsvTool"
-        $This.FolderReports = $FolderSource
-        [String]$SelectionLabel = "all"
-        $This.FoldercombineTarget = $FolderTarget.GetSubfolder($SelectionLabel, $True)
-        [System.Collections.ArrayList]$This.Selection = $Null
-    }
-
-    [Boolean]DoIt() {
-        Write-JtLog -Text ( -join ("DoIt - FoldercombineTarget:", $This.FoldercombineTarget.GetPath()))
-
-        [System.Collections.ArrayList]$AllReports = $This.FolderReports.GetSubfolders($False)
-        [System.Collections.ArrayList]$MyReports = $AllReports
-        if ($This.Selection.Count -gt 0) {
-            [System.Collections.ArrayList]$SelectedReports = [JtCsvTool]::GetSelectedJtIoFolders($AllReports, $This.Selection)
-            [System.Collections.ArrayList]$MyReports = $SelectedReports
-        }
-        
-        [System.Collections.ArrayList]$TheCsvFileNames = $This.GetCsvFilenames()
-        foreach ($FileName in $TheCsvFileNames) {
-            [String]$MyFilename = $FileName
-
-            [System.Collections.ArrayList]$MyCsvFiles = [System.Collections.ArrayList]::new()
-            [System.Collections.ArrayList]$MyCsvFilePaths = [System.Collections.ArrayList]::new()
-            foreach ($Folder in $MyReports) {
-                [JtIoFolder]$MyFolder = $Folder
-                [JtIoFolder]$MyFolderCsv = $MyFolder.GetSubfolder("csv")
-                if(!($Null -eq $MyFolderCsv)) {
-                    [JtIoFile]$JtIoFile = $MyFolderCsv.GetJtIoFile($MyFilename)
-                    if ($JtIoFile.IsExisting()) {
-                        $MyCsvFiles.Add($JtIoFile)
-                        $MyCsvFilePaths.Add($JtIoFile.GetPath())
-                    }
-                }
-            }
-
-            $CsvData = $MyCsvFilePaths | Import-Csv  -Delimiter ([JtUtil]::Delimiter)
-
-            [JtIoFile]$MyOutfile = $This.FoldercombineTarget.GetJtIoFile($MyFilename)
-            Write-JtIo -Text ( -join ("Combining for ", $MyFilename, " to:", $MyOutfile.GetPath()))                
-            # $CsvData | Export-Csv $MyOutfile.GetPath() -NoTypeInformation -Append -Delimiter ([JtUtil]::Delimiter) -Force
-            $CsvData | Export-Csv $MyOutfile.GetPath() -NoTypeInformation -Delimiter ([JtUtil]::Delimiter) -Force
-        }
-        return $True
-    }
-
-    [System.Collections.ArrayList]GetCsvFilenames() {
-        [System.Collections.ArrayList]$MyFilenames = [System.Collections.ArrayList]::new()
-        
-        [System.Collections.ArrayList]$MyReps = [JtReps]::GetReps()
-        foreach ($MyRep in $MyReps) {
-            [JtRep]$Rep = $MyRep
-            $MyFilenames.Add($Rep.GetCsvFilename())
-        }
-
-        return $MyFilenames
-    }
-}
-
-
-
 class JtCsv : JtClass {
     
     [String]$Label = $Null
@@ -159,6 +29,7 @@ class JtCsv : JtClass {
     }
 }
 
+
 class JtCsvWriteArraylist : JtCsv {
     
     [System.Collections.ArrayList]$Objects = $Null
@@ -171,7 +42,6 @@ class JtCsvWriteArraylist : JtCsv {
         [String]$FilePathCsv = $This.GetFilePathCsv()
         Write-JtIo -Text ( -join ("WARNING. Creating ", $MyExtension, " file:", $FilePathCsv))
         $This.Objects | Export-Csv -Path $FilePathCsv -NoTypeInformation -Delimiter ";"
-
     }
 }
 
@@ -242,3 +112,78 @@ Function New-JtCsvWriteTbl {
     $Datatable = Get-JtDataTableFromTable -JtTblTable $JtTblTable
     New-JtCsvWriteData -Label $Label -JtIoFolder $JtIoFolder -Datatable $Datatable
 }
+
+
+
+
+class JtCsvTool : JtClass {
+
+    [JtIoFolder]$FoldercombineTarget
+    [System.Collections.ArrayList]$Reports
+    [String]$SelectionLabel
+    
+
+
+    JtCsvTool([JtIoFolder]$MyFolderReports, [JtIoFolder]$FolderTarget, [String]$SelectionLabel, [System.Collections.ArrayList]$MySelection) {
+        $This.ClassName = "JtCsvTool"
+
+        $This.SelectionLabel = $SelectionLabel
+        $This.FoldercombineTarget = $FolderTarget.GetSubfolder($This.SelectionLabel, $True)
+
+        [System.Collections.ArrayList]$MyReports = $MyFolderReports.GetSelectedSubfolders($MySelection)
+        $This.Reports = $MyReports
+    }
+    
+    JtCsvTool([JtIoFolder]$MyFolderReports, [JtIoFolder]$FolderTarget) {
+        $This.ClassName = "JtCsvTool"
+
+        $This.SelectionLabel = "all"
+        $This.FoldercombineTarget = $FolderTarget.GetSubfolder($This.SelectionLabel, $True)
+
+        $This.Reports = $MyFolderReports.GetSubfolders($False)
+    }
+
+    [Boolean]DoIt() {
+        Write-JtLog -Text ( -join ("DoIt - FoldercombineTarget:", $This.FoldercombineTarget.GetPath()))
+        
+        [System.Collections.ArrayList]$TheCsvFileNames = $This.GetCsvFilenames()
+        foreach ($FileName in $TheCsvFileNames) {
+            [String]$MyFilename = $FileName
+
+            [System.Collections.ArrayList]$MyCsvFiles = [System.Collections.ArrayList]::new()
+            [System.Collections.ArrayList]$MyCsvFilePaths = [System.Collections.ArrayList]::new()
+            foreach ($Folder in $This.Reports) {
+                [JtIoFolder]$MyFolder = $Folder
+                [JtIoFolder]$MyFolderCsv = $MyFolder.GetSubfolder("csv")
+                if(!($Null -eq $MyFolderCsv)) {
+                    [JtIoFile]$JtIoFile = $MyFolderCsv.GetJtIoFile($MyFilename)
+                    if ($JtIoFile.IsExisting()) {
+                        $MyCsvFiles.Add($JtIoFile)
+                        $MyCsvFilePaths.Add($JtIoFile.GetPath())
+                    }
+                }
+            }
+
+            $CsvData = $MyCsvFilePaths | Import-Csv  -Delimiter ([JtUtil]::Delimiter)
+
+            [JtIoFile]$MyOutfile = $This.FoldercombineTarget.GetJtIoFile($MyFilename)
+            Write-JtIo -Text ( -join ("Combining for ", $MyFilename, " to:", $MyOutfile.GetPath()))                
+            # $CsvData | Export-Csv $MyOutfile.GetPath() -NoTypeInformation -Append -Delimiter ([JtUtil]::Delimiter) -Force
+            $CsvData | Export-Csv $MyOutfile.GetPath() -NoTypeInformation -Delimiter ([JtUtil]::Delimiter) -Force
+        }
+        return $True
+    }
+
+    [System.Collections.ArrayList]GetCsvFilenames() {
+        [System.Collections.ArrayList]$MyFilenames = [System.Collections.ArrayList]::new()
+        
+        [System.Collections.ArrayList]$MyReps = [JtReps]::GetReps()
+        foreach ($MyRep in $MyReps) {
+            [JtRep]$Rep = $MyRep
+            $MyFilenames.Add($Rep.GetCsvFilename())
+        }
+
+        return $MyFilenames
+    }
+}
+

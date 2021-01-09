@@ -117,7 +117,7 @@ class JtLog {
         if ([JtLog]::CounterError -lt 1) {
             [String]$Filter = -join("*", [JtLog]::FileNameError)
             [String]$PathReport = [JtLog]::C_inventory_Report
-            # Write-JtIo -Text ( -join ("Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -Text ( -join ("DoPrintError. Deleting content of:", $PathReport, " using filter:", $Filter))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter -File | Remove-Item -Filter $Filter -Force
             }
@@ -128,7 +128,6 @@ class JtLog {
         
         [JtLog]::CounterError = [JtLog]::CounterError + 1
         [String]$Type = "ERROR"
-        # [String]$Message = -join ($Type, " in: ", $This.ClassName, ", NR: ", [JtLog]::CounterError, " : ", $Output)
         [String]$Message = -join ($Type, " in: ", "...", "NR: ", [JtLog]::CounterError, " : ", $Output)
         [String]$MyLine = -join ("* ", $Message)
         
@@ -147,7 +146,7 @@ class JtLog {
         if ([JtLog]::CounterFolder -lt 1) {
             [String]$Filter = [JtLog]::GetFileNameFolder("*")
             [String]$PathReport = [JtLog]::C_inventory_Report
-            # Write-JtIo -Text ( -join ("Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -Text ( -join ("DoPrintFolder. Deleting content of:", $PathReport, " using filter:", $Filter))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter | Remove-Item -Filter $Filter -Force
             }
@@ -158,7 +157,6 @@ class JtLog {
 
         [JtLog]::CounterFolder = [JtLog]::CounterFolder + 1
         [String]$Type = "FOLDER"
-        #[String]$Message = -join ($Type, " in: ", $This.ClassName, ", NR: ", [JtLog]::CounterFolder, " : ", $Output)
         [String]$Message = -join ($Type, " in: ", "...", ", NR: ", [JtLog]::CounterFolder, " : ", $Output)
         [String]$MyLine = -join ("@echo ", $Output)
         
@@ -185,7 +183,7 @@ class JtLog {
         if ([JtLog]::CounterIo -lt 1) {
             [String]$Filter = [JtLog]::GetFileNameIo("*")
             [String]$PathReport = [JtLog]::C_inventory_Report
-            # Write-JtIo -Text ( -join ("Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -ForegroundColor Black -BackgroundColor DarkYellow -Text ( -join ("DoPrintIo. Deleting content of:", $PathReport, " using filter:", $Filter))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter | Remove-Item -Filter $Filter -Force
             }
@@ -196,7 +194,6 @@ class JtLog {
         
         [JtLog]::CounterIo = [JtLog]::CounterIo + 1
         [String]$Type = "IO"
-        # [String]$Message = -join ($Type, " in: ", $This.ClassName, ", NR: ", [JtLog]::CounterIo, " : ", $Output)
         [String]$Message = -join ($Type, " in: ", "...", ", NR: ", [JtLog]::CounterIo, " : ", $Output)
         [String]$MyLine = -join ("* ", $Message)
         
@@ -215,7 +212,7 @@ class JtLog {
         if ([JtLog]::CounterLog -lt 1) {
             [String]$Filter = [JtLog]::GetFileNameLog("*")
             [String]$PathReport = [JtLog]::C_inventory_Report
-            # Write-JtIo -Text ( -join ("Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -Text ( -join ("DoPrintLog. Deleting content of:", $PathReport, " using filter:", $Filter))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter | Remove-Item -Filter $Filter -Force
             }
@@ -226,7 +223,6 @@ class JtLog {
         
         [JtLog]::CounterLog = [JtLog]::CounterLog + 1
         [String]$Type = "LOG"
-        # [String]$Message = -join ($Type, " in: ", $This.ClassName, ", NR: ", [JtLog]::CounterLog, " : ", $Output)
         [String]$Message = -join ($Type, " in: ", "...", ", NR: ", [JtLog]::CounterLog, " : ", $Output)
         [String]$MyLine = -join ("* ", $Message)
 

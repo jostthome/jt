@@ -5,17 +5,17 @@ class JtConfig : JtClass {
 
     [JtIoFolder]$JtIoFolder_Base
     [JtIoFolder]$JtIoFolder_Report
+    [JtIoFolder]$JtIoFolder_Inv
     
     JtConfig() {
         $This.ClassName = "JtConfig"
         Write-JtLog -Text "START!"
         
-        [String]$MyProjectPath = ""
-        $MyProjectPath = Get-JtBasePath
+        [String]$MyProjectPath = Get-JtBasePath
 
-        [JtIoFolder]$This.JtIoFolder_Base = [JtIoFolder]::new($MyProjectPath)
+        $This.JtIoFolder_Base = [JtIoFolder]::new($MyProjectPath)
         $This.JTIoFolder_Report = New-JtIofolderReport
-        $This.DoPrintInfo()
+        $This.JTIoFolder_Inv = New-JtIofolderInv
     }
 
     [Boolean]DoPrintInfo() {
@@ -32,11 +32,11 @@ class JtConfig : JtClass {
     }
 
     [JtIoFolder]Get_JtIoFolder_Inv() {
-        return New-JtIoFolderInv
+        return $This.JtIoFolder_Inv
     }
 
     [JtIoFolder]Get_JtIoFolder_Report() {
-        return New-JtIoFolderReport
+        return $This.JtIoFolderReport
     }
     
 }

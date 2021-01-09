@@ -3,6 +3,9 @@ using module JtUtil
 
 class JtIo : JtClass {
 
+    hidden [String]$Path = ""
+    hidden [Boolean]$BlnExists = $true
+
     static [String]$FilenamePrefix_Anzahl = "zzz"
     static [String]$FilenamePrefix_Area = "zzz"
     static [String]$FilenamePrefix_Count = "zzz"
@@ -27,10 +30,6 @@ class JtIo : JtClass {
     
 
     static hidden [String]$TimestampFormat = "yyyy-MM-dd_HH-mm-ss"
-
-    hidden [String]$Path = ""
-    hidden [Boolean]$BlnExists = $true
-
     static [String]GetComputername() {
         [String]$Result = ""
         $Result = $env:COMPUTERNAME
@@ -98,6 +97,64 @@ class JtIo : JtClass {
         $SystemId = $SystemId.ToLower()
         return $SystemId
     }
+
+
+    static [System.Collections.ArrayList]GetSelectedJtIoFiles([System.Array]$Folders, [System.Collections.ArrayList]$MySelection) {
+        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]@()
+        foreach ($Folder in $Folders) {
+            [JtIoFolder]$JtIoFolder = $Folder
+            $FullPath = $JtIoFolder.GetPath()
+            if ($Null -eq $MySelection) {
+                [JtIoFile]$JtIoFile = New-JtIoFile -Path $FullPath
+                $Result.Add($FullPath)
+            }
+            else {
+                [Boolean]$Compare = [JtIo]::IsJtIoFolderInSelection($JtIoFolder, $MySelection)
+                if ($True -eq $Compare) {
+                    [JtIoFile]$JtIoFile = New-JtIoFile -Path $FullPath
+                    $Result.Add($FullPath)
+                }
+            } 
+        }
+        return $Result
+    }
+    
+
+    static [Boolean]IsJtIoFolderInSelection([JtIoFolder]$TheFolder, [System.Collections.ArrayList]$Sel) {
+        if ($Null -eq $Sel) {
+            return $False
+        }
+        [Boolean]$Result = $False
+        foreach ($Element in $Sel) {
+            [String]$TheName = $Element.ToString()
+            [String]$Search = -join ("*", $TheName, "*")
+
+            [String]$FullPath = $TheFolder.GetPath()
+
+            if ($FullPath -like $Search) {
+                return $True
+            }
+        }
+        return $Result
+    }
+
+    static [System.Collections.ArrayList]GetSelectedJtIoFolders([System.Array]$Folders, [System.Collections.ArrayList]$MySelection) {
+        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]@()
+        foreach ($Folder in $Folders) {
+            [JtIoFolder]$JtIoFolder = $Folder
+            if ($Null -eq $MySelection) {
+                $Result.Add($JtIoFolder)
+            }
+            else {
+                [Boolean]$Compare = [JtIo]::IsJtIoFolderInSelection($JtIoFolder, $MySelection)
+                if ($True -eq $Compare) {
+                    $Result.Add($JtIoFolder)
+                }
+            } 
+        }
+        return $Result
+    }
+
 
     JtIo() {
         $This.ClassName = "JtIo"
@@ -474,7 +531,6 @@ class JtIoFolder : JtIo {
         }
         return $FileDate
     }
-
     JtIoFolder([String]$MyPath) {
         $This.ClassName = "JtIoFolder"
         $This.Path = $MyPath
@@ -882,6 +938,12 @@ class JtIoFolder : JtIo {
     
     [System.Collections.ArrayList]GetSubfolders() {
         return $This.GetSubfolders($False)
+    }
+
+    [System.Collections.ArrayList]GetSelectedSubfolders([System.Collections.ArrayList]$MySelection) {
+        [System.Collections.ArrayList]$TheSubfolders = $This.GetSubfolders($False)
+        [System.Collections.ArrayList]$TheSelectedFolders = [JtIo]::GetSelectedJtIoFolders($TheSubfolders, $MySelection)
+        return $TheSelectedFolders
     }
     
     [System.Collections.ArrayList]GetSubfolders([Boolean]$Recurse) {

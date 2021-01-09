@@ -20,10 +20,9 @@ class JtInv : JtClass {
     [String]$SystemId = ""
 
     JtInv([JtConfig]$JtConfig) {
-        $This.ClassName = "Report"
+        $This.ClassName = "JtInv"
         $This.FolderReport = $JtConfig.Get_JtIoFolder_Report()
         $This.FolderBase = $JtConfig.Get_JtIoFolder_Base()
-        $This.DoLogRepoStart()
         $This.DoIt()
     }
     
@@ -209,7 +208,7 @@ class JtInvClientConfig : JtInv {
         $This.ClassName = "JtInvClientConfig"
         $JtConfig.DoPrintInfo()
     }
-
+    
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
 
@@ -800,11 +799,11 @@ class JtInvClientTimestamp : JtInv {
     }
 
     [boolean]DoIt() {
+        $This.DoLogRepoStart()
         return $true
     }
     
     [boolean]DoCreateMetaFile() {
-        $This.DoLogRepoStart()
         [String]$Timestamp = Get-JtTimestamp
         
         [String]$Content = "Hello world!"
@@ -1547,11 +1546,11 @@ function New-JtInvLines {
 
 }
 
-class JtInvJtMd : JtInv {
+class JtInvMd : JtInv {
 
 
-    JtInvJtMd ([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvJtMd"
+    JtInvMd ([JtConfig]$JtConfig) : Base($JtConfig) {
+        $This.ClassName = "JtInvMd"
     }
 
 
@@ -1622,7 +1621,7 @@ class JtInvJtMd : JtInv {
 }
 
 
-function New-JtInvJtMd {
+function New-JtInvMd {
 
     Param (
         [Parameter(Mandatory = $false)]
@@ -1630,7 +1629,7 @@ function New-JtInvJtMd {
     )
     
     [JtConfig]$JtConfig = New-JtConfig
-    [JtInvJtMd]::new([JtConfig]$JtConfig) 
+    [JtInvMd]::new([JtConfig]$JtConfig) 
     
     New-JtInvClientTimestamp -JtConfig $JtConfig -Label "JtMd"
 }
@@ -2259,11 +2258,11 @@ New-JtInvClientTimestamp -JtConfig $JtConfig -Label "wol"
 }
 
 
-class JtInvMasterCombine : JtInv {
+class JtInvClientCombine : JtInv {
 
     
-    JtInvMasterCombine([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvMasterCombine"
+    JtInvClientCombine([JtConfig]$JtConfig) : Base($JtConfig) {
+        $This.ClassName = "JtInvClientCombine"
     }
 
     [Boolean]DoIt() {
@@ -2357,7 +2356,7 @@ class JtInvMasterCombine : JtInv {
 }
 
 
-Function New-JtInvCombine {
+Function New-JtInvClientCombine {
     Param (
         [Parameter(Mandatory = $false)]
         [JtConfig]$JtConfig
@@ -2365,17 +2364,17 @@ Function New-JtInvCombine {
         
         
         [JtConfig]$JtConfig = New-JtConfig
-        [JtInvMasterCombine]::new([JtConfig]$JtConfig) 
+        [JtInvClientCombine]::new([JtConfig]$JtConfig) 
 }
 
 
 
 
 
-class JtInvMasterReports : JtInv {
+class JtInvClientReports : JtInv {
 
-    JtInvMasterReports([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvMasterReports"
+    JtInvClientReports([JtConfig]$JtConfig) : Base($JtConfig) {
+        $This.ClassName = "JtInvClientReports"
     }
 
     [Boolean]DoIt() {
@@ -2433,7 +2432,7 @@ Function New-JtInvClientReports {
         )
         
         [JtConfig]$JtConfig = New-JtConfig
-        [JtInvMasterReports]::new([JtConfig]$JtConfig) 
+        [JtInvClientReports]::new([JtConfig]$JtConfig) 
 
     return $Gen.DoIt()
 }
