@@ -13,15 +13,13 @@ class JtConfig : JtClass {
         [String]$MyProjectPath = ""
         $MyProjectPath = Get-JtBasePath
 
-        Write-JtLog -Text ( -join ("ProjectPath:", $MyProjectPath))
-
         [JtIoFolder]$This.JtIoFolder_Base = [JtIoFolder]::new($MyProjectPath)
         $This.JTIoFolder_Report = New-JtIofolderReport
         $This.DoPrintInfo()
     }
 
     [Boolean]DoPrintInfo() {
-        Write-Host "SHOULD BE LIKE: Get_JtIoFolder_Base   : D:\Seafile\al-apps\apps\inventory"
+#        Write-Host "SHOULD BE LIKE: Get_JtIoFolder_Base   : D:\Seafile\al-apps\apps\inventory"
         Write-JtLog (-join("Get_JtIoFolder_Base   : ", $This.Get_JtIoFolder_Base().GetPath()))
         return $True
     }

@@ -1148,6 +1148,7 @@ class JtInvFiles : JtInv {
         }
         return $JtTblRow
     }
+    
 
     [Boolean]DoWriteCsvFileIn([System.Collections.ArrayList]$Files, [String]$MyLabel, [String]$MyTemplate, [JtIoFolder]$MyTarget) {
         [JtTblTable]$JtTblTable = New-JtTblTable -Label "FileTable"      
@@ -1230,16 +1231,10 @@ class JtInvFiles : JtInv {
         return $true
     }
 
-
-
     [String]GetConfigName() {
         return "JtInvFILES"
     }
     
-    [String]GetReportLabel() {
-        return "files"
-    }
-
 
 
     [System.Collections.ArrayList]GetFiles([JtIoFolder]$JtIoFolder, [String]$Filter) {
@@ -1256,6 +1251,10 @@ class JtInvFiles : JtInv {
             [System.Collections.ArrayList]$Files = $JtIoFolder.GetJtIoFiles($True)
         }
         return $Files
+    }
+
+    [String]GetReportLabel() {
+        return "files"
     }
 }
 
@@ -1404,7 +1403,6 @@ class JtInvLengths : JtInv {
                 
             [JtTblTable]$JtTblTable = $This.GetTable($FolderSource)
 
-            # [System.Data.Datatable]$Datatable = Get-JtDataTableFromTable -JtTableTable $JtTblTable
             [System.Collections.ArrayList]$List = $JtTblTable.GetObjects() | Sort-Object -Property @{e = { $_.Length -as [int] } } -Descending
 
             [String]$Label = $Entity.label

@@ -240,7 +240,5 @@ Function New-JtCsvWriteTbl {
 
     # $Datatable = Get-JtDataTableFromTable -JtTblTable $JtTblTable
     $Datatable = Get-JtDataTableFromTable -JtTblTable $JtTblTable
-    $Datatable
-
     New-JtCsvWriteData -Label $Label -JtIoFolder $JtIoFolder -Datatable $Datatable
 }

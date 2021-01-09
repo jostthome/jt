@@ -60,7 +60,6 @@ Class JtFolderSummaryAll : JtFolderSummary {
             $FileCountAll = 0 
 
             $JtTblRow.Add("Name", $MyFolder.GetName())
-
             $JtTblRow.Add("Label", $This.Label)
             
             [Array]$ExpectedTypes = $This.Expected.Split(",")
