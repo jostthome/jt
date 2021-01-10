@@ -1,7 +1,7 @@
 using module JtImageMagick
 
 
-function New-CustomizeLoginImages() {
+function New-JtCustomizeLoginImages() {
     
     Param (
         [Parameter(Mandatory = $True)]
@@ -20,64 +20,64 @@ function New-CustomizeLoginImages() {
     $MySystem = "win10p"
     $MyUser = "inventory"
     $MyBackground = "red"
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
 
     $MyGeneration = "g"
     $MySystem = "win10p"
     $MyUser = "pool"
     $MyBackground = $BackgroundNormal
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "g"
     $MySystem = "win10p"
     $MyUser = "inventory"
     $MyBackground = $MyBackgroundInventory
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "g"
     $MySystem = "win10p-spezial"
     $MyUser = "pool"
     $MyBackground = $BackgroundSpezial
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "g"
     $MySystem = "win10p-spezial"
     $MyUser = "inventory"
     $MyBackground = $MyBackgroundInventory
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "h"
     $MySystem = "win10p"
     $MyUser = "pool"
     $MyBackground = $BackgroundNormal
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "h"
     $MySystem = "win10p"
     $MyUser = "inventory"
     $MyBackground = $MyBackgroundInventory
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "h"
     $MySystem = "win10p-spezial"
     $MyUser = "pool"
     $MyBackground = $BackgroundSpezial
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
         
     $MyGeneration = "h"
     $MySystem = "win10p-spezial"
     $MyUser = "inventory"
     $MyBackground = $MyBackgroundInventory
-    New-ImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
+    New-JtImageMagickItemLogin -OutputFolder $OutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser -Background $MyBackground
 
 }
 
-New-CustomizeLoginImages -Path "D:\Seafile\al-apps\apps\1.SETUP\111.CUSTOMIZE\1111.POOLS" 
+New-JtCustomizeLoginImages -Path "D:\Seafile\al-apps\apps\1.SETUP\111.CUSTOMIZE\1111.POOLS" 

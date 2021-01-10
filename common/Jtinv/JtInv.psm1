@@ -344,7 +344,7 @@ class JtInvClientExport  : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("reports")) {
+        foreach ($entity in $ConfigXml.getElementsByTagName("export")) {
             # [String]$JtInfo = $entity.'#text'
 
             [JtIoFolder]$FolderExport = $Null
@@ -2398,14 +2398,6 @@ class JtInvClientReports : JtInv {
                 return $False
             }
 
-            # [String]$Target = $Entity.target
-            # $Target = $Target.Replace("%OneDrive%", $env:OneDrive)
-            # [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target)
-            # if (!($FolderExport.IsExisting())) {
-            #     Write-JtError -Text ( -join ("Error!!! Target missing; please edit XML for:", $FolderExport.GetPath()))
-            #     return $False
-            # }
-                
             Write-JtLog -Text ( -join ("Using FolderSource (for reports):", $FolderSource.GetPath()))
             $Subfolders = $FolderSource.GetSubfolders($False)
             foreach ($Folder in $Subfolders) {

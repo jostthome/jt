@@ -1,6 +1,6 @@
 using module JtImageMagick
 
-function New-ImageMagickItemNumbers {
+function New-JtImageMagickItemNumbers {
     [String]$Background = "silver"
 
     [String]$OutputFolder = "D:\Seafile\al-apps\apps\Documents\numbers\0_to_9"
@@ -18,4 +18,4 @@ function New-ImageMagickItemNumbers {
     }
 }
 
-New-ImageMagickItemNumbers
+New-JtImageMagickItemNumbers

@@ -1003,6 +1003,40 @@ function New-JtIoFileMeta {
     $Content | Out-File -FilePath $OutputFilePath -Encoding utf8
 }
 
+function New-JtIoFileVersionMeta {
+        
+    Param (
+        [Parameter(Mandatory = $true)]
+        [String]$Path,
+        [Parameter(Mandatory = $False)]
+        [String]$Content
+    )
+
+    [String]$MyContent
+    if (!($Content)) {
+        $MyContent = "Hello World!"
+    }
+    else {
+        $MyContent = $Content
+    }
+
+    [String]$MyPath = ConvertTo-JtExpandedPath $Path
+    
+
+    [String]$MyType = "version"
+    [String]$MyTimestamp = Get-JtDate
+    [String]$MyLabel = -join("_", $MyTimestamp, ".", "version")
+    [String]$MyFilter = -join("*", ".", $MyType, [JtIo]::FilenameExtension_Meta)
+    [JtIoFolder]$TargetFolder = New-JtIoFolder -Path $MyPath
+    
+    $TargetFolder.DoDeleteAllFiles($MyFilter)
+
+    New-JtIoFileMeta -Path $MyPath -Label $MyLabel -Content $MyContent
+
+}
+
+
+
 
 Function New-JtIoFolder {
     Param (
@@ -1025,5 +1059,5 @@ Function New-JtIoFolderReport {
     New-JtIoFolder -Path "c:\_inventory\report" -Force $True
 }
 
-Export-ModuleMember -Function New-JtIo, New-JtIoFile, New-JtIoFileCsv, New-JtIoFileMeta, New-JtIoFolder, New-JtIoFolderInv, New-JtIofolderReport
+Export-ModuleMember -Function New-JtIo, New-JtIoFile, New-JtIoFileCsv, New-JtIoFileMeta, New-JtIoFileVersionMeta, New-JtIoFolder, New-JtIoFolderInv, New-JtIofolderReport
 

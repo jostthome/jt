@@ -117,7 +117,7 @@ class JtLog {
         if ([JtLog]::CounterError -lt 1) {
             [String]$Filter = -join("*", [JtLog]::FileNameError)
             [String]$PathReport = [JtLog]::C_inventory_Report
-            Write-Host -Text ( -join ("DoPrintError. Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host (-join ("DoPrintError. Deleting content of:", $PathReport, " using filter:", $Filter))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter -File | Remove-Item -Filter $Filter -Force
             }
@@ -300,4 +300,13 @@ function Get-JtTimestamp {
     Return $Timestamp
  
 }
+
+function Get-JtDate {
+    
+    $D = Get-Date
+    [String]$Timestamp = $D.toString("yyyy-MM-dd")
+    Return $Timestamp
+ 
+}
+
 

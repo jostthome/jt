@@ -420,7 +420,7 @@ function New-ImageMagickItemIcon {
 }
 
 
-function New-ImageMagickItemLogin {
+function New-JtImageMagickItemLogin {
 
     param (
         [Parameter()]

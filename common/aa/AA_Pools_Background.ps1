@@ -1,6 +1,6 @@
 using module JtImageMagick
 
-function New-CustomizeBackgroundImages() {
+function New-JtCustomizeBackgroundImages() {
     
     Param (
         [Parameter(Mandatory = $True)]
@@ -59,7 +59,7 @@ function New-CustomizeBackgroundImages() {
 }
 
 
-New-CustomizeBackgroundImages -Path "D:\Seafile\al-apps\apps\1.SETUP\111.CUSTOMIZE\1111.POOLS" 
+New-JtCustomizeBackgroundImages -Path "D:\Seafile\al-apps\apps\1.SETUP\111.CUSTOMIZE\1111.POOLS" 
 
 
 

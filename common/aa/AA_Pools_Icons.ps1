@@ -1,7 +1,7 @@
 using module JtImageMagick
 
 
-function New-ImageMagickItemIcons {
+function New-JtImageJtMagickItemIcons {
     [String]$Background = "grey"
 
     [String]$OutputFolder = "D:\Seafile\al-cad-20w\3.POSTER\39.DUMMY_SQUARE.POSTER\a.square_2100x2100"
@@ -34,4 +34,4 @@ function New-ImageMagickItemIcons {
 
 }
 
-New-ImageMagickItemIcons
+New-JtImageJtMagickItemIcons
