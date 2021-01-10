@@ -189,10 +189,10 @@ Function New-JtInvClientClean {
     Param (
         [Parameter(Mandatory = $false)]
         [JtConfig]$JtConfig
-        )
+    )
 
-        [JtConfig]$JtConfig = New-JtConfig
-        [JtInvClientClean]::new([JtConfig]$JtConfig) 
+    [JtConfig]$JtConfig = New-JtConfig
+    [JtInvClientClean]::new([JtConfig]$JtConfig) 
 
     New-JtInvClientTimestamp -JtConfig $JtConfig -Label "clean"
 }
@@ -344,7 +344,7 @@ class JtInvClientExport  : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($entity in $ConfigXml.getElementsByTagName("reports")) {
             # [String]$JtInfo = $entity.'#text'
 
             [JtIoFolder]$FolderExport = $Null
@@ -384,7 +384,7 @@ class JtInvClientExport  : JtInv {
 }
 
 
-function New-JtInvClientExport  {
+function New-JtInvClientExport {
 
     Param (
         [Parameter(Mandatory = $false)]
@@ -2253,7 +2253,7 @@ function New-JtInvWol {
 
     [JtInvWol]::new([JtConfig]$JtConfig) 
 
-New-JtInvClientTimestamp -JtConfig $JtConfig -Label "wol"
+    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "wol"
 
 }
 
@@ -2283,7 +2283,7 @@ class JtInvClientCombine : JtInv {
         [JtIoFolder]$FolderSource = $null
         [JtIoFolder]$FolderExport = $null
 
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($Entity in $ConfigXml.getElementsByTagName("combine")) {
             # [String]$JtInfo = $Entity.'#text'
 
             [String]$Source = $Entity.source
@@ -2323,6 +2323,8 @@ class JtInvClientCombine : JtInv {
             ForEach ($MyFile in $SelectionFiles) {
                 [JtIoFile]$SelectionFile = $MyFile
 
+                Write-JtLog ( -join ("SelectionFile: ", $SelectionFile.GetPath()))
+
                 [String]$ColumnName = "SystemId"
 
                 [JtIoFileCsv]$JtIoFileCsv = New-JtIoFileCsv -Path $SelectionFile.GetPath()
@@ -2346,7 +2348,7 @@ class JtInvClientCombine : JtInv {
     }
 
     [String]GetConfigName() {
-        return "JtInvCOMBINE"
+        return "JtInvClient"
     }
 
     [String]GetReportLabel() {
@@ -2360,11 +2362,11 @@ Function New-JtInvClientCombine {
     Param (
         [Parameter(Mandatory = $false)]
         [JtConfig]$JtConfig
-        )
+    )
         
         
-        [JtConfig]$JtConfig = New-JtConfig
-        [JtInvClientCombine]::new([JtConfig]$JtConfig) 
+    [JtConfig]$JtConfig = New-JtConfig
+    [JtInvClientCombine]::new([JtConfig]$JtConfig) 
 }
 
 
@@ -2385,7 +2387,7 @@ class JtInvClientReports : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($Entity in $ConfigXml.getElementsByTagName("reports")) {
             # [String]$JtInfo = $Entity.'#text'
 
             [String]$Source = $Entity.source
@@ -2417,7 +2419,7 @@ class JtInvClientReports : JtInv {
 
 
     [String]GetConfigName() {
-        return "JtInvClientReportS"
+        return "JtInvClient"
     }
   
     [String]GetReportLabel() {
@@ -2429,12 +2431,13 @@ Function New-JtInvClientReports {
     Param (
         [Parameter(Mandatory = $false)]
         [JtConfig]$JtConfig
-        )
+    )
         
-        [JtConfig]$JtConfig = New-JtConfig
-        [JtInvClientReports]::new([JtConfig]$JtConfig) 
+    [JtConfig]$JtConfig = New-JtConfig
+    [JtInvClientReports]$Inv = [JtInvClientReports]::new([JtConfig]$JtConfig) 
+    $Inv.DoIt()
 
-    return $Gen.DoIt()
+    return $True
 }
 
 
@@ -2673,7 +2676,7 @@ Function New-JtInvVersion {
     New-JtRobocopy -Source "%OneDrive%\0.INVENTORY\common" -Target "D:\Seafile\al-apps\apps\inventory\common"
     [String]$Timestamp = Get-JtTimestamp
     New-JtIoFileMeta -Path "%OneDrive%\0.INVENTORY\common" -Label $Timestamp
-pause
+    pause
 }
 
 
