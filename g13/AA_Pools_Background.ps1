@@ -20,42 +20,42 @@ function New-JtCustomizeBackgroundImages() {
     [String]$MyGeneration = "g"
     [String]$MySystem = "win10p"
     [String]$MyUser = "inventory"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
 
     $MyGeneration = "g"
     $MySystem = "win10p"
     $MyUser = "pool"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
         
     $MyGeneration = "g"
     $MySystem = "win10p-spezial"
     $MyUser = "inventory"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
         
     $MyGeneration = "g"
     $MySystem = "win10p-spezial"
     $MyUser = "pool"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
         
     $MyGeneration = "h"
     $MySystem = "win10p"
     $MyUser = "inventory"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
         
     $MyGeneration = "h"
     $MySystem = "win10p"
     $MyUser = "pool"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
         
     $MyGeneration = "h"
     $MySystem = "win10p-spezial"
     $MyUser = "inventory"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
         
     $MyGeneration = "h"
     $MySystem = "win10p-spezial"
     $MyUser = "pool"
-    New-ImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
+    New-JtImageMagickItemBackground -OutputFolder $MyOutputFolder -Generation $MyGeneration -System $MySystem -User $MyUser 
 }
 
 

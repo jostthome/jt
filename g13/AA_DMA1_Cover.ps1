@@ -26,7 +26,7 @@ function New-JtPdfWebCovers {
         [JtIoFile]$TheFile = $MyFile
         [String]$FolderPath = $TheFile.GetPathOfFolder()
         [JtIoFolder]$MyFolder = New-JtIoFolder -Path $FolderPath
-        New-ImageMagickItemCover -InputFolder $Source -FolderWork $Target -Filename $TheFile.GetName()
+        New-JtImageMagickItemCover -InputFolder $Source -FolderWork $Target -InputFilename $TheFile.GetName()
     }
 }
 

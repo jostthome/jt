@@ -136,6 +136,21 @@ function New-JtOverview_3c {
     $JtImageTool.DoMatrixJpgs("c", "d", 8)
 }
 
+function New-JtOverview_4a {
+    param (
+        [Parameter()]
+        [String]$FolderSource, 
+        [Parameter()]
+        [String]$FolderWork
+    )
+
+    [JtImageTool]$JtImageTool = New-JtImageTool -FolderSource $FolderSource -FolderWork $FolderWork
+    $JtImageTool.DoStartIn("a")
+    $JtImageTool.DoPdf2Jpg("a", "b")
+    $JtImageTool.DoExtendJpgs("b", "c", 2100, 2970)
+    $JtImageTool.DoMatrixJpgs("c", "d", 8)
+}
+
 
 function New-JtPosterRect {
 

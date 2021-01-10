@@ -2,18 +2,18 @@ using module JtClass
 using module JtTbl
 using module JtIo
 
-class ImageMagick : JtClass {
+class JtImageMagick : JtClass {
     
     [JtTblRow]$JtTblRow = $Null
-    [String]$ConvertExe = "c:\apps\tools\imageMagick\convert.exe"
-    [String]$CompositeExe = "c:\apps\tools\imageMagick\composite.exe"
+    [String]$ConvertExe = "c:\apps\tools\ImageMagick\convert.exe"
+    [String]$CompositeExe = "c:\apps\tools\ImageMagick\composite.exe"
     [String]$InputFolder = ""
     [String]$OutputFolder = ""
     [String]$InputFileName = ""
     [String]$OutputFileName = ""
     
-    ImageMagick([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) {
-        $This.ClassName = "ImageMagick"
+    JtImageMagick([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) {
+        $This.ClassName = "JtImageMagick"
         $This.JtTblRow = New-JtTblRow
         $This.InputFolder = $MyInputFolder
         $This.OutputFolder = $MyOutputFolder
@@ -53,8 +53,8 @@ class ImageMagick : JtClass {
         [Int16]$Thousand = 1000 + $I
         [String]$ThreeDigits = -join("", $Thousand )
         $ThreeDigits = [String]$ThreeDigits.SubString(1,3)
-        $Filename = -join("img", $ThreeDigits, ".jpg")
-        return $Filename
+        [String]$MyFilename = -join("img", $ThreeDigits, ".jpg")
+        return $MyFilename
     }
 
     AddParameter([String]$Parameter, [String]$Value) {
@@ -106,15 +106,15 @@ class ImageMagick : JtClass {
 
 }
 
-class ImageMagickComposite : ImageMagick {
+class JtImageMagickComposite : JtImageMagick {
     
     [String]$Params = ""
     [String]$Output = ""
     [String]$Source2Folder = ""
     [String]$Source2Filename = ""
     
-    ImageMagickComposite([String]$MyInputFolder, [String]$MyInputFilename,  [String]$MySource2Folder, [String]$MySource2Filename, [String]$MyOutputFolder, [String]$MyOutputFilename) : Base ([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) {
-        $This.ClassName = "ImageMagickComposite"
+    JtImageMagickComposite([String]$MyInputFolder, [String]$MyInputFilename,  [String]$MySource2Folder, [String]$MySource2Filename, [String]$MyOutputFolder, [String]$MyOutputFilename) : Base ([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) {
+        $This.ClassName = "JtImageMagickComposite"
         $This.Source2Folder = $MySource2Folder
         $This.Source2Filename = $MySource2Filename
     }
@@ -130,13 +130,13 @@ class ImageMagickComposite : ImageMagick {
         [String]$ArgumentList = -join ($This.GetParams(), " ", $FilePathInput1, " ", $FilePathInput2, " ", $OutputFilePath)
         
         Write-JtLog -Text ($ArgumentList)
-        Write-JtIo -Text ( -join ("ImageMagick composite: ", $OutputFilePath))
+        Write-JtIo -Text ( -join ("JtImageMagick composite: ", $OutputFilePath))
         Start-Process  -FilePath $This.CompositeExe  -ArgumentList $ArgumentList -NoNewWindow  -Wait
         return $True
     }
 }
 
-function New-ImageMagickComposite {
+function New-JtImageMagickComposite {
 
     param (
         [Parameter()]
@@ -153,16 +153,16 @@ function New-ImageMagickComposite {
         [String]$OutputFilename
     )
 
-    [ImageMagickComposite]::new($InputFolder, $InputFilename, $OutputFolder, $OutputFilename, $Source2Folder, $Source2Filename)
+    [JtImageMagickComposite]::new($InputFolder, $InputFilename, $OutputFolder, $OutputFilename, $Source2Folder, $Source2Filename)
 }
 
 
-class ImageMagickConvert : ImageMagick {
+class JtImageMagickConvert : JtImageMagick {
     
     [String]$Params = ""
     
-    ImageMagickConvert([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) : Base ([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) {
-        $This.ClassName = "ImageMagickConvert"
+    JtImageMagickConvert([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) : Base ([String]$MyInputFolder, [String]$MyInputFilename, [String]$MyOutputFolder, [String]$MyOutputFilename) {
+        $This.ClassName = "JtImageMagickConvert"
     }
 
     SetBackground([String]$Value) {
@@ -221,14 +221,14 @@ class ImageMagickConvert : ImageMagick {
         [String]$ArgumentList = -join ($This.GetParams(), " ", $InputFilePath, "  ", $OutputFilePath)
         
         
-        Write-JtLog -Text ($ArgumentList)
-        Write-JtIo -Text ( -join ("ImageMagick convert: ", $OutputFilePath))
+        Write-JtIo -Text ( -join ("JtImageMagick convert: ", $OutputFilePath))
+        Write-JtLog -Text ( -join ("ArgumentList: ", $ArgumentList))
         Start-Process  -FilePath $This.ConvertExe  -ArgumentList $ArgumentList -NoNewWindow  -Wait
         return $True
     }
 }
 
-function New-ImageMagickConvert {
+function New-JtImageMagickConvert {
 
     param(
         [Parameter(Mandatory = $false)]
@@ -241,13 +241,13 @@ function New-ImageMagickConvert {
         [String]$OutputFilename
     )
 
-    [ImageMagickConvert]::new($InputFolder, $InputFilename, $OutputFolder, $OutputFilename)
+    [JtImageMagickConvert]::new($InputFolder, $InputFilename, $OutputFolder, $OutputFilename)
 }
 
-class ImageMagickItem : JtClass {
+class JtImageMagickItem : JtClass {
 
-    ImageMagickItem() {
-        $This.ClassName = "ImageMagickItem"
+    JtImageMagickItem() {
+        $This.ClassName = "JtImageMagickItem"
     }
 
     [Boolean]DoWrite() {
@@ -257,7 +257,7 @@ class ImageMagickItem : JtClass {
     }
 }
 
-class ImageMagickItemBackground : ImageMagickItem {
+class JtImageMagickItemBackground : JtImageMagickItem {
 
     [String]$Generation = $Null
     [String]$System = $Null
@@ -265,8 +265,8 @@ class ImageMagickItemBackground : ImageMagickItem {
     [String]$OutputFolder = $Null
     [String]$TemplateFolder
     
-    ImageMagickItemBackground([String]$MyOutputFolder, [String]$MyGeneration, [String]$MySystem, [String]$MyUser) : Base() {
-        $This.ClassName = "ImageMagickItemBackground"
+    JtImageMagickItemBackground([String]$MyOutputFolder, [String]$MyGeneration, [String]$MySystem, [String]$MyUser) : Base() {
+        $This.ClassName = "JtImageMagickItemBackground"
         $This.OutputFolder = -join ($MyOutputfolder, "\", "BACKGROUND")
         New-JtIoFolder -Path $This.OutputFolder -Force $True
         $This.TemplateFolder = -join ($MyOutputfolder, "\", "TEMPLATE")
@@ -285,18 +285,18 @@ class ImageMagickItemBackground : ImageMagickItem {
         [String]$MyDateFilename = -join ("_", $This.Generation, ".", $This.System, ".", $This.User, ".", "date.jpg")
         [String]$MyOutputFilename = $MyDateFilename
         
-        [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert  -OutputFolder $MyOutputFolder  -OutputFilename $MyOutputFilename
-        $ImageMagickConvert.SetSize(1500, 30)
-        $ImageMagickConvert.SetFont("Arial")
-        $ImageMagickConvert.SetGravity("NorthWest")
-        $ImageMagickConvert.SetPointsize(20)
-        $ImageMagickConvert.SetBackground("black")
-        $ImageMagickConvert.SetFill("white")
+        [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert  -OutputFolder $MyOutputFolder  -OutputFilename $MyOutputFilename
+        $JtImageMagickConvert.SetSize(1500, 30)
+        $JtImageMagickConvert.SetFont("Arial")
+        $JtImageMagickConvert.SetGravity("NorthWest")
+        $JtImageMagickConvert.SetPointsize(20)
+        $JtImageMagickConvert.SetBackground("black")
+        $JtImageMagickConvert.SetFill("white")
         
         $D = Get-Date
         $MyLabel = -join ("             System: ", $This.System, "     User: ", $This.User, "     Version: ", $D.toString("yyyy-MM-dd"))
-        $ImageMagickConvert.SetLabel($MyLabel)
-        $ImageMagickConvert.DoWrite()
+        $JtImageMagickConvert.SetLabel($MyLabel)
+        $JtImageMagickConvert.DoWrite()
         
         return $MyOutputFilename
     }
@@ -306,13 +306,13 @@ class ImageMagickItemBackground : ImageMagickItem {
         [String]$MyOutputFolder = -join ($This.OutputFolder)
         
         [String]$MyOutputFilename = $MyFilenameDisclaimer
-        [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert  -OutputFolder $MyOutputFolder -OutputFilename $MyOutputFilename
-        $ImageMagickConvert.SetSize(1500, 30)
-        $ImageMagickConvert.SetFont("Arial")
-        $ImageMagickConvert.SetGravity("NorthEast")
-        $ImageMagickConvert.SetPointsize(20)
-        $ImageMagickConvert.SetBackground("black")
-        $ImageMagickConvert.SetFill("white")
+        [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert  -OutputFolder $MyOutputFolder -OutputFilename $MyOutputFilename
+        $JtImageMagickConvert.SetSize(1500, 30)
+        $JtImageMagickConvert.SetFont("Arial")
+        $JtImageMagickConvert.SetGravity("NorthEast")
+        $JtImageMagickConvert.SetPointsize(20)
+        $JtImageMagickConvert.SetBackground("black")
+        $JtImageMagickConvert.SetFill("white")
 
         [String]$MyLabel = ""
         if ($This.System -eq "win10p") {
@@ -321,29 +321,29 @@ class ImageMagickItemBackground : ImageMagickItem {
         else {
             $MyLabel = "Bitte Computer neu starten, um auf ALLE Anwendungen Zugriff zu haben..." 
         }
-        $ImageMagickConvert.SetLabel($MyLabel)
-        $ImageMagickConvert.DoWrite()
+        $JtImageMagickConvert.SetLabel($MyLabel)
+        $JtImageMagickConvert.DoWrite()
         return $MyOutputFilename
     }
     
 
-    [String]DoWriteImageTitleLeft([String]$Filename, [String]$Folder2, [String]$File2) {
+    [String]DoWriteImageTitleLeft([String]$MyFilename, [String]$Folder2, [String]$File2) {
         [String]$MyOutputFolder = -join ($This.OutputFolder)
         [String]$MyOutputFilename = -join ("_", $This.Generation, ".", $This.System, ".", $This.User, ".", "title.jpg")
 
-        [ImageMagickComposite]$ImageMagickComposite = New-ImageMagickComposite -InputFolder $MyOutputFolder -InputFileName $Filename -OutputFolder $MyOutputFolder -OutputFilename $MyOutputFilename -Source2Folder $Folder2 -Source2Filename $File2
-        $ImageMagickComposite.SetGravity("NorthWest")
-        $ImageMagickComposite.DoWrite()
+        [JtImageMagickComposite]$JtImageMagickComposite = New-JtImageMagickComposite -InputFolder $MyOutputFolder -InputFileName $MyFilename -OutputFolder $MyOutputFolder -OutputFilename $MyOutputFilename -Source2Folder $Folder2 -Source2Filename $File2
+        $JtImageMagickComposite.SetGravity("NorthWest")
+        $JtImageMagickComposite.DoWrite()
         return $MyOutputFilename
     }
 
-    [String]DoWriteImageTitleRight([String]$Filename, [String]$Folder2, [String]$File2) {
+    [String]DoWriteImageTitleRight([String]$MyFilename, [String]$Folder2, [String]$File2) {
         [String]$MyOutputFolder = -join ($This.OutputFolder)
         [String]$MyOutputFilename = -join ($This.Generation, ".", $This.System, ".", $This.User, ".", "background.jpg")
 
-        [ImageMagickComposite]$ImageMagickComposite = New-ImageMagickComposite -InputFolder $MyOutputFolder -InputFileName $Filename -OutputFolder $MyOutputFolder -OutputFilename $MyOutputFilename -Source2Folder $Folder2 -Source2Filename $File2
-        $ImageMagickComposite.SetGravity("NorthEast")
-        $ImageMagickComposite.DoWrite()
+        [JtImageMagickComposite]$JtImageMagickComposite = New-JtImageMagickComposite -InputFolder $MyOutputFolder -InputFileName $MyFilename -OutputFolder $MyOutputFolder -OutputFilename $MyOutputFilename -Source2Folder $Folder2 -Source2Filename $File2
+        $JtImageMagickComposite.SetGravity("NorthEast")
+        $JtImageMagickComposite.DoWrite()
         return $MyOutputFilename
     }
     
@@ -360,7 +360,7 @@ class ImageMagickItemBackground : ImageMagickItem {
     }
 }
 
-function New-ImageMagickItemBackground {
+function New-JtImageMagickItemBackground {
     
     param (
         [Parameter(Mandatory = $true)]
@@ -373,13 +373,13 @@ function New-ImageMagickItemBackground {
         [String]$User
     )
 
-    [ImageMagickItemBackground]$ImageMagickItemBackground = [ImageMagickItemBackground]::new($OutputFolder, $Generation, $System, $User)
-    $ImageMagickItemBackground.DoWrite()
+    [JtImageMagickItemBackground]$JtImageMagickItemBackground = [JtImageMagickItemBackground]::new($OutputFolder, $Generation, $System, $User)
+    $JtImageMagickItemBackground.DoWrite()
 
 }
 
 
-function New-ImageMagickItemIcon {
+function New-JtImageMagickItemIcon {
 
     param (
         [Parameter(Mandatory = $true)]
@@ -400,22 +400,22 @@ function New-ImageMagickItemIcon {
 
     New-JtIoFolder -Path $OutputFolder -Force $True
 
-    [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert -OutputFolder $OutputFolder -OutputFilename $OutputFilename
-    $ImageMagickConvert.SetFont("Arial")
-    $ImageMagickConvert.SetSize($X, $Y)
-    $ImageMagickConvert.SetGravity("Center")
+    [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert -OutputFolder $OutputFolder -OutputFilename $OutputFilename
+    $JtImageMagickConvert.SetFont("Arial")
+    $JtImageMagickConvert.SetSize($X, $Y)
+    $JtImageMagickConvert.SetGravity("Center")
         
     # Pointsize??
-    $ImageMagickConvert.SetPointsize($Size)
+    $JtImageMagickConvert.SetPointsize($Size)
     if ($Null -eq $Background) {
         $Background = "red"
     }
-    $ImageMagickConvert.SetBackground($Background)
-    $ImageMagickConvert.SetFill("white")
+    $JtImageMagickConvert.SetBackground($Background)
+    $JtImageMagickConvert.SetFill("white")
 
-    $ImageMagickConvert.SetLabel($Label)
+    $JtImageMagickConvert.SetLabel($Label)
 
-    $ImageMagickConvert.DoWrite()
+    $JtImageMagickConvert.DoWrite()
     return $False
 }
 
@@ -442,16 +442,16 @@ function New-JtImageMagickItemLogin {
 
     New-JtIoFolder -Path $MyOutputFolder -Force $True
 
-    [String]$Filename = -join ($Generation, ".", $System, ".", $User, ".png")
-    [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert -OutputFolder $MyOutputFolder -OutputFilename $Filename
-    $ImageMagickConvert.SetFont("Arial")
-    $ImageMagickConvert.SetSize(250, 250)
-    $ImageMagickConvert.SetGravity("Center")
+    [String]$MyFilename = -join ($Generation, ".", $System, ".", $User, ".png")
+    [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert -OutputFolder $MyOutputFolder -OutputFilename $MyFilename
+    $JtImageMagickConvert.SetFont("Arial")
+    $JtImageMagickConvert.SetSize(250, 250)
+    $JtImageMagickConvert.SetGravity("Center")
         
     # Pointsize??
-    $ImageMagickConvert.SetPointsize(65)
-    $ImageMagickConvert.SetBackground($Background)
-    $ImageMagickConvert.SetFill("white")
+    $JtImageMagickConvert.SetPointsize(65)
+    $JtImageMagickConvert.SetBackground($Background)
+    $JtImageMagickConvert.SetFill("white")
 
     [String]$Classification = ""
     if ($System -eq "win10p") {
@@ -469,13 +469,13 @@ function New-JtImageMagickItemLogin {
         $D = Get-Date
         $Label = -join ($D.toString("yyyy"), "\n", $D.toString("MM"), "\n", $D.toString("dd"))
     }
-    $ImageMagickConvert.SetLabel($Label)
+    $JtImageMagickConvert.SetLabel($Label)
 
-    $ImageMagickConvert.DoWrite()
+    $JtImageMagickConvert.DoWrite()
     return $False
 }
 
-function New-ImageMagickItemPdf {
+function New-JtImageMagickItemPdf {
 
     param (
         [Parameter(Mandatory = $True)]
@@ -488,26 +488,26 @@ function New-ImageMagickItemPdf {
     )
 
     [String]$MyInputFilename = -join ($InputFilename, "[0]")
-    [String]$OutputFilename = $Filename.Replace(".pdf", ".jpg")
+    [String]$OutputFilename = $InputFilename.Replace(".pdf", ".jpg")
 
-    [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert -InputFolder $Inputfolder -InputFilename $MyInputFilename -OutputFolder $OutputFolder -OutputFilename $OutputFilename
-    Write-JtLog ( -join ("... New-ImageMagickItemPdf - InputFolder:", $InputFolder, " InputFilename:", $MyInputFilename))
+    [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert -InputFolder $Inputfolder -InputFilename $MyInputFilename -OutputFolder $OutputFolder -OutputFilename $OutputFilename
+    Write-JtLog ( -join ("... New-JtImageMagickItemPdf - InputFolder:", $InputFolder, " InputFilename:", $MyInputFilename))
         
-    $ImageMagickConvert.SetColorspace("rgb")
-    $ImageMagickConvert.SetDepth(8)
-    $ImageMagickConvert.SetDensity(300)
-    $ImageMagickConvert.DoWrite()
+    $JtImageMagickConvert.SetColorspace("rgb")
+    $JtImageMagickConvert.SetDepth(8)
+    $JtImageMagickConvert.SetDensity(300)
+    $JtImageMagickConvert.DoWrite()
 }
 
-function New-ImageMagickItemCover {
+function New-JtImageMagickItemCover {
 
     param (
         [Parameter(Mandatory = $True)]
         [String]$InputFolder, 
         [Parameter(Mandatory = $True)]
-        [String]$FolderWork,
+        [String]$InputFilename,
         [Parameter(Mandatory = $True)]
-        [String]$OutputFilename
+        [String]$FolderWork
     )
 
     New-JtIoFolder -Path $FolderWork -Force $True
@@ -521,20 +521,20 @@ function New-ImageMagickItemCover {
     [String]$FolderWorkC = -join ($FolderWork, "\", "c")
     New-JtIoFolder -Path $FolderWorkC -Force $True
 
-    New-ImageMagickItemPdf -InputFolder $Inputfolder -OutputFolder $FolderWorkA -OutputFilename $OutputFilename
+    New-JtImageMagickItemPdf -InputFolder $Inputfolder -InputFilename $InputFilename -OutputFolder $FolderWorkA 
 
-    New-ImageMagickItemResize -InputFolder $FolderWorkA -OutputFolder $FolderWorkB -OutputFilename $OutputFilename -X1 1920 -Y1 1080
+    New-JtImageMagickItemResize -InputFolder $FolderWorkA  -InputFilename $InputFilename -OutputFolder $FolderWorkB -X1 1920 -Y1 1080
     
-    New-ImageMagickItemResize -InputFolder $FolderWorkB -OutputFolder $FolderWorkC -OutputFilename $OutputFilename -X1 384 -Y1 216
+    New-JtImageMagickItemResize -InputFolder $FolderWorkB -InputFilename $InputFilename -OutputFolder $FolderWorkC -X1 384 -Y1 216
 }
 
-function New-ImageMagickItemResize {
+function New-JtImageMagickItemResize {
 
     param (
         [Parameter(Mandatory = $True)]
         [String]$InputFolder, 
         [Parameter(Mandatory = $True)]
-        [String]$Filename,
+        [String]$InputFilename,
         [Parameter(Mandatory = $True)]
         [String]$OutputFolder, 
         [Parameter(Mandatory = $True)]
@@ -543,12 +543,12 @@ function New-ImageMagickItemResize {
         [Int16]$Y1
     )
 
-    [String]$InputFilename = $Filename
-    [String]$OutputFilename = $Filename
-    [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert -InputFolder $InputFolder -InputFilename $InputFilename -OutputFolder $OutputFolder -OutputFilename $OutputFilename
-    $ImageMagickConvert.SetResize($X1, $Y1)
-    $ImageMagickConvert.SetExtent($X1, $Y1)
-    $ImageMagickConvert.DoWrite()
+    [String]$InputFilename = $InputFilename
+    [String]$OutputFilename = $InputFilename
+    [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert -InputFolder $InputFolder -InputFilename $InputFilename -OutputFolder $OutputFolder -OutputFilename $OutputFilename
+    $JtImageMagickConvert.SetResize($X1, $Y1)
+    $JtImageMagickConvert.SetExtent($X1, $Y1)
+    $JtImageMagickConvert.DoWrite()
     return $False
 }
 
@@ -584,20 +584,20 @@ class JtImageTool : JtClass {
         foreach ($File in $Files) {
             # [String]$Source = $File.Fullname
             
-            [String]$Filename = $File.name
+            [String]$MyFilename = $File.name
             
 
-            $Msg = -join ("   ... creating: ", $Filename, " in: ", $TargetJpg)
+            $Msg = -join ("   ... creating: ", $MyFilename, " in: ", $TargetJpg)
             Write-Host $Msg
             
             # [String]$Args1 = -Join ("  -extend ", $MyY1, "x", $MyY1, "! -crop ", $MyY1, "x", $MyY1, " -background red ", $Source, " ", $Target )
 
-            [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert -InputFolder $SourceJpg -OutputFolder $TargetJpg -InputFilename $Filename -OutputFilename $Filename
-            $ImageMagickConvert.SetCrop($MyX1, $MyY1)
-            $ImageMagickConvert.SetBackground("white")
-            $ImageMagickConvert.DoWrite()
+            [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert -InputFolder $SourceJpg -OutputFolder $TargetJpg -InputFilename $MyFilename -OutputFilename $MyFilename
+            $JtImageMagickConvert.SetCrop($MyX1, $MyY1)
+            $JtImageMagickConvert.SetBackground("white")
+            $JtImageMagickConvert.DoWrite()
             
-            #    c:\apps\tools\imageMagick\convert.exe %1.jpg %1.jpg.pdf
+            #    c:\apps\tools\JtImageMagick\convert.exe %1.jpg %1.jpg.pdf
         }
         return $True
     }
@@ -614,18 +614,18 @@ class JtImageTool : JtClass {
         $Files = Get-ChildItem -Path $SourceJpg
         
         foreach ($File in $Files) {
-            [String]$Filename = $File.name
+            [String]$MyFilename = $File.name
             
             # [String]$Args1 = -Join ("  -extend ", $MyY1, "x", $MyY1, "! -crop ", $MyY1, "x", $MyY1, " -background red ", $Source, " ", $Target )
             
-            [ImageMagickConvert]$ImageMagickConvert = New-ImageMagickConvert -InputFolder $SourceJpg -OutputFolder $TargetJpg -InputFilename $Filename -OutputFilename $Filename
-            $ImageMagickConvert.SetResize($MyY1, $MyY1)
-            $ImageMagickConvert.SetExtent($MyY1, $MyX1)
-            $ImageMagickConvert.SetGravity("center")
-            $ImageMagickConvert.SetBackground("white")
-            $ImageMagickConvert.DoWrite()
+            [JtImageMagickConvert]$JtImageMagickConvert = New-JtImageMagickConvert -InputFolder $SourceJpg -OutputFolder $TargetJpg -InputFilename $MyFilename -OutputFilename $MyFilename
+            $JtImageMagickConvert.SetResize($MyY1, $MyY1)
+            $JtImageMagickConvert.SetExtent($MyY1, $MyX1)
+            $JtImageMagickConvert.SetGravity("center")
+            $JtImageMagickConvert.SetBackground("white")
+            $JtImageMagickConvert.DoWrite()
             
-            #    c:\apps\tools\imageMagick\convert.exe %1.jpg %1.jpg.pdf
+            #    c:\apps\tools\JtImageMagick\convert.exe %1.jpg %1.jpg.pdf
         }
         return $True
     }
@@ -685,12 +685,12 @@ class JtImageTool : JtClass {
             [String]$Source = $File.Fullname
             # Use only first page in pdf
             
-            [String]$Filename = $File.name
+            [String]$MyFilename = $File.name
 
-            New-ImageMagickItemPdf -InputFolder $SourcePdf -OutputFolder $TargetJpg -Filename $Filename 
+            New-JtImageMagickItemPdf -InputFolder $SourcePdf -InputFilename $MyFilename -OutputFolder $TargetJpg 
             
             # Start-Process -FilePath $This.ConvertExe  -ArgumentList $Args1 -NoNewWindow -Wait
-            #    c:\apps\tools\imageMagick\convert.exe %1.jpg %1.jpg.pdf
+            #    c:\apps\tools\JtImageMagick\convert.exe %1.jpg %1.jpg.pdf
         }
         return $True
     }
