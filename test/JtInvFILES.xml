@@ -1,4 +1,0 @@
-<config>
-	<folder label="CSV_in_report" filter="*.csv" template="PARENT_NAME.NAME.EXTENSION.PATH" source="c:\_inventory\report\csv"></folder>
-</config>
-

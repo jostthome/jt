@@ -1,5 +1,0 @@
-<config>
-	<folder filter="*.md" label="apps_documents_markdown" pattern="^(http(s)??\:\/\/)?(www\.)?((youtube\.com\/watch\?v=)|(youtu.be\/))([a-zA-Z0-9\-_])+" source="c:\apps\Documents\markdown"></folder>
-	<folder filter="*.web.md" label="apps_documents" pattern="[\[][A-Za-z0-9_]*[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))" source="c:\apps\Documents"></folder>
-</config>
-
