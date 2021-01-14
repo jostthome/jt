@@ -1,5 +1,5 @@
 using module  JtIoFolder 
-using module  JtFolderRenderer
+using module  JtIndex
 using module  JtPreisliste
 using module  JtTbl
 
@@ -9,8 +9,8 @@ $ErrorActionPreference = "Stop"
 
 Write-JTLog ("Miete")
 [JtIoFolder]$JtIoFolder = New-JtIoFolder -Path "C:\apps\Documents\miete\Beispiel_Miete1"
-[JtFolderRenderer]$JtFolderRenderer = [JtFolderRenderer_Miete]::new($JtIoFolder)
-Write-Host $JtFolderRenderer.GetInfo()
+[JtIndex]$JtIndex = [JtIndex_Zahlung]::new($JtIoFolder)
+Write-Host $JtIndex.GetInfo()
 New-JtInvMiete
 
 exit 
@@ -19,22 +19,22 @@ exit
 Write-JTLog ("Poster")
 [JtPreisliste]$JtPreisliste = New-JtPreisliste_Plotten_2020_07_01 
 [JtIoFolder]$JtIoFolder = New-JtIoFolder -Path "C:\apps\Documents\poster\Beispiel_Poster"
-[JtFolderRenderer]$JtFolderRenderer = [JtFolderRenderer_Poster]::new($JtIoFolder, $JtPreisliste)
-$JtFolderRenderer.GetInfo()
-Write-Host $JtFolderRenderer.GetMdDoc()
+[JtIndex]$JtIndex = [JtIndex_BxH]::new($JtIoFolder, $JtPreisliste)
+$JtIndex.GetInfo()
+Write-Host $JtIndex.GetMdDoc()
 
 
 Write-JTLog ("Lizenzen")
 [JtIoFolder]$JtIoFolder = New-JtIoFolder -Path "C:\apps\Documents\folder\Beispiel_Lizenzen"
-[JtFolderRenderer]$JtFolderRenderer = [JtFolderRenderer_Count]::new($JtIoFolder)
-Write-Host $JtFolderRenderer.GetInfo()
-# Write-Host $JtFolderRenderer.GetMdDoc()
+[JtIndex]$JtIndex = [JtIndex_Anzahl]::new($JtIoFolder)
+Write-Host $JtIndex.GetInfo()
+# Write-Host $JtIndex.GetMdDoc()
 
 Write-JTLog ("Rechnungen")
 [JtIoFolder]$JtIoFolder = New-JtIoFolder -Path "C:\apps\Documents\folder\Beispiel_Rechnungen1"
-[JtFolderRenderer]$JtFolderRenderer = [JtFolderRenderer_Sum]::new($JtIoFolder)
-Write-Host $JtFolderRenderer.GetInfo()
-# Write-Host $JtFolderRenderer.GetMdDoc()
+[JtIndex]$JtIndex = [JtIndex_Anzahl]::new($JtIoFolder)
+Write-Host $JtIndex.GetInfo()
+# Write-Host $JtIndex.GetMdDoc()
 
 
 

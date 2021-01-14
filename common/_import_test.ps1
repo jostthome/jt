@@ -9,7 +9,7 @@ Import-Module JtConfig -Verbose -NoClobber
 Import-Module JtCsv -Verbose -NoClobber
 Import-Module JtCsvGenerator -Verbose -NoClobber
 Import-Module JtFacFolderRen -Verbose -NoClobber
-Import-Module JtFolderRenderer -Verbose -NoClobber
+Import-Module JtIndex -Verbose -NoClobber
 Import-Module JtFolderSummary -Verbose -NoClobber
 Import-Module JtImageMagick -Verbose -NoClobber
 Import-Module JtInf -Verbose -NoClobber

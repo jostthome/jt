@@ -1,5 +1,5 @@
  
-using module JtFolderRenderer
+using module JtIndex
 using module JtPreisliste
 using module JtTbl
 using module JtTemplateFile
@@ -45,7 +45,7 @@ foreach($MyFile in $NormalFiles) {
 $c = $JtTemplateFile.GetJtColRens()
 $c
 
-# [JtFolderRenderer]$JtFolderRenderer = [JtFolderRenderer_Poster]::new($JtIoFolder, $JtPreisliste)
-# $JtFolderRenderer.GetInfo()
-# Write-Host $JtFolderRenderer.GetMdDoc()
+# [JtIndex]$JtIndex = [JtIndex_BxH]::new($JtIoFolder, $JtPreisliste)
+# $JtIndex.GetInfo()
+# Write-Host $JtIndex.GetMdDoc()
 exit

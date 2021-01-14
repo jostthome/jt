@@ -5,7 +5,7 @@ using module JtTbl
 using module JtUtil
 using module JtCsvGenerator
 using module JtCsv
-using module JtFolderRenderer
+using module JtIndex
 using module JtTemplateFile
 using module JtMd
 using module JtSnapshot
@@ -56,14 +56,13 @@ class JtInv : JtClass {
 
     [Xml]GetConfigXml() {
         [String]$MyConfigName = $This.GetConfigName()
-        Write-JtLog ( -Join ("IN:", $This.ClassName, "GetConfigXml; FolderBase:", $This.FolderBase.GetPath(), " Config:", $This.GetConfigName()))        
         if ($MyConfigName.Length -lt 1) {
             Write-JtError -Text ("ConfigFolderName not set!")
             Throw "This should not happen."
         }
-
-        [String]$FilePathXml =        
-        $FilePathXml = -join ($This.FolderBase.GetPath(), "\", $MyConfigName, ".xml")
+        
+        [String]$FilePathXml = -join ($This.FolderBase.GetPath(), "\", $MyConfigName, ".xml")
+        Write-JtLog ( -Join ("IN:", $This.ClassName, "GetConfigXml; FilePathXml:", $FilePathXml))        
         [JtIoFile]$JtIoFile = New-JtIoFile -Path $FilePathXml
         if ($JtIoFile.IsExisting()) {
             [FileElementXml]$FileElementXml = [FileElementXml]::new($JtIoFile)
@@ -1185,7 +1184,7 @@ class JtInvFiles : JtInv {
             Write-JtLog -Text ( -join ("Source:", $Source))
 
             if ($False -eq $FolderSource.IsExisting()) {
-                Write-JtError -Text ( -join ("Error in JtInvFiles GenerteCsvForFolder. Please edit XML in files!!!!"))
+                Write-JtError -Text ( -join ($This.ClassName, ". Error in GenerateCsvForFolder. Please edit XML in files!!!!"))
                 Write-JtError -Text ( -join ("Path not found:", $FolderSource.GetPath()))
                 return $False
             }
@@ -1289,21 +1288,53 @@ class JtInvFolders : JtInv {
         }
 
 
+        [Hashtable]$Hashtable = New-Object Hashtable
         foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
             # [String]$JtInfo = $Entity.'#text'
 
             [String]$Source = $Entity.source
             $Source = ConvertTo-JtExpandedPath $Source
+            [JtIoFolder]$FolderSource = New-JtIoFolder -Path $Source
+            if (!($FolderSource.IsExisting())) {
+                Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderSource.GetPath()))
+                return $False
+            }
+            Write-JtLog -Text ( -join ("FolderSource:", $FolderSource.GetPath()))
+
+            Get-JtIoFolderTypes -Path $FolderSource.GetPath()
+                
+            [JtIoFolder]$FolderExport = $Null
+            [String]$Target = $Entity.target
+            $Target = ConvertTo-JtExpandedPath $Target
+            if ($Target.Length -gt 0) {
+                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
+            }
+            else {
+                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
+            }
+            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
+
+            $HashTable.Add($Source, $target)
+        } 
+
+$Hashtable
+
+
+        foreach ($Source in $Hashtable.keys) {
+            # [String]$JtInfo = $Entity.'#text'
+
             [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
             if (!($FolderSource.IsExisting())) {
                 Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderSource.GetPath()))
                 return $False
             }
             Write-JtLog -Text ( -join ("FolderSource:", $FolderSource.GetPath()))
+
+            Get-JtIoFolderTypes -Path $FolderSource.GetPath()
                 
             [JtIoFolder]$FolderExport = $Null
             [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
+            $Target = $HashTable.item($source)
             if ($Target.Length -gt 0) {
                 [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
             }
@@ -1320,15 +1351,19 @@ class JtInvFolders : JtInv {
                 Write-JtLog -Text ( -join ("Path of FolderFile:", $MyFile.GetPath()))
 
                 [JtFacFolderRen]$JtFacFolderRen = [JtFacFolderRen]::new($FileFolder)
-                [JtFolderRenderer]$JtFolderRenderer = $JtFacFolderRen.GetJtFolderRenderer()
-                Write-JtLog -Text ( -join ("Kind of folder: ", $JtFacFolderRen.GetKind()))
-                Write-JtLog -Text ( -join ("Info for folder: ", $JtFolderRenderer.GetInfo()))
-                Write-JtLog -Text ( -join ("Check for folder: ", $JtFolderRenderer.DoCheckFolder()))
-                Write-JtLog -Text ( -join ("Clean special files... ", $JtFolderRenderer.DoCleanFilesInFolder()))
-                Write-JtLog -Text ( -join ("Create special file... ", $JtFolderRenderer.DoWriteSpecialFileInFolder()))
-                Write-JtLog -Text ( -join ("Create special file in... ", $FolderExport.GetPath(), " - ", $JtFolderRenderer.DoWriteSpecialFileIn($FolderExport)))
-                Write-JtLog -Text ( -join ("Create table CSV file... ", $JtFolderRenderer.DoWriteCsvFileInFolder()))
-                Write-JtLog -Text ( -join ("Create table CSV file in... ", $FolderExport.GetPath(), " - ", $JtFolderRenderer.DoWriteCsvFileIn($FolderExport)))
+                [JtIndex]$JtIndex = $JtFacFolderRen.GetJtIndex()
+
+                [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($FileFolder)
+                $JtIndex.DoIt($JtIoFolder)
+                
+                # Write-JtLog -Text ( -join ("Kind of folder: ", $JtFacFolderRen.GetKind()))
+                # Write-JtLog -Text ( -join ("Info for folder: ", $JtIndex.GetInfo()))
+                # Write-JtLog -Text ( -join ("Check for folder: ", $JtIndex.DoCheckFolder()))
+                # Write-JtLog -Text ( -join ("Clean special files... ", $JtIndex.DoCleanFilesInFolder()))
+                # Write-JtLog -Text ( -join ("Create special file... ", $JtIndex.DoWriteSpecialFileInFolder()))
+                # Write-JtLog -Text ( -join ("Create special file in... ", $FolderExport.GetPath(), " - ", $JtIndex.DoWriteSpecialFileIn($FolderExport)))
+                # Write-JtLog -Text ( -join ("Create table CSV file... ", $JtIndex.DoWriteCsvFileInFolder()))
+                # Write-JtLog -Text ( -join ("Create table CSV file in... ", $FolderExport.GetPath(), " - ", $JtIndex.DoWriteCsvFileIn($FolderExport)))
                 
             }
         } 
@@ -1375,11 +1410,11 @@ class JtInvLengths : JtInv {
             return $False
         }
 
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($Entity in $ConfigXml.getElementsByTagName("lengths")) {
             # [String]$JtInfo = $Entity.'#text'
 
             [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
+            $Source = ConvertTo-JtExpandedPath -Path $Source
             Write-JtLog -Text ( -join ("Source:", $Source))
             [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
             if (!($FolderSource.IsExisting())) {
@@ -1390,7 +1425,7 @@ class JtInvLengths : JtInv {
                 
             [JtIoFolder]$FolderExport = $Null
             [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
+            $Target = ConvertTo-JtExpandedPath -Path $Target
             if ($Target.Length -gt 0) {
                 [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
             }
@@ -1478,7 +1513,7 @@ class JtInvLines : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($entity in $ConfigXml.getElementsByTagName("lines")) {
             # [String]$JtInfo = $entity.'#text'
 
             [String]$Source = $entity.source
@@ -1562,7 +1597,7 @@ class JtInvMd : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($Entity in $ConfigXml.getElementsByTagName("md")) {
             # [String]$JtInfo = $Entity.'#text'
     
             [String]$Source = $Entity.source
@@ -1637,7 +1672,7 @@ function New-JtInvMd {
 
 class JtInvMiete : JtInv {
 
-    [String]$TemplateFileExtension = [JtIo]::FilenameExtension_Whg
+    [String]$TemplateFileExtension = [JtIo]::FilenameExtension_Folder
 
     JtInvMiete ([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvMiete"
@@ -1674,17 +1709,17 @@ class JtInvMiete : JtInv {
                 [JtIoFolder]$JtIoFolderMiete = $MyFolder
                 # $JtIoFolderMiete.DoOptimizeFilenames()
 
-                [JtTemplateFile]$JtTemplateFile = Get-JtTemplateFile -JtIoFolder $JtIoFolderMiete -Extension $This.TemplateFileExtension
+                [JtTemplateFile]$JtTemplateFile = Get-JtTemplateFile -JtIoFolder $JtIoFolderMiete
 
                 Write-JtLog ( -join ($This.ClassName, " Folder:", $MyFolder.GetPath()))
 
                 if ($JtTemplateFile.IsValid()) {
-                    [JtFolderRenderer_Miete]$JtFolderRenderer = [JtFolderRenderer_Miete]::new($JtIoFolderMiete)
-                    $JtFolderRenderer.DoWriteInFolder()
-                    $JtFolderRenderer.DoWriteMdFile()
-                    $JtFolderRenderer.DoWriteSpecialFileIn($FolderTarget.GetSubfolder("sum", $True))
-                    $JtFolderRenderer.DoWriteMdFileIn($FolderTarget.GetSubfolder("md", $True))
-                    $JtFolderRenderer.DoWriteCsvFileIn($FolderTarget.GetSubfolder("csv", $True))
+                    [JtIndex_Zahlung]$JtIndex = [JtIndex_Zahlung]::new($JtIoFolderMiete)
+                    $JtIndex.DoWriteInFolder()
+                    $JtIndex.DoWriteMdFile()
+                    $JtIndex.DoWriteSpecialFileIn($FolderTarget.GetSubfolder("sum", $True))
+                    $JtIndex.DoWriteMdFileIn($FolderTarget.GetSubfolder("md", $True))
+                    $JtIndex.DoWriteCsvFileIn($FolderTarget.GetSubfolder("csv", $True))
                 }
             }
         } 
@@ -1737,7 +1772,7 @@ class JtInvMirror : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($entity in $ConfigXml.getElementsByTagName("mirror")) {
             # [String]$JtInfo = $entity.'#text'
                 
             [String]$Source = $entity.source
@@ -1786,30 +1821,12 @@ class JtInvPoster : JtInv {
 
     [String]$ExtensionFolder = ".job"
 
-    [JtPreisliste]$JtPreisliste = $Null
 
     JtInvPoster ([JtConfig]$JtConfig) : Base($JtConfig) {
         $This.ClassName = "JtInvPoster"
-        $This.JtPreisliste = New-JtPreisliste_Plotten_2020_07_01
     }
 
 
-    [Boolean]DoPrepareJtTemplateFiles([JtIoFolder]$JtIoFolder) {
-        foreach ($MyFolder in $JtIoFolder.GetSubfolders($False)) {
-            [JtIoFolder]$JtIoFolderJob = $MyFolder
-
-            [String]$MyFilter = -join ("*", [JtIo]::FilenameExtension_Poster)
-            [System.Collections.ArrayList]$FolderFiles = $JtIoFolderJob.GetJtIoFilesWithFilter($MyFilter) 
-
-            if ($FolderFiles.Count -eq 0) {
-                [String]$JtTemplateFileName = $This.JtPreisliste.TemplateFileName
-                [String]$JtTemplateFilePath = $JtIoFolderJob.GetFilePath($JtTemplateFileName)
-
-                "Hello world!" | Out-File -FilePath $JtTemplateFilePath -Encoding utf8
-            }
-        }
-        return $True
-    }
 
     [Boolean]DoIt () {
         $This.DoLogRepoStart()
@@ -1820,7 +1837,7 @@ class JtInvPoster : JtInv {
             return $False
         }
 
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($Entity in $ConfigXml.getElementsByTagName("poster")) {
             # [String]$JtInfo = $Entity.'#text'
 
             [String]$Source = $Entity.source
@@ -1833,14 +1850,9 @@ class JtInvPoster : JtInv {
                 return $False
             }
 
-            $This.DoPrepareJtTemplateFiles($FolderSource)
-            foreach ($MyFolder in $FolderSource.GetSubfolders($False)) {
-                [JtIoFolder]$JtIoFolderJob = $MyFolder
-                $JtIoFolderJob.DoOptimizeFilenames()
-
-                [JtFolderRenderer_Poster]$JtFolderRenderer = [JtFolderRenderer_Poster]::new($JtIoFolderJob, $This.JtPreisliste)
-                $JtFolderRenderer.DoWriteInFolder()
-                $JtFolderRenderer.DoWriteMdFile()
+            foreach ($Folder in $FolderSource.GetSubfolders($False)) {
+                [JtIoFolder]$JtIoFolder = $Folder
+                New-JtIndex_BxH -Path $JtIoFolder.GetPath()        
             }
         } 
         return $true
@@ -2120,12 +2132,12 @@ function New-JtInvRename {
 
 
 
-class JtInvJtSnapshot : JtInv {
+class JtInvSnapshot : JtInv {
 
     [JtIoFolder]$Folder_C_Inv
 
-    JtInvJtSnapshot([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvJtSnapshot"
+    JtInvSnapshot([JtConfig]$JtConfig) : Base($JtConfig) {
+        $This.ClassName = "JtInvSnapshot"
         $This.Folder_C_Inv = $JtConfig.Get_JtIoFolder_Inv()
     }
 
@@ -2137,7 +2149,7 @@ class JtInvJtSnapshot : JtInv {
         if ($Null -eq $ConfigXml) {
             return $False
         }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
+        foreach ($Entity in $ConfigXml.getElementsByTagName("snapshot")) {
             # [String]$JtInfo = $Entity.'#text'
 
             [String]$Target = $Entity.target
@@ -2171,7 +2183,7 @@ class JtInvJtSnapshot : JtInv {
 }
 
 
-function New-JtInvJtSnapshot {
+function New-JtInvSnapshot {
 
     Param (
         [Parameter(Mandatory = $false)]
@@ -2179,7 +2191,7 @@ function New-JtInvJtSnapshot {
     )
 
     [JtConfig]$JtConfig = New-JtConfig
-    [JtInvJtSnapshot]::new([JtConfig]$JtConfig) 
+    [JtInvSnapshot]::new([JtConfig]$JtConfig) 
     New-JtInvClientTimestamp -JtConfig $JtConfig -Label "JtSnapshot"
 }
 

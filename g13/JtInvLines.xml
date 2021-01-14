@@ -1,0 +1,4 @@
+<config>
+	<lines source="d:\Seafile\al-public" filter="*.md" pattern="[\[]({FILELABEL})[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))" target="D:\Seafile\al-public"></lines>
+</config>
+

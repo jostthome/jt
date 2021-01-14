@@ -1,12 +1,12 @@
 using module JtClass
 using module JtIo
-using module JtFolderRenderer
+using module JtIndex
 using module JtPreisliste
 
 class JtFacFolderRen : JtClass {
 
     [JtIoFolder]$JtIoFolder = $Null
-    [JtFolderRenderer]$JtFolderRenderer = $Null
+    [JtIndex]$JtIndex = $Null
     [String]$Kind = "default"
 
     JtFacFolderRen([JtIoFile]$JtIoFile) {
@@ -15,53 +15,62 @@ class JtFacFolderRen : JtClass {
 
         [String]$FilePath = $JtIoFile.GetPath()
 
-        $This.JtFolderRenderer = $This.GetJtFolderRenderer_Default()
-        $This.Kind = $This.JtFolderRenderer.GetLabel()
+        $This.JtIndex = $This.GetJtIndex_Default()
+        $This.Kind = $This.JtIndex.GetLabel()
 
         if($FilePath.EndsWith(".ANZAHL.folder")) {
-            $This.JtFolderRenderer = $This.GetJtFolderRenderer_Count()
-            $This.Kind = $This.JtFolderRenderer.GetLabel()
+            $This.JtIndex = $This.GetJtIndex_Anzahl()
+            $This.Kind = $This.JtIndex.GetLabel()
         }
 
         if($FilePath.EndsWith(".BxH.folder")) {
-            $This.JtFolderRenderer = $This.GetJtFolderRenderer_Poster()
-            $This.Kind = $This.JtFolderRenderer.GetLabel()
+            $This.JtIndex = $This.GetJtIndex_BxH()
+            $This.Kind = $This.JtIndex.GetLabel()
         }
 
         if($FilePath.EndsWith(".BETRAG.folder")) {
-            $This.JtFolderRenderer = $This.GetJtFolderRenderer_Sum()
-            $This.Kind = $This.JtFolderRenderer.GetLabel()
+            $This.JtIndex = $This.GetJtIndex_Betrag()
+            $This.Kind = $This.JtIndex.GetLabel()
         }
 
         if($FilePath.EndsWith(".PREIS.folder")) {
-            $This.JtFolderRenderer = $This.GetJtFolderRenderer_Sum()
-            $This.Kind = $This.JtFolderRenderer.GetLabel()
+            $This.JtIndex = $This.GetJtIndex_Betrag()
+            $This.Kind = $This.JtIndex.GetLabel()
+        }
+
+        if($FilePath.EndsWith(".ZAHLUNG.folder")) {
+            $This.JtIndex = $This.GetJtIndex_Zahlung()
+            $This.Kind = $This.JtIndex.GetLabel()
         }
     }
 
-    [JtFolderRenderer]GetJtFolderRenderer() {
-        return $This.JtFolderRenderer
+    [JtIndex]GetJtIndex() {
+        return $This.JtIndex
     }
 
-    [JtFolderRenderer]GetJtFolderRenderer_Count() {
-        [JtFolderRenderer]$Ren = [JtFolderRenderer_Count]::new($This.JtIoFolder)
+    [JtIndex]GetJtIndex_Anzahl() {
+        [JtIndex]$Ren = [JtIndex_Anzahl]::new()
         return $Ren
     }
 
-    [JtFolderRenderer]GetJtFolderRenderer_Default() {
-        [JtFolderRenderer]$Ren = [JtFolderRenderer_Default]::new($This.JtIoFolder)
+
+    [JtIndex]GetJtIndex_Betrag() {
+        [JtIndex]$Ren = [JtIndex_Betrag]::new()
         return $Ren
     }
 
-    [JtFolderRenderer]GetJtFolderRenderer_Poster() {
-        [JtPreisliste]$JtPreisliste = New-JtPreisliste_Plotten_2020_07_01
-
-        [JtFolderRenderer]$Ren = [JtFolderRenderer_Poster]::new($This.JtIoFolder, $JtPreisliste)
+    [JtIndex]GetJtIndex_Default() {
+        [JtIndex]$Ren = [JtIndex_Default]::new()
         return $Ren
     }
 
-    [JtFolderRenderer]GetJtFolderRenderer_Sum() {
-        [JtFolderRenderer]$Ren = [JtFolderRenderer_Sum]::new($This.JtIoFolder)
+    [JtIndex]GetJtIndex_BxH() {
+        [JtIndex]$Ren = [JtIndex_BxH]::new()
+        return $Ren
+    }
+
+    [JtIndex]GetJtIndex_Zahlung() {
+        [JtIndex]$Ren = [JtIndex_Zahlung]::new()
         return $Ren
     }
 

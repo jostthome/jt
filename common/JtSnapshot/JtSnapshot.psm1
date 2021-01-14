@@ -5,9 +5,9 @@ using module JtTool
 
 class JtSnap : JtClass {
     
-    hidden [String]$PathFolderToolsSource = "\\oslo\JtSnap$\_archland\tools"
+    hidden [String]$PathFolderToolsSource = "\\oslo\Snap$\_archland\tools"
     hidden [String]$PathFolderTools = "C:\_archland\tools"
-    hidden [String]$JtSnapshotExe = "C:\_archland\tools\JtSnapshot64.exe"
+    hidden [String]$JtSnapshotExe = "C:\_archland\tools\Snapshot64.exe"
     hidden [String]$ShutdownExe = "C:\Windows\System32\shutdown.exe"
 
     JtSnap () {
@@ -15,7 +15,6 @@ class JtSnap : JtClass {
     }
 
     [Boolean]DoPrepareTools() {
-        [Boolean]$Result = $False
         [JtIoFolder]$FolderToolsSource = [JtIoFolder]::new($This.PathFolderToolsSource)
         [JtIoFolder]$FolderTools = [JtIoFolder]::new($This.PathFolderTools)
     
@@ -23,10 +22,10 @@ class JtSnap : JtClass {
 
         [JtIoFile]$FileJtSnaphotExe = [JtIoFile]::new($This.JtSnapshotExe)
         if ($False -eq $FileJtSnaphotExe.IsExisting()) {
-            Write-JtError -Text ( -join ("JtSnapshot64.exe does not exist at:", $This.JtSnapshotExe))
+            Write-JtError -Text ( -join ("Snapshot64.exe does not exist at:", $This.JtSnapshotExe))
             return $False
         }
-        return $Result
+        return $True
     }
 }
 
@@ -77,7 +76,7 @@ class JtSnap_Partition : JtSnap {
     
         $TheCommand = -Join ($This.MyPartition, " ", $ImageFilePath, " -Go -R")
         if($True -eq $This.GetDev()) {
-            Write-JtLog -Text (-join("JtSnapshot.exe:", $This.JtSnapshotExe, ", Command:", $TheCommand))
+            Write-JtLog -Text (-join("Snapshot.exe:", $This.JtSnapshotExe, ", Command:", $TheCommand))
         } else {
             Start-Process -FilePath $This.JtSnapshotExe -ArgumentList $TheCommand -NoNewWindow -Wait
         }
@@ -147,15 +146,6 @@ class JtSnap_Recover : JtSnap {
         
         [String]$ImageFilePath = $This.SnaFile.GetPath()
 
-        # %c_archland_tools%\JtSnapshot64.exe e:\sync\AL-ITS-PC-G20\hd11\hd11.sna hd1:1 -y
-        # %c_archland_tools%\JtSnapshot64.exe c: e:\sync\AL-ITS-PC-G20\hd12\hd12.sna --schedule --autoreboot:success
-
-        # %c_archland_tools%\JtSnapshot64.exe e:\sync\AL-ITS-PC-H38\hd21\hd21.sna hd1:1 -y
-        # %c_archland_tools%\JtSnapshot64.exe e:\sync\AL-ITS-PC-H38\hd21\hd22.sna hd1:2 -y
-        # %c_archland_tools%\JtSnapshot64.exe e:\sync\AL-ITS-PC-H38\hd21\hd23.sna hd1:3 -y
-        # %c_archland_tools%\JtSnapshot64.exe c: e:\sync\AL-ITS-PC-H38\hd24\hd24.sna --schedule --autoreboot:success
-
-
     
         [String]$TheCommandNormal = -Join (" ", $ImageFilePath, " ", "hd", $This.Disk, ":", $This.Part, " ", "-y")
         [String]$TheCommandSystem = -Join (" ", "C:", " ", $ImageFilePath, " ", "--schedule", " ", "--autoreboot:success")
@@ -167,7 +157,7 @@ class JtSnap_Recover : JtSnap {
         else {
             $TheCommand = $TheCommandNormal
         }
-        Write-JtLog -Text ( -join ("JtSnapshot.exe:", $This.JtSnapshotExe, ", Command:", $TheCommand))
+        Write-JtLog -Text ( -join ("Snapshot.exe:", $This.JtSnapshotExe, ", Command:", $TheCommand))
         if ($True -eq $This.GetDev()) {
             Write-JtLog -Text ("Doing nothing. This is a dev system.")
         }
@@ -186,7 +176,7 @@ class JtSnap_Recover : JtSnap {
 class JtSnapshot : JtClass {
 
     [JtIoFolder]$TargetFolder = $Null
-    [String]$ServerShare = '\\al-its-se-oslo\JtSnap$'
+    [String]$ServerShare = '\\al-its-se-oslo\Snap$'
 
     JtSnapshot([JtIoFolder]$MyFolderTarget) : Base() {
         $This.ClassName = "JtSnapshot"

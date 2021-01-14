@@ -1,0 +1,4 @@
+<config>
+	<lines source="C:\apps\Documents\markdown" filter="*.md" pattern="[\[]({FILELABEL})[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))" target="%OneDrive%\jt\testing\JtInvLines"></lines>
+</config>
+

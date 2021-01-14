@@ -180,8 +180,9 @@ function New-JtPosterSquare {
     $JtImageTool.DoMatrixJpgs("a", "b", 10)
 }
 
-New-JtOverview_4a -FolderSource "D:\Seafile\al-cad-20w\3.POSTER\POSTER.4A\a.aX_quer_pdf"    -FolderWork "C:\_inventory\temp\poster\aufgabe_4a"
+New-JtOverview_4a -FolderSource "D:\Seafile\al-cad-20w\3.POSTER\POSTER.4B\a.aX_quer_pdf"    -FolderWork "C:\_inventory\temp\poster\aufgabe_4b"
 pause
+New-JtOverview_4a -FolderSource "D:\Seafile\al-cad-20w\3.POSTER\POSTER.4A\a.aX_quer_pdf"    -FolderWork "C:\_inventory\temp\poster\aufgabe_4a"
 New-JtOverview_0a -FolderSource "D:\Seafile\al-cad-20w\3.POSTER\POSTER.0A\a.a4_pdf"         -FolderWork "C:\_inventory\temp\poster\aufgabe_0a"
 New-JtOverview_1a -FolderSource "D:\Seafile\al-cad-20w\3.POSTER\POSTER.1A\a.a4_pdf"         -FolderWork "C:\_inventory\temp\poster\aufgabe_1a"
 New-JtOverview_2a -FolderSource "D:\Seafile\al-cad-20w\3.POSTER\POSTER.2A\a.3000x3000_jpg"  -FolderWork "C:\_inventory\temp\poster\aufgabe_2a"

@@ -290,15 +290,22 @@ function ConvertTo-LabelToFilename([String]$MyInput) {
 }
 
 
-function ConvertTo-JtExpandedPath([String]$MyPath) {
-        
-        [String]$Result = $MyPath
-        if ($Null -eq $Result) {
-            $Result = ""
-        }
-        $Result = $Result.Replace("%OneDrive%", $env:OneDrive)
-        $Result = $Result.Replace("%COMPUTERNAME%", $env:COMPUTERNAME)
 
-        return $Result
-    } 
+
+function ConvertTo-JtExpandedPath {
+
+    Param (
+        [Parameter(Mandatory = $true)]
+        [String]$Path
+    )
+
+    [String]$Result = $Path
+    if ($Null -eq $Result) {
+        $Result = ""
+    }
+    $Result = $Result.Replace("%OneDrive%", $env:OneDrive)
+    $Result = $Result.Replace("%COMPUTERNAME%", $env:COMPUTERNAME)
+
+    return $Result
+} 
 

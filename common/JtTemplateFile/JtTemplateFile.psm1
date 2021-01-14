@@ -16,36 +16,9 @@ class JtTemplateFile : JtClass {
         $This.TemplateFileExtension = [JtIo]::FilenameExtension_Folder
         $This.DoInit()
     }
-    
-    JtTemplateFile([JtIoFolder]$MyFolder, [String]$MyExtension) {
-        $This.ClassName = "JtTemplateFile"
-        $This.JtIoFolder = $MyFolder
-        $This.TemplateFileExtension = $MyExtension
-        $This.DoInit()
-        
-    }
-
-    # [JtIoFile]GetJtTemplateFile() {
-    #     [String]$MyExtension = $This.GetTemplateFileExtension()
-    #     [JtIoFile]$JtIoFile = $Null
-    #     [String]$MyFilter = -join ("*", $MyExtension)
-    #     [System.Collections.ArrayList]$FolderFiles = $This.JtIoFolder.GetJtIoFilesWithFilter($MyFilter) 
-    #     if ($Null -eq $FolderFiles) {
-    #         Write-JtError -Text ( -join ("This should not happen. FolderFiles is null for JtIoFolder ", $This.JtIoFolder.GetPath()))
-    #     }
-    #     elseif ($FolderFiles.Count -lt 1) {
-    #         Write-JtError -Text ( -join ("This should not happen. No FolderFile in JtIoFolder ", $This.JtIoFolder.GetPath()))
-    #     }
-    #     elseif ($FolderFiles.Count -gt 1) {
-    #         Write-JtError -Text ( -join ("This should not happen. More than one FolderFiles in JtIoFolder ", $This.JtIoFolder.GetPath()))
-    #     }
-    #     else {
-    #         [JtIoFile]$JtIoFile = $FolderFiles[0]
-    #     }
-    #     return $JtIoFile
-    # }
 
     [Boolean]DoInit() {
+        Write-JtLog (-join("TemplateFile.DoInit(). Path: ", $This.JtIoFolder.GetPath()))
         [String]$MyExtension = $This.TemplateFileExtension
         [String]$Filter = -join ("*", $MyExtension)
         [System.Collections.ArrayList]$TheFiles = $This.JtIoFolder.GetJtIoFilesWithFilter($Filter, $False)
@@ -80,11 +53,15 @@ class JtTemplateFile : JtClass {
     }
 
     [System.Collections.ArrayList]GetJtColRens() {
+        [System.Collections.ArrayList]$JtColRens = [System.Collections.ArrayList]::new()
+        if($This.JtTemplateFileName.Length -lt 1) {
+            Throw "GetJtColRens. JtTemplateFileName is empty."
+        }
         $TemplateParts = $This.JtTemplateFileName.Split(".")
  
-        [System.Collections.ArrayList]$JtColRens = [System.Collections.ArrayList]::new()
         foreach ($Part in $TemplateParts) {
             [String]$MyPart = $Part
+            Write-JtLog (-join("GetJtColRens. TemplateFileName:", $This.TemplateFileName))
             [JtColRen]$MyJtColRen = [JtColRen]::GetJtColRen($MyPart) 
             # $Head = $MyJtColRen.GetHeader()
             $JtColRens.Add($MyJtColRen)
@@ -169,11 +146,9 @@ class JtTemplateFile : JtClass {
 Function Get-JtTemplateFile {
     Param (
         [Parameter(Mandatory = $true)]
-        [JtIoFolder]$JtIoFolder,
-        [Parameter(Mandatory = $false)]
-        [String]$Extension
+        [JtIoFolder]$JtIoFolder
     )
 
-    [JtTemplateFile]::new($JtIoFolder, $Extension)
+    [JtTemplateFile]::new($JtIoFolder)
 }
 

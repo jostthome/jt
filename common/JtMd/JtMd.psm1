@@ -114,7 +114,7 @@ class JtMd : JtClass{
 
     static [Boolean]DoWriteJtMdCsv([JtIoFolder]$FolderWork, [JtIoFolder]$FolderTarget, [String]$MyLabel, [String]$MyFilter, [String]$ThePattern) {
         [System.Collections.ArrayList]$MyList = [System.Collections.ArrayList]::new()
-        [System.Collections.ArrayList]$JtIoFiles = $FolderWork.GetJtIoFilesWithFilter($MyFilter)
+        [System.Collections.ArrayList]$JtIoFiles = $FolderWork.GetJtIoFilesWithFilter($MyFilter, $True)
 
         [System.Collections.ArrayList]$ArrayList = [JtMd]::GetList($JtIoFiles, $ThePattern)
 

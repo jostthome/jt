@@ -14,7 +14,7 @@ New-JtInvFiles
 New-JtInvFolders
 New-JtInvLengths
 New-JtInvLines
-New-JtInvMarkdown
+New-JtInvMd
 New-JtInvMirror
 New-JtInvReports
 New-JtInvCombine

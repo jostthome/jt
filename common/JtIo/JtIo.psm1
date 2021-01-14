@@ -9,6 +9,7 @@ class JtIo : JtClass {
     static [String]$FilenamePrefix_Anzahl = "zzz"
     static [String]$FilenamePrefix_Area = "zzz"
     static [String]$FilenamePrefix_Count = "zzz"
+    static [String]$FilenamePrefix_Csv = "zzz"
     static [String]$FilenamePrefix_Files = "files"
     static [String]$FilenamePrefix_Folder = "zzz"
     static [String]$FilenamePrefix_Report = "report"
@@ -17,15 +18,22 @@ class JtIo : JtClass {
     static [String]$FilenameSuffix_Time = "time"
     static [String]$FilenameSuffix_Errors = "errors"
     
+    static [String]$FilenameExtension_Anzahl_Meta = ".anzahl.meta"
     static [String]$FilenameExtension_Area = ".area"
+    static [String]$FilenameExtension_Betrag_Meta = ".betrag.meta"
     static [String]$FilenameExtension_Count = ".count"
     static [String]$FilenameExtension_Csv = ".csv"
     static [String]$FilenameExtension_Folder = ".folder"
     static [String]$FilenameExtension_Md = ".md"
     static [String]$FilenameExtension_Meta = ".meta"
     static [String]$FilenameExtension_Poster = ".poster"
+    static [String]$FilenameExtension_BxH_Meta = ".bxh.meta"
+    static [String]$FilenameExtension_BxH_Md = ".bxh.md"
     static [String]$FilenameExtension_Sum = ".sum"
+    static [String]$FilenameExtension_Sum_Meta = ".sum.meta"
     static [String]$FilenameExtension_Whg = ".whg"
+    static [String]$FilenameExtension_Zahlung_Meta = ".zahlung.meta"
+    static [String]$FilenameExtension_Zahlung_Md = ".zahlung.md"
     static [String]$FilenameExtension_Xml = ".xml"
     
 
@@ -182,7 +190,8 @@ class JtIo : JtClass {
     }
     
     [String]GetPath() {
-        return $This.Path
+        [String]$MyPath = $This.Path
+        return $MyPath
     }
 }
     
@@ -201,7 +210,7 @@ class JtIoFile : JtIo {
     
     JtIoFile([String]$MyPath) {
         $This.ClassName = "JtIoFile"
-        $This.Path = $MyPath
+        $This.Path = ConvertTo-JtExpandedPath -Path $MyPath
         $This.BlnExists = Test-Path -Path $MyPath
     }
     
@@ -232,6 +241,7 @@ class JtIoFile : JtIo {
         $MyList.Add([JtIo]::FilenameExtension_Csv)
         $MyList.Add([JtIo]::FilenameExtension_Folder)
         $MyList.Add([JtIo]::FilenameExtension_Md)
+        $MyList.Add([JtIo]::FilenameExtension_Meta)
         $MyList.Add([JtIo]::FilenameExtension_Whg)
         $MyList.Add([JtIo]::FilenameExtension_Poster)
         $MyList.Add([JtIo]::FilenameExtension_Sum)
@@ -249,6 +259,17 @@ class JtIoFile : JtIo {
    
     [String]GetExtension() {
         [String]$Result = [System.IO.Path]::GetExtension($This.Path)
+        Return $Result
+    }
+
+
+    [String]GetExtension2() {
+        [String]$Path1 = $This.Path
+        [String]$Extension1 = [System.IO.Path]::GetExtension($Path1)
+        [String]$Path2 = $Path1.Replace($Extension1, "")
+        [String]$Extension2 = [System.IO.Path]::GetExtension($Path2)
+
+        [String]$Result = -join ($Extension2, $Extension1)
         Return $Result
     }
 
@@ -490,12 +511,10 @@ class JtIoFileCsv : JtIoFile {
         $Elements = $Csv | Select-Object -Property $Column | Sort-Object -Property $Column
 
         foreach ($Element in $Elements) {
-
             [String]$TheElement = $Element.$Column
             # [JtIoFile]$MyFile = [JtIoFile]::new($Element)
             $MyArrayList.Add($TheElement)
         }
-
         return $MyArrayList
     }
 }
@@ -516,13 +535,14 @@ class JtIoFolder : JtIo {
     [System.IO.FileSystemInfo]$File = $Null
 
     static hidden [DateTime]GetReportFolderDateTime([String]$Path) {
+        [String]$ThePath = ConvertTo-JtExpandedPath -Path $Path
         [System.DateTime]$FileDate = Get-Date
-        [Boolean]$FileOk = Test-Path -Path $Path
+        [Boolean]$FileOk = Test-Path -Path $ThePath
 
         [String]$MyFilter = -join ("*", [JtIo]::FilenameExtension_Md)
  
         if ($FileOk) {
-            [System.Object[]]$JtObjects = Get-ChildItem -Path $Path -File -Filter $MyFilter 
+            [System.Object[]]$JtObjects = Get-ChildItem -Path $ThePath -File -Filter $MyFilter 
             if ($JtObjects.Count -gt 0) {
                 [System.IO.FileSystemInfo]$MyFile = $JtObjects[0]
                 [System.DateTime]$MyDate = $MyFile.LastWriteTime
@@ -531,9 +551,10 @@ class JtIoFolder : JtIo {
         }
         return $FileDate
     }
+    
     JtIoFolder([String]$MyPath) {
         $This.ClassName = "JtIoFolder"
-        $This.Path = $MyPath
+        $This.Path = ConvertTo-JtExpandedPath -Path $MyPath
         $This.BlnExists = Test-Path -Path $This.Path
         if ($False -eq $This.BlnExists) {
             Write-JtError -Text ( -join ("JtIoFolder does NOT exist:", $This.Path))
@@ -551,7 +572,7 @@ class JtIoFolder : JtIo {
 
     JtIoFolder([String]$MyPath, [Boolean]$BlnCreate) {
         $This.ClassName = "JtIoFolder"
-        $This.Path = $MyPath
+        $This.Path = ConvertTo-JtExpandedPath -Path $MyPath
         $This.BlnExists = Test-Path -Path $This.Path
 
         if ($False -eq $This.BlnExists) {
@@ -584,10 +605,10 @@ class JtIoFolder : JtIo {
         [String]$FilePath = $JtIoFile.GetPath()
         [String]$ParentPath = (Get-Item $FilePath).Directory.FullName
 
-        $This.Path = $ParentPath
+        $This.Path = ConvertTo-JtExpandedPath -Path $ParentPath
         $This.BlnExists = Test-Path -Path $This.Path
         if ($False -eq $This.BlnExists) {
-            Write-JtError -Text ( -join ("JtIoFolder does NOT exist:", $This.Path))
+            Write-JtError -Text ( -join ("JtIoFolder (from file). Path does NOT exist:", $This.Path))
         }
         else {
             # [System.Object[]]$JtObjects = Get-Item -Path $This.Path 
@@ -692,8 +713,8 @@ class JtIoFolder : JtIo {
 
     [System.Collections.ArrayList]GetJtIoFiles([Boolean]$DoRecurse) {
         if (!($This.IsExisting())) {
-            Write-JtError -Text ( -join ("Folder does not exist:", $This.GetPath()))
-            Write-JtError -Text ("Please edit XML in lines!!!!")
+            Write-JtError -Text ( -join ("GetJtIoFiles. Folder does not exist:", $This.GetPath()))
+            Write-JtError -Text ("GetJtIoFiles. Please edit XML in lines!!!!")
             #            Throw $ErrorMsg
             #            Exit
         }
@@ -730,9 +751,10 @@ class JtIoFolder : JtIo {
         [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]::new()
         
         if (!($This.IsExisting())) {
-            Write-JtError -Text ( -join ("Folder does not exist:", $This.GetPath()))
-            Write-JtError -Text ("Please edit XML in lines!!!!")
-            #            Throw $ErrorMsg
+            [String]$ErrorMsg =  -join ("GetJtIoFilesWithFilter. Not existing. PATH:", $This.GetPath(), " FILTER:", $Myfilter)
+            Write-JtError -Text $ErrorMsg
+            Write-JtError -Text ("GetJtIoFilesWithFilter. Please edit XML in lines!!!!")
+            Throw $ErrorMsg
             #            Exit
             return $Result
         }
@@ -1020,13 +1042,13 @@ function New-JtIoFileVersionMeta {
         $MyContent = $Content
     }
 
-    [String]$MyPath = ConvertTo-JtExpandedPath $Path
+    [String]$MyPath = ConvertTo-JtExpandedPath -Path $Path
     
 
     [String]$MyType = "version"
     [String]$MyTimestamp = Get-JtDate
-    [String]$MyLabel = -join("_", $MyTimestamp, ".", "version")
-    [String]$MyFilter = -join("*", ".", $MyType, [JtIo]::FilenameExtension_Meta)
+    [String]$MyLabel = -join ("_", $MyTimestamp, ".", "version")
+    [String]$MyFilter = -join ("*", ".", $MyType, [JtIo]::FilenameExtension_Meta)
     [JtIoFolder]$TargetFolder = New-JtIoFolder -Path $MyPath
     
     $TargetFolder.DoDeleteAllFiles($MyFilter)
@@ -1036,7 +1058,16 @@ function New-JtIoFileVersionMeta {
 }
 
 
+Function ConvertTo-JtIoBetterFilenames {
+    Param (
+        [Parameter(Mandatory = $true)]
+        [String]$Path
+    )
 
+    [JtIoFolder]$TheFolder = [JtIoFolder]::new($Path)
+
+    $TheFolder.DoOptimizeFilenames()
+}
 
 Function New-JtIoFolder {
     Param (
@@ -1059,5 +1090,34 @@ Function New-JtIoFolderReport {
     New-JtIoFolder -Path "c:\_inventory\report" -Force $True
 }
 
-Export-ModuleMember -Function New-JtIo, New-JtIoFile, New-JtIoFileCsv, New-JtIoFileMeta, New-JtIoFileVersionMeta, New-JtIoFolder, New-JtIoFolderInv, New-JtIofolderReport
+Function Get-JtIoFolderTypes {
+    Param (
+        [Parameter(Mandatory = $true)]
+        [String]$Path
+    )
+
+    [String]$MyFilter = "*.folder"
+    [JtIoFolder]$MyFolder = New-JtIoFolder -Path $Path
+    [System.Collections.ArrayList]$MyFiles = $MyFolder.GetJtIoFilesWithFilter($MyFilter, $True)
+
+    [Hashtable]$Ext = New-Object Hashtable
+
+    foreach ($File in $MyFiles) {
+        $File.GetPath()
+        # $File.GetName()
+        # $File.GetExtension()
+        # $File.GetExtension2()    
+        $Value = $File.GetExtension2()
+        if (!($Ext.Contains($Value))) {
+            $Ext.add($Value, $Value)
+        }
+
+    }
+    return $Ext.Keys
+
+}
+
+
+
+Export-ModuleMember -Function ConvertTo-JtIoBetterFilenames, Get-JtIoFolderTypes, New-JtIo, New-JtIoFile, New-JtIoFileCsv, New-JtIoFileMeta, New-JtIoFileVersionMeta, New-JtIoFolder, New-JtIoFolderInv, New-JtIofolderReport
 

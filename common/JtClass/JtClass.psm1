@@ -4,12 +4,17 @@ class JtClass {
     
     hidden [String]$ClassName = "CLASSNAME not set!!!"
 
-    static [String]$Version = "2021-01-03"
+    static [String]$Version = "2021-01-12"
 
     [String]GetVersion() {
         [String]$Result = [JtClass]::Version
         return $Result
     } 
+
+    # is in development mode?
+    [Boolean]GetDev() {
+        return $False
+    }
     
 
     
@@ -117,7 +122,7 @@ class JtLog {
         if ([JtLog]::CounterError -lt 1) {
             [String]$Filter = -join("*", [JtLog]::FileNameError)
             [String]$PathReport = [JtLog]::C_inventory_Report
-            Write-Host (-join ("DoPrintError. Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -ForegroundColor Black -BackgroundColor DarkYellow  (-join ("DoPrintError. Deleting in (Filter:", $Filter, "): ", $PathReport))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter -File | Remove-Item -Filter $Filter -Force
             }
@@ -146,7 +151,7 @@ class JtLog {
         if ([JtLog]::CounterFolder -lt 1) {
             [String]$Filter = [JtLog]::GetFileNameFolder("*")
             [String]$PathReport = [JtLog]::C_inventory_Report
-            Write-Host -Text ( -join ("DoPrintFolder. Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -ForegroundColor Black -BackgroundColor DarkYellow (-join ("DoPrintError. Deleting in (Filter:", $Filter, "): ", $PathReport))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter | Remove-Item -Filter $Filter -Force
             }
@@ -183,7 +188,7 @@ class JtLog {
         if ([JtLog]::CounterIo -lt 1) {
             [String]$Filter = [JtLog]::GetFileNameIo("*")
             [String]$PathReport = [JtLog]::C_inventory_Report
-            Write-Host -ForegroundColor Black -BackgroundColor DarkYellow -Text ( -join ("DoPrintIo. Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -ForegroundColor Black -BackgroundColor DarkYellow (-join ("DoPrintError. Deleting in (Filter:", $Filter, "): ", $PathReport))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter | Remove-Item -Filter $Filter -Force
             }
@@ -212,7 +217,7 @@ class JtLog {
         if ([JtLog]::CounterLog -lt 1) {
             [String]$Filter = [JtLog]::GetFileNameLog("*")
             [String]$PathReport = [JtLog]::C_inventory_Report
-            Write-Host -Text ( -join ("DoPrintLog. Deleting content of:", $PathReport, " using filter:", $Filter))
+            Write-Host -ForegroundColor Black -BackgroundColor DarkYellow (-join ("DoPrintError. Deleting in (Filter:", $Filter, "): ", $PathReport))
             try {
                 Get-Childitem -Path $PathReport -Filter $Filter | Remove-Item -Filter $Filter -Force
             }
