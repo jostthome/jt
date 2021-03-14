@@ -1,0 +1,117 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=0.2in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\author{}
+\date{}
+
+\begin{document}
+
+\hypertarget{fakultuxe4t-fuxfcr-architektur-und-landschaft}{%
+\section{Fakultät für Architektur und
+Landschaft}\label{fakultuxe4t-fuxfcr-architektur-und-landschaft}}
+
+\hypertarget{plot-service---abrechnung}{%
+\subsection{Plot-Service - Abrechnung}\label{plot-service---abrechnung}}
+
+\hypertarget{pluxe4ne}{%
+\subsection{Pläne}\label{pluxe4ne}}
+
+\begin{longtable}[]{@{}llllllllll@{}}
+\toprule
+NR & PREIS & NACHNAME & VORNAME & LABEL & PAPIER & BxH & DIM & PAP. &
+TINT. \\
+\midrule
+\endhead
+1 & 1996002,00 & musterfrau & max & projekt\_blatt1 & 90g & 841x1189 &
+1.000 & 1,25 & 6,50 \\
+2 & 1996002,00 & musterfrau & max & projekt\_blatt2 & 180g & 841x1189 &
+1.000 & 2,50 & 6,50 \\
+3 & 1996002,00 & musterfrau & max & projekt\_blatt3 & trans & 841x1189 &
+1.000 & 2,50 & 6,50 \\
+4 & 1996002,00 & musterfrau & max & projekt\_blatt4 & semi & 841x1189 &
+1.000 & 2,50 & 6,50 \\
+5 & 1996002,00 & musterfrau & max & projekt\_blatt5 & glossy & 841x1189
+& 1.000 & 2,50 & 6,50 \\
+6 & 1996002,00 & musterfrau & max & projekt\_blatt6 & fabriano &
+841x1189 & 1.000 & 2,50 & 6,50 \\
+SUM: & 52,75 & & & & & & & & \\
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Kunde
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Plot-Service
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{itemize}
+\item
+  Stand: 2021-03-11\_08-14-32; Preisliste: Plotten\_2020\_07\_01
+\item
+  C:/Users/thome.ARCHLAND/OneDrive/jt/testing/1.EXAMPLE/14.DATA.POSTER/141.POSTER.Beispiel1
+\item
+  \url{https://www.archland.uni-hannover.de/de/fakultaet/ausstattung/plotservice/}
+\end{itemize}
+
+\end{document}

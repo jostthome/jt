@@ -1,4 +1,4 @@
-using module JtClass
+using module Jt  
 
 class JtTbl : JtClass {
 
@@ -7,22 +7,23 @@ class JtTbl : JtClass {
     }
 }
 
-class JtField {
+class JtFld : JtClass {
 
     hidden [String]$Label = ""
     hidden [String]$Value = ""
 
-    JtField([String]$MyLabel) {
-        $This.Label = $MyLabel
+    JtFld([String]$TheLabel) {
+        $This.ClassName = "JtFld"
+        $This.Label = $TheLabel
     } 
 
-    JtField([String]$MyLabel, [String]$MyValue) {
-        $This.Label = $MyLabel
-        $This.Value = $MyValue
+    JtFld([String]$TheLabel, [String]$TheValue) {
+        $This.Label = $TheLabel
+        $This.Value = $TheValue
     } 
 
-    SetValue([String]$MyValue) {
-        $This.Value = $MyValue
+    SetValue([String]$TheValue) {
+        $This.Value = $TheValue
     } 
 
     [String]GetValue() {
@@ -38,14 +39,11 @@ class JtField {
     } 
 } 
 
-Function New-JtField {
+Function New-JtFld {
 
     Param (
-        [OutputType([JtField])]
-        [Parameter(Mandatory = $true)]
-        [String]$Label,
-        [Parameter(Mandatory = $false)]
-        [String]$Value
+        [OutputType([JtFld])][Parameter(Mandatory = $True)][String]$Label,
+        [Parameter(Mandatory = $False)][String]$Value
 
     )
     [String]$MyValue = ""
@@ -57,50 +55,58 @@ Function New-JtField {
         $MyValue = $Value
     }
 
-    [JtField]::new($Label, $MyValue)
+    [JtFld]::new($Label, $MyValue)
 }
 
 
 class JtTblRow : JtTbl {
 
     [System.Collections.Specialized.OrderedDictionary]$HashTable = [System.Collections.Specialized.OrderedDictionary]::new()
+    [String]$Label = $TheLabel
 
     
     JtTblRow () {
         $This.ClassName = "JtTblRow"
+        $This.Label = $This.ClassName
         $This.HashTable = [System.Collections.Specialized.OrderedDictionary]::new()
     }
 
-    [Boolean]Add([String]$Key, [String]$Value) {
-        if ($This.HashTable.Contains($Key)) {
-            $This.HashTable.($Key) = $Value
-            return $True
+    JtTblRow ([String]$TheLabel) {
+        $This.ClassName = "JtTblRow"
+        $This.Label = $TheLabel
+        $This.HashTable = [System.Collections.Specialized.OrderedDictionary]::new()
+    }
+
+    [Void]Add([String]$TheKey, [String]$TheValue) {
+        [String]$MyKey = $TheKey
+        [String]$MyValue = $TheValue
+
+        if ($This.HashTable.Contains($MyKey)) {
+            $This.HashTable.($MyKey) = $MyValue
         }
         else {
             try {
-                $This.HashTable.add($Key, $Value) | Out-Null
-                return $True
+                $This.HashTable.add($MyKey, $MyValue) | Out-Null
             }
             catch {
-                Write-JtError -Text ( -join ("Error for ", $Key, " and ", $Value))
-                return $False
+                Write-JtLog_Error -Where $This.ClassName -Text "Error for MyKey: $MyKey VALUE: $MyValue"
             }
         }
     }
 
 
-    [Boolean]Add([JtField]$Field) {
-        if ($Null -eq $Field) {
-            Write-JtError -Text ("Field is null!")
+    [Void]Add([JtFld]$TheField) {
+        [JtFld]$MyField = $TheField
+        if ($Null -eq $MyField) {
+            Write-JtLog_Error -Where $This.ClassName -Text "Add. MyField is null!"
             # Throw "Field is null!"
         }
         else {
-            [String]$Key = $Field.GetLabel()
-            [String]$Value = $Field.GetValue()
+            [String]$MyKey = $MyField.GetLabel()
+            [String]$MyValue = $MyField.GetValue()
 
-            return $This.Add([String]$Key, [String]$Value)
+            $This.Add([String]$MyKey, [String]$MyValue)
         }
-        return $False
     }
 
     [Int32]GetColsCount() {
@@ -112,35 +118,39 @@ class JtTblRow : JtTbl {
     }
 
     [String]GetHeaderFromColumnByNumber([Int32]$IntColNumber) {
-        [String]$Result = ""
-        $Keys = $This.HashTable.Keys
-        if ($Keys.Count -gt $IntColNumber) {
+        [String]$MyResult = ""
+        $MyAlKeys = $This.HashTable.Keys
+        if ($MyAlKeys.Count -gt $IntColNumber) {
             [int32]$i = 0
-            foreach ($Key in $This.HashTable.Keys) {
-                
+            foreach ($Key in $MyAlKeys) {
                 if ($i -eq $IntColNumber) {
-                    $Result = $Key
-
+                    $MyResult = $Key
                 }
                 $i = $i + 1
             }
         }
-        return $Result
+        return $MyResult
     }
 
     [System.Collections.ICollection]GetKeys() {
-        [System.Collections.ICollection]$Keys = $This.HashTable.Keys
-        return $Keys
+        [System.Collections.ICollection]$MyKeys = $This.HashTable.Keys
+        return $MyKeys
     }
 
     [System.Collections.Specialized.OrderedDictionary]GetObject() {
         Return $This.HashTable
     }
+
     
-    [String]GetValue ([String]$Key) {
+    [String]GetLabel() {
+        Return $This.Label
+    }
+    
+    [String]GetValue([String]$TheKey) {
+        [String]$MyKey = $TheKey
         $MyHash = $This.HashTable
-        [String]$Value = $MyHash.($Key)
-        return $Value
+        [String]$MyValue = $MyHash.($MyKey)
+        return $MyValue
     }
 
     [System.Array]GetValues() {
@@ -148,27 +158,25 @@ class JtTblRow : JtTbl {
     }
 
     [String]GetValueFromColumnByNumber([Int32]$IntColNumber) {
-        [String]$Result = ""
-        $Values = $This.HashTable.Values
-        if ($Values.Count -gt $IntColNumber) {
+        [String]$MyResult = ""
+        $MyAlValues = $This.HashTable.Values
+        if ($MyAlValues.Count -gt $IntColNumber) {
             [int32]$i = 0
             foreach ($Key in $This.HashTable.Keys) {
-                
                 if ($i -eq $IntColNumber) {
-                    $Result = $This.HashTable.Item($Key)
-
+                    $MyResult = $This.HashTable.Item($Key)
                 }
                 $i = $i + 1
             }
         }
-        return $Result
+        return $MyResult
     }
 
     # ==============================================================================
     [System.Collections.Specialized.OrderedDictionary]JoinHashtable ([System.Collections.Specialized.OrderedDictionary]$First, [System.Collections.Specialized.OrderedDictionary]$Second) {
         [System.Collections.Specialized.OrderedDictionary]$Fir = $First
         [System.Collections.Specialized.OrderedDictionary]$Sec = $Second
-        [System.Collections.Specialized.OrderedDictionary]$Result = [System.Collections.Specialized.OrderedDictionary]::new()
+        [System.Collections.Specialized.OrderedDictionary]$MyResult = [System.Collections.Specialized.OrderedDictionary]::new()
 
         if ($Null -eq $Fir) {
             Write-Host "This should not happen in JoinHashtable: $Fir is NULL" 
@@ -187,32 +195,42 @@ class JtTblRow : JtTbl {
         }
  
         foreach ($MyItem in $Fir.keys) {
-            $Result.Add($MyItem, $Fir[$MyItem])
+            $MyResult.Add($MyItem, $Fir[$MyItem])
         }
  
         foreach ($MyItem in $Sec.keys) {
-            $Result.Add($MyItem, $Sec[$MyItem])
+            $MyResult.Add($MyItem, $Sec[$MyItem])
         }
  
-        return $Result
+        return $MyResult
  
     } #end Join-Hashtable
+
  
-    [Boolean]Join ([JtTblRow]$JtTblRow) {
-        $MyHash = $JtTblRow.HashTable
+    Join ([JtTblRow]$TheJtTblRow) {
+        $MyHash = $TheJtTblRow.HashTable
  
         $This.HashTable = $This.JoinHashtable($This.HashTable, $MyHash)
-        return $True
     }
+
+
 }
 
 Function New-JtTblRow {
 
     Param(
-
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label
     )
 
-    [JtTblRow]::new()
+    [String]$MyFunctionName = "New-JtTblRow"
+    [String]$MyLabel = $MyFunctionName
+
+    if($Label) {
+        $MyLabel = $Label
+    }
+
+    [JtTblRow]$MyRow = [JtTblRow]::new($MyLabel)
+$MyRow
 }
 
 
@@ -224,20 +242,25 @@ class JtTblTable : JtTbl {
     [int32]$ColsCount = 0
 
  
-    JtTblTable([String]$MyLabel) {
+    JtTblTable([String]$TheLabel) {
         $This.ClassName = "JtTblTable"
-        $This.Label = $MyLabel
+        $This.Label = $TheLabel
         $This.Objects = [System.Collections.ArrayList]::new()
     }
 
-    [Boolean]AddRow([JtTblRow]$JtTblRow) {
-        [int32]$RowColsCount = $JtTblRow.GetColsCount()
-        if ($RowColsCount -gt $This.ColsCount) {
-            $This.ColsCount = $RowColsCount
+    [Void]AddRow([JtTblRow]$TheJtTblRow) {
+        [JtTblRow]$MyJtTblRow = $TheJtTblRow
+        if ($MyJtTblRow) {
+            [int32]$MyIntColsCount = $MyJtTblRow.GetColsCount()
+            if ($MyIntColsCount -gt $This.ColsCount) {
+                $This.ColsCount = $MyIntColsCount
+            }
+            [System.Collections.Specialized.OrderedDictionary]$MyHashTable = $MyJtTblRow.HashTable
+            $This.Objects.add($MyHashTable)
         }
-        [System.Collections.Specialized.OrderedDictionary]$HashTable = $JtTblRow.HashTable
-        $This.Objects.add($HashTable)
-        return $true
+        else {
+            Write-JtLog_Error -Where $This.ClassName -Text "AddRow. MyJtTblRow is NULL."
+        }
     }
 
     [String]GetLabel() {
@@ -250,12 +273,12 @@ class JtTblTable : JtTbl {
     }
     
     [System.Collections.ArrayList]GetOutput() {
-        [System.Collections.ArrayList]$Output = [System.Collections.ArrayList]::new()
-        foreach ($MyLine In $This.Objects) {
-            $Mlo = $MyLine
-            $Output.add($Mlo)
+        [System.Collections.ArrayList]$MyAlOutput = [System.Collections.ArrayList]::new()
+        foreach ($Line In $This.Objects) {
+            $MyLo = $Line
+            $MyAlOutput.add($MyLo)
         }
-        return $Output
+        return $MyAlOutput
     }
 
     [System.Collections.ArrayList]GetRows() {
@@ -268,47 +291,13 @@ class JtTblTable : JtTbl {
 Function New-JtTblTable {
 
     Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Label
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
     )
 
     [JtTblTable]::new($Label)
 }
 
-Function Get-JtDataTableFromTable {
-    param (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [JtTblTable]$JtTblTable
-    )
-
-    [System.Data.DataTable]$DataTable = New-Object System.Data.DataTable
-    [System.Collections.ArrayList]$MyObjects = $JtTblTable.GetObjects()
-
-    [System.Collections.Specialized.OrderedDictionary]$OrdDic = $MyObjects[0]
-    foreach ($MyKey in $OrdDic.keys) {
-        $DataTable.Columns.Add($MyKey, "String")
-    }
-    [System.Collections.ArrayList]$MyObjects = $JtTblTable.GetObjects()
-
-    foreach ($Element in $MyObjects) {
-        [System.Collections.Specialized.OrderedDictionary]$OrdDic = $Element
-
-        $Row = $DataTable.NewRow()
-
-        foreach ($MyKey in $OrdDic.keys) {
-            $row.($MyKey) = $OrdDic[$MyKey]
-        }
-        $DataTable.Rows.Add($Row)
-    }
-    # [System.Data.DataTable]$DataTable | Format-Table
-    
-    # return [System.Data.DataTable]$DataTable
-    # return [System.Data.DataTable]$DataTable
-    Write-Host "Get-JtDataTableFromTable - Type:" $DataTable.GetType()
-    return $DataTable
-}
-
-
-
-Export-ModuleMember -Function New-JtField, New-JtTbl, New-JtTblTable, New-JtTblRow, Get-JtDataTableFromTable
+Export-ModuleMember -Function New-JtFld
+Export-ModuleMember -Function New-JtTbl
+Export-ModuleMember -Function New-JtTblTable
+Export-ModuleMember -Function New-JtTblRow

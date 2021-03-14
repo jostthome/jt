@@ -1,13 +1,11 @@
-using module JtClass
+using module Jt  
 using module JtIo
-using module JtTime
-using module JtTool
 
 class JtSnap : JtClass {
     
-    hidden [String]$PathFolderToolsSource = "\\oslo\Snap$\_archland\tools"
-    hidden [String]$PathFolderTools = "C:\_archland\tools"
-    hidden [String]$JtSnapshotExe = "C:\_archland\tools\Snapshot64.exe"
+    hidden [String]$FolderPathToolsSource = "\\oslo\Snap$\_archland\tools"
+    hidden [String]$FolderPathTools = "C:\_archland\tools"
+    hidden [String]$FilePath_Exe_Snapshot = "C:\_archland\tools\Snapshot64.exe"
     hidden [String]$ShutdownExe = "C:\Windows\System32\shutdown.exe"
 
     JtSnap () {
@@ -15,21 +13,19 @@ class JtSnap : JtClass {
     }
 
     [Boolean]DoPrepareTools() {
-        [JtIoFolder]$FolderToolsSource = [JtIoFolder]::new($This.PathFolderToolsSource)
-        [JtIoFolder]$FolderTools = [JtIoFolder]::new($This.PathFolderTools)
-    
-        New-JtRobocopyIo -IoSource $FolderToolsSource -IoTarget $FolderTools
+        [String]$MyFolderPath_Input = $This.FolderPathToolsSource
+        [String]$MyFolderPath_Output = $This.FolderPathTools
 
-        [JtIoFile]$FileJtSnaphotExe = [JtIoFile]::new($This.JtSnapshotExe)
-        if ($False -eq $FileJtSnaphotExe.IsExisting()) {
-            Write-JtError -Text ( -join ("Snapshot64.exe does not exist at:", $This.JtSnapshotExe))
+        New-JtRobocopy -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
+
+        [JtIoFile]$MyJtIoFile_SnaphotExe = [JtIoFile]::new($This.FilePath_Exe_Snapshot)
+        if ($False -eq $MyJtIoFile_SnaphotExe.IsExisting()) {
+            Write-JtLog_Error -Where $This.ClassName -Text "Snapshot64.exe does not exist at MyJtIoFile_SnaphotExe: $MyJtIoFile_SnaphotExe"
             return $False
         }
         return $True
     }
 }
-
-
 
 class JtSnap_Partition : JtSnap {
 
@@ -54,47 +50,60 @@ class JtSnap_Partition : JtSnap {
 
     
 
-    [Boolean]DoIt([JtIoFolder]$FolderJtSnap) {
-        if($False -eq $This.DoPrepareTools()) {
+    [Boolean]DoIt([String]$TheFolderPath_Output) {
+        [String]$MyFolderPath_Output = $TheFolderPath_Output
+        
+        [JtIoFolder]$MyJtIoFolder_Snap = New-JtIoFolder -FolderPath $MyFolderPath_Output
+        [String]$MyFilePath_SnapshotExe = $This.FilePath_Exe_Snapshot
+
+        [Boolean]$MyBlnToolsPrepared = $This.DoPrepareTools()
+        if (! ($MyBlnToolsPrepared)) {
             return $False
         }
 
+        [String]$MyLabel = -Join ("JtSnap", $This.MyName)
+        [JtTimer]$MyJtTimer = [JtTimer]::new($MyLabel)
 
-        [JtTimer]$JtTimer = [JtTimer]::new( -Join ("JtSnap", $This.MyName))
-
-        if ($False -eq $FolderJtSnap.IsExisting()) {
-            Write-JtError -Text ( -join ("FolderJtSnap does not exist:", $FolderJtSnap.GetPath()))
+        if (! ($MyJtIoFolder_Snap.IsExisting())) {
+            Write-JtLog_Error -Where $This.ClassName -Text "Folder does not exist MyJtIoFolder_Snap: $MyJtIoFolder_Snap"
             return $False
         }
         
-        [JtIoFolder]$FolderJtSnapComputer = $FolderJtSnap.GetSubFolder($env:COMPUTERNAME)
-        [JtIoFolder]$FolderJtSnapComputerPart = $FolderJtSnapComputer.GetSubFolder($This.MyName)
-        $FolderJtSnapComputerPart.DoDeleteAllFiles()
+        [String]$MyComputername = $env:COMPUTERNAME
+        [JtIoFolder]$MyJtIoFolder_SnapComputer = $MyJtIoFolder_Snap.GetJtIoFolder_Sub($MyComputername)
+        [JtIoFolder]$MyJtIoFolder_SnapComputerPart = $MyJtIoFolder_SnapComputer.GetJtIoFolder_Sub($This.MyName)
+        $MyJtIoFolder_SnapComputerPart.DoRemoveFiles_All()
         
-        [String]$ImageFilename = -join ($This.MyName, ".sna")
-        [String]$ImageFilePath = $FolderJtSnapComputerPart.GetFilePath($ImageFilename)
+        [String]$MyFilename_Image = -join ($This.MyName, ".sna")
+        [String]$MyFilePath_Image = $MyJtIoFolder_SnapComputerPart.GetFilePath($MyFilename_Image)
     
-        $TheCommand = -Join ($This.MyPartition, " ", $ImageFilePath, " -Go -R")
-        if($True -eq $This.GetDev()) {
-            Write-JtLog -Text (-join("Snapshot.exe:", $This.JtSnapshotExe, ", Command:", $TheCommand))
-        } else {
-            Start-Process -FilePath $This.JtSnapshotExe -ArgumentList $TheCommand -NoNewWindow -Wait
+        $MyCommand = -Join ($This.MyPartition, " ", $MyFilePath_Image, " -Go -R")
+        if (Get-JtDevMode) {
+            Write-JtLog -Where $This.ClassName -Text "MyFilePath_SnapshotExe: $MyFilePath_SnapshotExe, MyCommand: $MyCommand"
+        }
+        else {
+            Start-Process -FilePath $MyFilePath_SnapshotExe -ArgumentList $MyCommand -NoNewWindow -Wait
         }
         
-        $tstamp = Get-Date -Format yyyy-MM-dd
-        [String]$FilenameTstamp = -join ( "JtSnapshot.", $tstamp, ".tstamp.meta")
-        [String]$FilePathTstamp = $FolderJtSnapComputerPart.GetFilePath($FilenameTstamp)
-        Out-File -FilePath $FilePathTstamp
-        
-        [String]$MySize = $FolderJtSnapComputerPart.GetFolderSize()
-        $MySize = $MySize.replace('.', '_')
-        $MySize = $MySize.replace(',', '_')
-        $MySize = $MySize.replace(' ', '')
-        [String]$FilenameSize = -join ( "JtSnapshot.", $MySize, ".size.meta")
-        [String]$FilePathSize = $FolderJtSnapComputerPart.GetFilePath($FilenameSize)
-        Out-File -FilePath $FilePathSize
+        [String]$MyTstamp = Get-JtTimestamp
+        $MyParams = @{
+            FolderPath_Input  = $MyJtIoFolder_SnapComputerPart
+            FolderPath_Output = $MyJtIoFolder_SnapComputerPart
+            Name              = "snapshot"
+            Value             = $MyTstamp
+        }
+        Write-JtIoFile_Meta_Report @MyParams
+
+        [Decimal]$MyDecSizeGb = Get-JtFolderPath_Info_SizeGb -FolderPath $MyJtIoFolder_SnapComputerPart
+        $MyParams = @{
+            FolderPath_Input  = $MyJtIoFolder_SnapComputerPart
+            FolderPath_Output = $MyJtIoFolder_SnapComputerPart
+            Name              = "size"
+            Value             = $MyDecSizeGb
+        }
+        Write-JtIoFile_Meta_Report @MyParams
     
-        $JtTimer.Report()
+        $MyJtTimer.Report()
         return $True
     }
 }
@@ -109,9 +118,8 @@ class JtSnap_Recover : JtSnap {
     # [String]$MyPartition
     [Boolean]$System = $False
 
-    
     JtSnap_Recover([JtIoFile]$MySnaFile, [Int32]$MyDisk, [Int32]$MyPart, [String]$TheComputer) {
-        $This.ClassName = "JtSnap_Partition"
+        $This.ClassName = "JtSnap_Recover"
         $This.Disk = $MyDisk
         $This.Part = $MyPart
         $This.Computer = $TheComputer
@@ -124,73 +132,96 @@ class JtSnap_Recover : JtSnap {
         # $This.MyPartition = -join ("HD", $Disk, ":", $Part)
     }
     
-    JtSnap_Recover([JtIoFile]$MySnaFile, [Int32]$MyDisk, [Int32]$MyPart, [String]$TheComputer, [Boolean]$IsSystem) {
-        $This.ClassName = "JtSnap_Partition"
-        $This.Disk = $MyDisk
-        $This.Part = $MyPart
+    JtSnap_Recover([JtIoFile]$TheSnaFile, [Int32]$TheDisk, [Int32]$ThePart, [String]$TheComputer, [Boolean]$TheBlnIsSystem) {
+        $This.ClassName = "JtSnap_Recover"
+        $This.Disk = $TheDisk
+        $This.Part = $ThePart
         $This.Computer = $TheComputer
         $This.MyName = -join ("HD", $This.Disk, "", $This.Part)
 
-        $This.SnaFile = $MySnaFile
-        $This.System = $IsSystem
+        $This.SnaFile = $TheSnaFile
+        $This.System = $TheBlnIsSystem
 
         # $MyPartition = "HD2:1"
         # $This.MyPartition = -join ("HD", $Disk, ":", $Part)
     }
 
     [Boolean]DoIt() {
+        [String]$MyFilePath_SnapshotExe = $This.FilePath_Exe_Snapshot
         if ($False -eq $This.DoPrepareTools()) {
             return $False
         }
 
-        
-        [String]$ImageFilePath = $This.SnaFile.GetPath()
+        [String]$MyFilePath_Image = $This.SnaFile.GetPath()
 
-    
-        [String]$TheCommandNormal = -Join (" ", $ImageFilePath, " ", "hd", $This.Disk, ":", $This.Part, " ", "-y")
-        [String]$TheCommandSystem = -Join (" ", "C:", " ", $ImageFilePath, " ", "--schedule", " ", "--autoreboot:success")
+        [String]$MyCommandNormal = -Join (" ", $MyFilePath_Image, " ", "hd", $This.Disk, ":", $This.Part, " ", "-y")
+        [String]$MyCommandSystem = -Join (" ", "C:", " ", $MyFilePath_Image, " ", "--schedule", " ", "--autoreboot:success")
 
-        [String]$TheCommand = ""
+        [String]$MyCommand = ""
         if ($True -eq $This.System) {
-            $TheCommand = $TheCommandSystem
+            $MyCommand = $MyCommandSystem
         }
         else {
-            $TheCommand = $TheCommandNormal
+            $MyCommand = $MyCommandNormal
         }
-        Write-JtLog -Text ( -join ("Snapshot.exe:", $This.JtSnapshotExe, ", Command:", $TheCommand))
-        if ($True -eq $This.GetDev()) {
-            Write-JtLog -Text ("Doing nothing. This is a dev system.")
+        Write-JtLog -Where $This.ClassName -Text "MyFilePath_SnapshotExe: $MyFilePath_SnapshotExe, MyCommand: $MyCommand"
+        if (Get-JtDevMode) {
+            Write-JtLog -Where $This.ClassName -Text "Doing nothing. This is a dev system."
         }
         else {
-            Start-Process -FilePath $This.JtSnapshotExe -ArgumentList $TheCommand -NoNewWindow -Wait
+            Start-Process -FilePath $This.FilePath_Exe_Snapshot -ArgumentList $MyCommand -NoNewWindow -Wait
             if ($True -eq $This.System) {
-                $TheCommand = -join ('/c', ' ', '"', 'Computer wird neu gestartet. System wird recovered.', '"', ' ', '/r')
-                #                Start-Process -FilePath $This.ShutdownExe -ArgumentList $TheCommand -NoNewWindow -Wait
+                $MyCommand = -join ('/c', ' ', '"', 'Computer wird neu gestartet. System wird recovered.', '"', ' ', '/r')
+                #                Start-Process -FilePath $This.ShutdownExe -ArgumentList $MyCommand -NoNewWindow -Wait
             }
         }
         return $True
     }
 }
 
+Function New-JtSnap_Partition {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Disk,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition
+    )
 
-class JtSnapshot : JtClass {
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [String]$MyDisk = $Disk
+    [String]$MyPartition = $Partition
 
-    [JtIoFolder]$TargetFolder = $Null
-    [String]$ServerShare = '\\al-its-se-oslo\Snap$'
+    [JtSnap_Partition]$MyJtSnap_Partition = [JtSnap_Partition]::new($MyDisk, $MyPartition)
+    $MyJtSnap_Partition.DoIt($MyFolderPath_Output)
+}
 
-    JtSnapshot([JtIoFolder]$MyFolderTarget) : Base() {
-        $This.ClassName = "JtSnapshot"
-        $This.TargetFolder = $MyFolderTarget
+
+Function New-JtSnap_Recover {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Disk,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Computer,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Boolean]$BlnSystem
+    )
+
+    [String]$MyFilePath = [String]$FilePath,
+    [String]$MyDisk = [String]$Disk,
+    [String]$MyPartition = [String]$Partition,
+    [String]$MyComputer = [String]$Computer,
+    [Boolean]$MyBlnSystem = [Boolean]$BlnSystem
+
+    [JtIoFile]$MyJtIoFile_Sna = [JtIoFile]::new($MyItem.source)
+    if (!($MyJtIoFile_Sna.IsExisting())) {
+        Write-JtLog_Error -Where $This.ClassName -Text "Error!!! File missing; please edit XML for MyJtIoFile_Sna: $MyJtIoFile_Sna"
+        return $False
     }
-
-
-    [Boolean]DoJtSnapPart([Int32]$Disk, [Int32]$Part) {
-        [JtSnap_Partition]$JtSnap_Partition = [JtSnap_Partition]::new($Disk, $Part)
-        $JtSnap_Partition.DoIt($This.TargetFolder)
-        return $True
-    }
+        
+    [JtSnap_Recover]$MyJtSnap_Recover = [JtSnap_Recover]::new($MyFilePath, $MyDisk, $MyPartition, $MyComputer, $MyBlnSystem)
+    $MyJtSnap_Recover.DoIt()
 }
 
 
 
 
+Export-ModuleMember -Function New-JtSnap_Partition
+Export-ModuleMember -Function New-JtSnap_Recover

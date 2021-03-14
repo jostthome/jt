@@ -1,2 +1,0 @@
-New-JtInit_Inf_Win32NetworkAdapter
-

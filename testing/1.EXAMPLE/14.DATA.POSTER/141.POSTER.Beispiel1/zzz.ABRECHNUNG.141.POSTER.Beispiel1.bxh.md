@@ -1,0 +1,33 @@
+﻿# Fakultät für Architektur und Landschaft
+
+
+## Plot-Service - Abrechnung
+
+
+| NR   | PREIS   | NACHNAME   | VORNAME | LABEL          | PAPIER   | BxH      | DIM   | PAP. | TINT. | 
+|----|-------|----------|-------|--------------|--------|--------|-----|----|-----|
+| 1    | 7,75    | musterfrau | max     | projekt_blatt1 | 90g      | 841x1189 | 1.000 | 1,25 | 6,50  | 
+| 2    | 9,00    | musterfrau | max     | projekt_blatt2 | 180g     | 841x1189 | 1.000 | 2,50 | 6,50  | 
+| 3    | 9,00    | musterfrau | max     | projekt_blatt3 | trans    | 841x1189 | 1.000 | 2,50 | 6,50  | 
+| 4    | 9,00    | musterfrau | max     | projekt_blatt4 | semi     | 841x1189 | 1.000 | 2,50 | 6,50  | 
+| 5    | 9,00    | musterfrau | max     | projekt_blatt5 | glossy   | 841x1189 | 1.000 | 2,50 | 6,50  | 
+| 6    | 9,00    | musterfrau | max     | projekt_blatt6 | fabriano | 841x1189 | 1.000 | 2,50 | 6,50  | 
+| SUM: | 5275,00 |            |         |                |          |          |       |      |       | 
+
+
+---
+
+Kunde
+
+---
+
+Plot-Service
+
+---
+
+* Stand: 13.03.2021; Preisliste: JtPreisliste
+
+* %OneDrive%/jt/testing/1.EXAMPLE/14.DATA.POSTER/141.POSTER.Beispiel1
+
+* <https://www.archland.uni-hannover.de/de/fakultaet/ausstattung/plotservice/>
+

@@ -1,10 +1,11 @@
-New-JtIoFileVersionMeta -Path "%OneDrive%\jt"
-New-JtIoFileVersionMeta -Path "%OneDrive%\jt\common"
-New-JtIoFileVersionMeta -Path "D:\Seafile\al-apps\apps"
+using module JtIndex
 
-New-JtRobocopy -Source "%OneDrive%\jt\common" -Target "D:\Seafile\al-apps\apps\jt\common"
+Write-JtIoFile_Meta_Version -FolderPath_Output "%OneDrive%\jt"
+Write-JtIoFile_Meta_Version -FolderPath_Output "%OneDrive%\jt\common"
+Write-JtIoFile_Meta_Version -FolderPath_Output "D:\Seafile\al-apps\apps"
 
-pause
+New-JtRobocopy -FolderPath_Input "%OneDrive%\jt\common" -FolderPath_Output "D:\Seafile\al-apps\apps\jt\common"
+New-JtRobocopy -FolderPath_Input "%OneDrive%\jt\uni"    -FolderPath_Output "D:\Seafile\al-apps\apps\jt\uni"
 
 
 

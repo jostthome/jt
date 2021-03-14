@@ -1,0 +1,3 @@
+<config>
+	<data source="c:\apps" target="%OneDrive%\jt\testing\JtInvData" label="c_apps"></data>
+</config>

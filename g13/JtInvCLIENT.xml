@@ -1,7 +1,5 @@
 <config>
-	<export target="C:\Users\thome.ARCHLAND\OneDrive\0.INVENTORY\01.OUTPUT\reports"></export>
-	<reports target="C:\Users\thome.ARCHLAND\OneDrive\0.INVENTORY\01.OUTPUT\reports"></reports>
-	<combine source="D:\backup\oslo\reports" target="%OneDrive%\0.INVENTORY\01.OUTPUT\combine"></combine>
-	<update source="D:\Seafile\al-apps\apps"></update>
+	<export target="%OneDrive%\0.INVENTORY\01.OUTPUT\reports"></export>
+	<export target="%OneDrive%\jt\testing\1.EXAMPLE\20.REPORTS"></export>
 </config>
 

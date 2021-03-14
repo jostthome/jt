@@ -1,5 +1,10 @@
 <config>
-	<files label="D_SEAFILE_AL-APPS" filter="*.*" source="D:\Seafile\al-apps" target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></files>
-	<files label="FOLDER-Files_in_ONEDRIVE" filter="*.folder" source="%OneDrive%" target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></files>
-	<files label="FOLDER-Files_in_ONEDRIVE" filter="*.folder" source="%OneDrive%" target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></files>
+	<files source="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\BANK"    filter="*.meta"               target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="meta.bank"></files>
+	<files source="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\FAMILIE" filter="*.meta"               target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="meta.familie"></files>
+	<files source="%OneDrive%\BANK" filter="*.folder"               target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="ONEDRIVE.BANK"></files>
+	<files source="%OneDrive%\FAMILIE" filter="*.folder"            target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="ONEDRIVE.FAMILIE"></files>
+	<files source="%OneDrive%\IMMO" filter="*.folder"               target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="ONEDRIVE.IMMO"></files>
+	<files source="%OneDrive%\GERHARD" filter="*.folder"            target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="ONEDRIVE.GERHARD"></files>
+	<files source="%OneDrive%\STEUER" filter="*.folder"             target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="ONEDRIVE.STEUER"></files>
+	<files source="%OneDrive%\VERSICHERUNG" filter="*.folder"       target="%OneDrive%\0.INVENTORY\01.OUTPUT\files" label="ONEDRIVE.VERSICHERUNG"></files>
 </config>

@@ -1,0 +1,4 @@
+<config>
+	<combine source="%OneDrive%\jt\testing\1.EXAMPLE\20.REPORTS" target="c:\_inventory\out\Test-JtInvClientCombine"></combine>
+</config>
+

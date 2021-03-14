@@ -1,0 +1,5 @@
+<config>
+	<mirror source="%OneDrive%\jt\testing\1.EXAMPLE\20.REPORTS\g13-al-pc-dell.c-win10p" target="\\130.75.66.1\reports$\g13-al-pc-dell.c-win10p">common</mirror>
+	<mirror source="\\130.75.66.1\reports$" target="D:\backup\oslo\reports">common</mirror>
+</config>
+

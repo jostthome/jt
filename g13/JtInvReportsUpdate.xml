@@ -1,0 +1,6 @@
+<config>
+	<reports source="%OneDrive%\jt\example\reports"></reports>
+	<reports source="%OneDrive%\0.INVENTORY\01.OUTPUT\reports"></reports>
+	<reports source="D:\backup\oslo\reports"></reports>
+</config>
+

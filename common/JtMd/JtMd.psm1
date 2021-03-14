@@ -1,7 +1,7 @@
-using module JtClass
+using module Jt  
 using module JtIo
 using module JtTbl
-using module JtCsv
+# using module JtCsv
 
 class JtMd : JtClass{
 
@@ -11,7 +11,7 @@ class JtMd : JtClass{
     }
 
     static [String]GetLinkForLine([String]$Line) {
-        [String]$Result = $Line
+        [String]$MyResult = $Line
         if ($Null -eq $Line) {
 
         }
@@ -24,28 +24,29 @@ class JtMd : JtClass{
             }
             else {
                 [String]$Link = $matches[0]
-                $Result = $Link
+                $MyResult = $Link
             }
         }
-        return $Result
+        return $MyResult
     }
 
-    static [System.Collections.ArrayList]GetList([System.Collections.ArrayList]$JtIoFiles, [String]$ThePattern) {
+    static [System.Collections.ArrayList]GetList([System.Collections.ArrayList]$TheAlJtIoFiles, [String]$ThePattern) {
         [System.Collections.ArrayList]$MyList = [System.Collections.ArrayList]::new()
-        foreach ($AnyFile in $JtIoFiles) {
-            [JtIoFile]$JtIoFile = $AnyFile
-            [String]$FileName = $JtIoFile.GetName()
-            [String]$FileLabel = $JtIoFile.GetLabelForFileName()
-            [String]$FilePath = $JtIoFile.GetPath()
-            [String]$Pattern = $ThePattern.Replace("{FILELABEL}", $FileLabel)
-            [String]$FileExtension = [System.IO.Path]::GetExtension($FileName)
+        foreach ($File in $TheAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            [String]$MyFilename = $MyJtIoFile.GetName()
+            [String]$MyFileLabel = $MyJtIoFile.GetLabelForFileName()
+            [String]$MyFilePath = $MyJtIoFile.GetPath()
+            [String]$MyPattern = $ThePattern
+            [String]$MyPattern = $MyPattern.Replace("{FILELABEL}", $MyFileLabel)
+            [String]$MyFileExtension = [System.IO.Path]::GetExtension($MyFilename)
             
-            [String]$Content = Get-Content -Path $JtIoFile.GetPath() -Encoding UTF8
-            [System.Collections.ArrayList]$MyHitList = [JtMd]::GetHits($Content, $Pattern)
-            foreach ($El in $MyHitList) {
-                [String]$Find = $Content | Select-String -Pattern $Pattern
-                if ($Null -ne $Find) {
-                    $Content -match $Pattern
+            [String]$MyContent = Get-Content -Path $MyFilePath -Encoding UTF8
+            [System.Collections.ArrayList]$AlHitList = [JtMd]::GetHits($MyContent, $MyPattern)
+            foreach ($El in $AlHitList) {
+                [String]$MyFind = $MyContent | Select-String -Pattern $MyPattern
+                if ($Null -ne $MyFind) {
+                    $MyContent -match $MyPattern
                     # if ($matches.Length -gt 0) {
                     #     [String]$MyLine = $matches[0]
                     #     if ($MyLine.Length -gt 0) {
@@ -53,11 +54,11 @@ class JtMd : JtClass{
                     #     }
                     # }
                     [PSCustomObject]$MyObject = [PSCustomObject]@{ }
-                    $MyObject | Add-Member -MemberType NoteProperty -Name Filename -Value $FileName
-                    $MyObject | Add-Member -MemberType NoteProperty -Name Filepath -Value $FilePath
-                    $MyObject | Add-Member -MemberType NoteProperty -Name Extension -Value $FileExtension
+                    $MyObject | Add-Member -MemberType NoteProperty -Name Filename -Value $MyFilename
+                    $MyObject | Add-Member -MemberType NoteProperty -Name FilePath -Value $MyFilePath
+                    $MyObject | Add-Member -MemberType NoteProperty -Name Extension -Value $MyFileExtension
                     # $MyObject | Add-Member -MemberType NoteProperty -Name Find -Value $MyLine
-                    $MyObject | Add-Member -MemberType NoteProperty -Name Label -Value $FileLabel
+                    $MyObject | Add-Member -MemberType NoteProperty -Name Label -Value $MyFileLabel
                     
                     $MyLab = [JtMd]::GetLabelForLine($El)
                     $MyObject | Add-Member -MemberType NoteProperty -Name Lab -Value $MyLab
@@ -72,7 +73,7 @@ class JtMd : JtClass{
     }
 
     static [String]GetLabelForLine([String]$Line) {
-        [String]$Result = $Line
+        [String]$MyResult = $Line
         if ($Null -eq $Line) {
 
         }
@@ -85,12 +86,12 @@ class JtMd : JtClass{
             }
             else {
                 [String]$Label = $matches[0]
-                $Result = $Label
+                $MyResult = $Label
             }
         }
-        $Result = $Result.Replace("[", "")
-        $Result = $Result.Replace("]", "")
-        return $Result
+        $MyResult = $MyResult.Replace("[", "")
+        $MyResult = $MyResult.Replace("]", "")
+        return $MyResult
     }
 
 
@@ -112,207 +113,250 @@ class JtMd : JtClass{
         return $MyList
     }
 
-    static [Boolean]DoWriteJtMdCsv([JtIoFolder]$FolderWork, [JtIoFolder]$FolderTarget, [String]$MyLabel, [String]$MyFilter, [String]$ThePattern) {
-        [System.Collections.ArrayList]$MyList = [System.Collections.ArrayList]::new()
-        [System.Collections.ArrayList]$JtIoFiles = $FolderWork.GetJtIoFilesWithFilter($MyFilter, $True)
+    static [Boolean]DoWriteJtMdCsv([JtIoFolder]$TheJtIoFolderWork, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabel, [String]$TheFilter, [String]$ThePattern) {
+        [System.Collections.ArrayList]$MyAlList = [System.Collections.ArrayList]::new()
+        [String]$MyJtIoFolderWork = $TheJtIoFolderWork
+        
+        [String]$MyFolderPath_Output = $TheJtIoFolder_Output.GetPath()
+        [String]$MyFilter = $TheFilter
+        [String]$MyLabel = $TheLabel
+        [String]$MyPattern = $ThePattern
 
-        [System.Collections.ArrayList]$ArrayList = [JtMd]::GetList($JtIoFiles, $ThePattern)
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolderWork -Filter $MyFilter -Recurse
+        [System.Collections.ArrayList]$MyAlList = [JtMd]::GetList($MyAlJtIoFiles, $MyPattern)
 
-        New-JtCsvWriteArraylist -Label $MyLabel -JtIoFolder $FolderTarget -ArrayList $ArrayList
-
+        Convert-JtAl_to_FileCsv -ArrayList $MyAlList -FolderPath_Output $MyFolderPath_Output -Label $MyLabel  
         return $True
     }
 }
 
-class MdDocument {
+class JtMdDocument {
 
     [String]$End = "`n"
 
     hidden [System.Collections.ArrayList]$Lines = [System.Collections.ArrayList]::new()
 
-    MdDocument([String]$Title) {
-        $This.AddH1($Title)
+    JtMdDocument([String]$TheTitle) {
+        $This.AddH1($TheTitle)
     }
 
-    [Boolean]AddLine([String]$Input) {
-        $This.Lines.Add(-join($Input, $This.End))
-        return $True
+    AddLine([String]$TheInput) {
+        $This.Lines.Add(-join($TheInput, $This.End))
     }
 
-    [Boolean]AddLine() {
+    AddLine() {
         $This.Lines.Add(-join("---", $This.End))
-        return $True
+
     }
 
-    [Boolean]AddH1([String]$Input) {
-        [String]$MyLine = -join("# ", $Input, $This.End)
+    AddH1([String]$TheInput) {
+        [String]$MyLine = -join("# ", $TheInput, $This.End)
         $This.AddLine($MyLine)
-        return $True
     }
 
-    [Boolean]AddH2([String]$Input) {
-        [String]$MyLine = -join("## ", $Input, $This.End)
+    AddH2([String]$TheInput) {
+        [String]$MyLine = -join("## ", $TheInput, $This.End)
         $This.AddLine($MyLine)
-        return $True
     }
 
-    [Boolean]AddH3([String]$Input) {
-        [String]$MyLine = -join("### ", $Input, $This.End)
+    AddH3([String]$TheInput) {
+        [String]$MyLine = -join("### ", $TheInput, $This.End)
         $This.AddLine($MyLine)
-        return $True
     }
 
     [String]GetOutput() {
-        [String]$Result = ""
+        [String]$MyResult = ""
 
-        $Result = ($This.Lines -join $This.End)
-
-        return $Result
+        $MyResult = ($This.Lines -join $This.End)
+        return $MyResult
     }
-
 }
 
 
-class MdTable : JtClass {
+Function New-JtMdDocument {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Title
+    )
+
+    # [String]$MyFunctionName = "New-JtMdDocument"
+
+    [String]$MyTitle = $Title
+
+    [JtMdDocument]::new($MyTitle)
+
+}
+
+Function Get-JtDataTable_Info_Column_Width {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][System.Data.Datatable]$DataTable,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Int32]$IntCol
+    )
+
+    [System.Data.Datatable]$MyDataTable = $DataTable
+    [Int32]$MyIntNumberCol = $IntCol
+    [int32]$MyIntResult = 0
+    foreach ($MyRow in $MyDataTable.Rows) {
+        # [Int32]$IntWidth = $Row.GetValueFromColumnByNumber($ColNumber)
+        [String]$MyValue = $MyRow.ItemArray[$MyIntNumberCol]
+        [Int32]$MyIntWidth = $MyValue.Length
+        if ($MyIntWidth -gt $MyIntResult) {
+            $MyIntResult = $MyIntWidth
+        }
+
+        [String]$MyValue = $MyDataTable.Columns[$MyIntNumberCol].caption
+        [Int32]$MyIntWidth = $MyValue.Length
+        if ($MyIntWidth -gt $MyIntResult) {
+            $MyIntResult = $MyIntWidth
+        }
+    }
+    return , $MyIntResult
+}
+
+
+
+
+class JtMdTable : JtClass {
 
     [String]$Vertical = "|"
 
     [System.Data.Datatable]$Datatable = $Null
 
-    MdTable([System.Data.Datatable]$MyDatatable) {
-        if($Null -eq $MyDatatable) {
+    JtMdTable([System.Data.Datatable]$TheDataTable) {
+        if($Null -eq $TheDataTable) {
             Throw "JtTblTable is null!"
         }
-        $This.Datatable = $MyDatatable
+        $This.Datatable = $TheDataTable
     }
 
-    
-    [Int32] GetColWidth([System.Data.Datatable]$DataTable, [Int32]$ColNumber) {
-        [int32]$Result = 0
-        foreach ($Row in $DataTable.Rows) {
-            # [Int32]$IntWidth = $Row.GetValueFromColumnByNumber($ColNumber)
-            [String]$Value = $Row.ItemArray[$ColNumber]
-            [Int32]$IntWidth = $Value.Length
-            if ($IntWidth -gt $Result) {
-                $Result = $IntWidth
-            }
-
-            [String]$Value = $DataTable.Columns[$ColNumber].caption
-            [Int32]$IntWidth = $Value.Length
-            if ($IntWidth -gt $Result) {
-                $Result = $IntWidth
-            }
-        }
-        return $Result
+    [Int32]GetColWidth([System.Data.Datatable]$TheDataTable, [Int32]$TheIntNumberCol) {
+        return Get-JtDataTable_Info_Column_Width -DataTable $TheDataTable -IntCol $TheIntNumberCol
     }
 
-    [String]GetFormattedOutput([Int32]$IntCol, [String]$Input) {
-        [String]$Result = $Input
+    [String]GetFormattedOutput([Int32]$TheIntCol, [String]$TheInput) {
+        [String]$MyInput = $TheInput
+        [Int32]$MyIntCol = $TheIntCol
 
-        [int32]$ColWidth = $This.GetColWidth($This.Datatable, $IntCol)
+        [int32]$MyColWidth = $This.GetColWidth($This.Datatable, $MyIntCol)
 
-        [String]$Spacer = "                                                                                                                                 "
-        [String]$Out = ( -join ($Input, $Spacer)).Substring(0, $ColWidth)
+        [String]$MySpacer = "                                                                                                                                 "
+        [String]$MyOut = ( -join ($MyInput, $MySpacer)).Substring(0, $MyColWidth)
 
-        $Result = $Out
-        return $Result 
+
+        [String]$MyResult = $MyOut
+        return $MyResult 
     }
 
-    [String]GetHeadLine([System.Array]$ArrayList) {
-        [String]$Vert = $This.Vertical
+    [String]GetHeadLine([System.Array]$TheArrayList) {
+        [System.Array]$MyArrayList = $TheArrayList
+        [String]$MyVert = $This.Vertical
 
         [System.Collections.ArrayList]$MyLIne = [System.Collections.ArrayList]::new()
         
-        [String]$Result = ""
         
-        $MYLine.Add($Vert)
+        $MyLine.Add($MyVert)
         
         [Int32]$i = 0
-        foreach ($Element in $ArrayList) {
-            [String]$TheElement = $This.GetFormattedOutput($i, $Element)
+        foreach ($Element in $MyArrayList) {
+
+            [String]$MyElement = $Element
+            [String]$MyOutput = $This.GetFormattedOutput($i, $MyElement)
             # [String]$TheElement = $Element
-            $MyLine.Add($TheElement)
-            $MyLine.Add($Vert)
+            $MyLine.Add($MyOutput)
+            $MyLine.Add($MyVert)
             $i = $i + 1
         }
-
-        $MyLine.Add("`n")
         
-        $Result = -join ($MyLine)
-        return $Result
+        $MyLine.Add("`n")
+        [String]$MyResult = $MyLine
+        return $MyResult
     }
 
-    [String]GetNormalLine($Datarow) {
-        [String]$Vert = $This.Vertical
+    [String]GetNormalLine($MyDatarow) {
+        [String]$MyVert = $This.Vertical
 
         [System.Collections.ArrayList]$MyLIne = [System.Collections.ArrayList]::new()
         
-        [String]$Result = ""
-        
-        $MYLine.Add($Vert)
+        $MyLine.Add($MyVert)
         
         [Int32]$i = 0
-        foreach ($Element in $Datarow.ItemArray) {
-            [String]$TheElement = $This.GetFormattedOutput($i, $Element)
+        foreach ($Element in $MyDatarow.ItemArray) {
+            [String]$MyElement = $Element
+            [String]$MyOutput = $This.GetFormattedOutput($i, $MyElement)
             # [String]$TheElement = $Element
-            $MyLine.Add($TheElement)
-            $MyLine.Add($Vert)
+            $MyLine.Add($MyOutput)
+            $MyLine.Add($MyVert)
             $i = $i + 1
         }
-
+        
         $MyLine.Add("`n")
         
-        $Result = -join ($MyLine)
-        return $Result
+        [String]$MyResult = $MyLine
+        return $MyResult
     }
     
-    [String]GetHorLine([System.Collections.ArrayList]$ArrayList) {
-        [String]$Vert = $This.Vertical
-        [String]$Hor = "-----------------------------------------------------------------------------------"
+    [String]GetHorLine([System.Collections.ArrayList]$TheArrayList) {
+        [String]$MyVert = $This.Vertical
+        [String]$MyHor = "-----------------------------------------------------------------------------------"
         
         [System.Collections.ArrayList]$MyLIne = [System.Collections.ArrayList]::new()
         
-        [String]$Result = ""
         
-        $MYLine.Add($Vert)
+        $MyLine.Add($MyVert)
         
         [Int32]$i = 0
-        foreach ($Element in $ArrayList) {
-            [String]$TheElement = $This.GetFormattedOutput($i, $Hor)
+        foreach ($Element in $TheArrayList) {
+            [String]$MyOutput = $This.GetFormattedOutput($i, $MyHor)
             # [String]$TheElement = $Hor
-            $MyLine.Add($TheElement)
-            $MyLine.Add($Vert)
+            $MyLine.Add($MyOutput)
+            $MyLine.Add($MyVert)
             $i = $i + 1
         }
-
+        
         $MyLine.Add("`n")
         
-        $Result = [system.String]::Join("", $MyLine.ToArray())
-        return $Result
+        [String]$MyResult = [system.String]::Join("", $MyLine.ToArray())
+        return $MyResult
     }
 
     [String]GetOutput() {
         [System.Collections.ArrayList]$MyRows = $This.Datatable.rows
-        [System.Collections.ArrayList]$Lines = [System.Collections.ArrayList]::new()
+        [System.Collections.ArrayList]$MyLines = [System.Collections.ArrayList]::new()
 
-
-        [System.Collections.ArrayList]$Listhead = [System.Collections.ArrayList]::new()
+        [System.Collections.ArrayList]$MyListhead = [System.Collections.ArrayList]::new()
         foreach($Column in $This.Datatable.Columns) {
-            $Listhead.Add($Column.caption)
+            [String]$MyCaption = $Column
+            $MyListhead.Add($MyCaption)
         }
-        $Lines.add($This.GetHeadLine($Listhead))
-        $Lines.add($This.GetHorLine($Listhead))
+        $MyLines.add($This.GetHeadLine($MyListhead))
+        $MyLines.add($This.GetHorLine($MyListhead))
 
         foreach($Row in $MyRows) {
-            $Lines.add($This.GetNormalLine($Row))
-
+            $MyLines.add($This.GetNormalLine($Row))
         }
-        #     [System.Array]$TheList = $MyRow.GetValues() 
-        # }
 
-        [String]$Result = ""
-        $Result = [system.String]::Join("", $Lines.ToArray())
-
-        return $Result
+        [String]$MyResult = [system.String]::Join("", $MyLines.ToArray())
+        return $MyResult
     }
 }
+
+
+
+Function New-JtMdTable {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][System.Data.Datatable]$DataTable
+    )
+
+
+    # [String]$MyFunctionName = "New-JtMdTable"
+
+    [System.Data.Datatable]$MyDataTable = $DataTable
+
+    [JtMdTable]::new($MyDataTable)
+
+}
+
+Export-ModuleMember -Function New-JtMdDocument
+Export-ModuleMember -Function New-JtMdTable

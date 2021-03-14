@@ -1,51 +1,245 @@
-using module JtClass
-using module JtConfig
-using module JtIo
-using module JtTbl
-using module JtUtil
-using module JtCsvGenerator
-using module JtCsv
+using module Jt 
+using module JtColRen
 using module JtIndex
-using module JtTemplateFile
+using module JtIo
 using module JtMd
+using module JtRep
 using module JtSnapshot
-using module JtFacFolderRen
-using module JtPreisliste
-using module JtTool
+using module JtTbl
+
+class Gen_Csvs_To_CsvsAll : JtClass {
+
+    [JtIoFolder]$JtIoFolder_Input
+
+    static hidden [Boolean]DoJoinCsvs([System.Collections.ArrayList]$TheAlCsvFiles, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabel) {
+
+        [JtIoFolder]$MyJtIoFolder_Output = $TheJtIoFolder_Output
+        [String]$MyLabel = $TheLabel
+        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
+        foreach ($File in $TheAlCsvFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            [String]$MyFilename = $MyJtIoFile.GetName() 
+            if (! ($MyFilename.StartsWith("all"))) {
+                $MyFilePath_Csv = $MyJtIoFile.GetPath()
+                $MyContent = Import-Csv -Path $MyFilePath_Csv -Delimiter ([JtClass]::Delimiter)
+                $MyContent
+                
+                [JtTblRow]$MyJtTblRow = New-JtTblRow
+                foreach ($Field in $MyContent) {
+                    foreach ($Element in $Field | Get-Member) {
+                        if ($element.MemberType -eq "NoteProperty") {
+                            $Name = $element.Name   
+                            [String]$MyFieldLabel = $Element.Name
+                            [String]$MyFieldValue = $Field.$Name
+    
+                            [JtFld]$MyJtFld = New-JtFld -Label $MyFieldLabel
+                            $MyJtFld.SetValue($MyFieldValue)
+    
+                            $MyJtTblRow.Add($MyJtFld)
+                        }
+                    }
+                }
+                $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
+            }
+        }
+        [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
+        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
+        return $True
+    }  
+
+
+    Gen_Csvs_To_CsvsAll([JtIoFolder]$TheJtIoFolder_Input) {
+        $This.ClassName = "Gen_Csvs_To_CsvsAll"
+        $This.JtIoFolder_Input = $TheJtIoFolder_Input
+    }
+
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        [JtIoFolder]$MyJtIoFolder_Csv = $This.JtIoFolder_Input.GetJtIoFolder_Sub("csv")
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Csv
+
+        [String]$MyLabel = "all"
+
+        [JtIoFolder]$MyJtIoFolder_Output = $This.JtIoFolder_Input
+        [Gen_Csvs_To_CsvsAll]::DoJoinCsvs($MyAlJtIoFiles, $MyJtIoFolder_Output, $MyLabel)
+
+        return $True
+    }
+}
+
+
+class JtCsvTool : JtClass {
+
+    [JtIoFolder]$JtIoFolder_Output_Combine
+    [System.Collections.ArrayList]$AlJtIoFolders_Reports
+    [String]$LabelSelection
+    
+    JtCsvTool([JtIoFolder]$TheJtIoFolder_Reports, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabelSelection, [System.Collections.ArrayList]$TheSelection) {
+        $This.ClassName = "JtCsvTool"
+
+        [JtIoFolder]$MyJtIoFolder_Reports = $TheJtIoFolder_Reports
+        [JtIoFolder]$MyJtIoFolder_Output = $TheJtIoFolder_Output
+        [System.Collections.ArrayList]$MySelection = $TheSelection
+        
+        $This.LabelSelection = $TheLabelSelection
+        $This.JtIoFolder_Output_Combine = $MyJtIoFolder_Output.GetJtIoFolder_Sub($This.LabelSelection, $True)
+        
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Reports = $MyJtIoFolder_Reports.GetAlJtIoFolders_Sub($False)
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Reports_Selected = [JtCsvTool]::GetAlIoFolders_Selected($MyAlJtIoFolders_Reports, $MySelection) 
+        
+        $This.AlJtIoFolders_Reports = $MyAlJtIoFolders_Reports_Selected
+    }
+    
+    JtCsvTool([JtIoFolder]$TheJtIoFolder_Reports, [JtIoFolder]$TheJtIoFolder_Output) {
+        $This.ClassName = "JtCsvTool"
+        
+        [JtIoFolder]$MyJtIoFolder_Reports = $TheJtIoFolder_Reports
+        [JtIoFolder]$MyJtIoFolder_Output = $TheJtIoFolder_Output
+        
+        $This.LabelSelection = "all"
+        $This.JtIoFolder_Output_Combine = $MyJtIoFolder_Output.GetJtIoFolder_Sub($This.LabelSelection, $True)
+  
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Reports = $MyJtIoFolder_Reports.GetAlJtIoFolders_Sub($False)
+
+        $This.AlJtIoFolders_Reports = $MyAlJtIoFolders_Reports
+    }
+
+    static [System.Collections.ArrayList]GetAlIoFolders_Selected([System.Collections.ArrayList]$TheAlJtIoFolders, [System.Collections.ArrayList]$TheAlSelection) {
+        [System.Collections.ArrayList]$MyAlSelection = $TheAlSelection
+        [System.Collections.ArrayList]$MyAlJtIoFolders = $TheAlJtIoFolders
+
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Selected = New-Object System.Collections.ArrayList
+        foreach ($Folder in $MyAlJtIoFolders) {
+            [JtIoFolder]$MyJtIoFolder = $Folder
+            if ($Null -eq $MyAlSelection) {
+                $MyAlJtIoFolders_Selected.Add($MyJtIoFolder)
+            }
+            else {
+                [Boolean]$MyBlnSelected = [JtCsvTool]::IsJtIoFolderInSelection($MyJtIoFolder, $MyAlSelection)
+                if ($MyBlnSelected) {
+                    $MyAlJtIoFolders_Selected.Add($MyJtIoFolder)
+                }
+            } 
+        }
+        return $MyAlJtIoFolders_Selected
+    }
+
+    static [Boolean]IsJtIoFolderInSelection([JtIoFolder]$TheJtIoFolder, [System.Collections.ArrayList]$TheAlFoldernames) {
+        if ($Null -eq $TheAlFoldernames) {
+            return $False
+        }
+        [Boolean]$MyBlnSelected = $False
+        foreach ($Element in $TheAlFoldernames) {
+            [String]$MyFoldername = $Element.ToString()
+            
+            [String]$MySearch = -join ("*", $MyFoldername, "*")
+            [String]$MyFolderPathFull = $TheJtIoFolder.GetPath()
+            if ($MyFolderPathFull -like $MySearch) {
+                return $True
+            }
+        }
+        return $MyBlnSelected
+    }
+
+    [System.Collections.ArrayList]GetAlJtIoFolders_Sub_Selected([System.Collections.ArrayList]$TheSelection) {
+        [System.Collections.ArrayList]$MyAlJtIoFolders = $This.GetAlJtIoFolders_Sub($False)
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Selected = [JtCsvTool]::GetAlIoFolders_Selected($MyAlJtIoFolders, $TheSelection)
+        return $MyAlJtIoFolders_Selected
+    }
+
+    [Boolean]DoIt() {
+        [JtIoFolder]$MyJtIoFolder_Output_Combine = $This.JtIoFolder_Output_Combine
+        Write-JtLog -Where $This.ClassName -Text "DoIt - MyJtIoFolder_Output_Combine: $MyJtIoFolder_Output_Combine"
+
+        [System.Collections.ArrayList]$MyAlFilenames_Csv = [System.Collections.ArrayList]::new()
+
+        [JtIoFolder]$MyJtIoFolder_Report = New-JtIoFolder_Report
+        [JtIoFolder]$MyJtIoFolder_Report_Csv = $MyJtIoFolder_Report.GetJtIoFolder_Sub("csv")
+        [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Csv)
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Report_Csv -Filter $MyFilter
+        foreach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            $MyAlFilenames_Csv.Add($MyJtIoFile.GetName())
+        }
+    
+        foreach ($Filename in $MyAlFilenames_Csv) {
+            [String]$MyFilename = $Filename
+
+            [System.Collections.ArrayList]$MyAlJtIoFiles_Csv = [System.Collections.ArrayList]::new()
+            [System.Collections.ArrayList]$MyAlFilePaths_Csv = [System.Collections.ArrayList]::new()
+            
+            [System.Collections.ArrayList]$MyAlJtIoFolders_Reports = $This.AlJtIoFolders_Reports
+            foreach ($Folder in $MyAlJtIoFolders_Reports) {
+                [JtIoFolder]$MyJtIoFolder = $Folder
+                [JtIoFolder]$MyJtIoFolder_Csv = $MyJtIoFolder.GetJtIoFolder_Sub("csv")
+                if ($MyJtIoFolder_Csv.IsExisting()) {
+                    [JtIoFile]$MyJtIoFile = $MyJtIoFolder_Csv.GetJtIoFile($MyFilename)
+                    if ($MyJtIoFile.IsExisting()) {
+                        $MyAlJtIoFiles_Csv.Add($MyJtIoFile)
+                        $MyAlFilePaths_Csv.Add($MyJtIoFile.GetPath())
+                    }
+                }
+            }
+
+            $MyDataCsv = $MyAlFilePaths_Csv | Import-Csv  -Delimiter ([JtClass]::Delimiter)
+
+            [JtIoFile]$MyJtIoFileOutput = $MyJtIoFolder_Output_Combine.GetJtIoFile($MyFilename)
+            [String]$MyFilePath_Output = $MyJtIoFileOutput.GetPath()
+            Write-JtLog_File -Where $This.ClassName -Text "Combining for MyFilename: $MyFilename" -FilePath $MyFilePath_Output            
+            $MyDataCsv | Export-Csv $MyFilePath_Output -NoTypeInformation -Delimiter ([JtClass]::Delimiter) -Force
+        }
+        return $True
+    }
+}
 
 class JtInv : JtClass {
 
-    [JtIoFolder]$FolderBase
-    [JtIoFolder]$FolderReport
+    [JtIoFolder]$JtIoFolder_Base
+    [JtIoFolder]$JtIoFolder_Report
     [String]$SystemId = ""
 
-    JtInv([JtConfig]$JtConfig) {
+    JtInv() {
+        [JtConfig]$MyJtConfig = New-JtConfig
         $This.ClassName = "JtInv"
-        $This.FolderReport = $JtConfig.Get_JtIoFolder_Report()
-        $This.FolderBase = $JtConfig.Get_JtIoFolder_Base()
+        $This.JtIoFolder_Report = $MyJtConfig.Get_JtIoFolder_Report()
+        $This.JtIoFolder_Base = $MyJtConfig.Get_JtIoFolder_Base()
         $This.DoIt()
     }
     
     DoLogRepoInit() {
-        Write-JtLog -Text ( -join ("Init ", $This.ClassName, " REPORT: ", $This.GetReportLabel()))
+        [String]$MyReportLabel = $This.GetReportLabel()
+        Write-JtLog -Where $This.ClassName -Text "INIT. REPORT: $MyReportLabel"
     }
-
+    
     DoLogRepoStart() {
-        Write-JtLog -Text ( -join ("Starting in ", $This.ClassName, " REPORT: ", $This.GetReportLabel()))
+        [String]$MyReportLabel = $This.GetReportLabel()
+        Write-JtLog -Where $This.ClassName -Text "Starting in REPORT: $MyReportLabel"
     }
-
+    
     [String]GetConfigName() {
-        Write-JtError -Text ("Function GetConfigName should be overwritten!!!")
-        Throw("Function GetConfigName should be overwritten!!!")
+        Write-JtLog_Error -Where $This.ClassName -Text "GetConfigName. Should be overwritten!!!"
+        Throw "GetConfigName. Should be overwritten!!!"
         return ""
     }
-
-    [JtIoFolder]GetFolderTarget() {
-        [JtIoFolder]$Result = $This.FolderReport
-        if ($This.GetReportLabel().Length -gt 0) {
-            $Result = $Result.GetSubfolder($This.GetReportLabel(), $True)
+    
+    [JtIoFolder]GetFolderPath_Output() {
+        [JtIoFolder]$MyJtIoFolder_Report = $This.JtIoFolder_Report
+        [JtIoFolder]$MyJtIoFolder_Output = $Null
+        
+        [String]$MyLabel_Report = $This.GetReportLabel()
+        if ($MyLabel_Report.Length -gt 0) {
+            $MyJtIoFolder_Output = $MyJtIoFolder_Report.GetJtIoFolder_Sub($MyLabel_Report, $True)
         }
-        return $Result
+        return $MyJtIoFolder_Output
+    }
+
+
+    [JtIoFolder]GetFolderPath_Input() {
+        [JtConfig]$MyJtConfig = New-JtConfig
+        [JtIoFolder]$MyJtIoFolder_Report = $MyJtConfig.Get_JtIoFolder_Report()
+        [JtIoFolder]$MyJtIoFolder_Input = $MyJtIoFolder_Report
+        return $MyJtIoFolder_Input
     }
 
     [String]GetReportLabel() {
@@ -53,75 +247,59 @@ class JtInv : JtClass {
         return "GetReportLabel is not defined!"
     }
 
-
     [Xml]GetConfigXml() {
         [String]$MyConfigName = $This.GetConfigName()
         if ($MyConfigName.Length -lt 1) {
-            Write-JtError -Text ("ConfigFolderName not set!")
+            Write-JtLog_Error -Where $This.ClassName -Text "ConfigFolderName not set!"
             Throw "This should not happen."
+            return $Null
         }
         
-        [String]$FilePathXml = -join ($This.FolderBase.GetPath(), "\", $MyConfigName, ".xml")
-        Write-JtLog ( -Join ("IN:", $This.ClassName, "GetConfigXml; FilePathXml:", $FilePathXml))        
-        [JtIoFile]$JtIoFile = New-JtIoFile -Path $FilePathXml
-        if ($JtIoFile.IsExisting()) {
-            [FileElementXml]$FileElementXml = [FileElementXml]::new($JtIoFile)
+        [String]$MyFileName_Xml = -join ($MyConfigName, ".xml")
+        [String]$MyFilePath_Xml = $This.JtIoFolder_Base.GetFilePath($MyFileName_Xml)
+        Write-JtLog -Where $This.ClassName -Text "GetConfigXml; FilePathXml: $MyFilePath_Xml"    
+        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath_Xml
+        if ($MyJtIoFile.IsExisting()) {
+            [FileElementXml]$MyFileElementXml = [FileElementXml]::new($MyJtIoFile)
 
-            [Xml]$XmlContent = $FileElementXml.GetXml()
-            return $XmlContent
+            [Xml]$MyXmlContent = $MyFileElementXml.GetXml()
+            return $MyXmlContent
         }
         else {
             return $Null
         }
     }
 
-    [boolean]DoIt() {
+    [Boolean]DoIt() {
         Throw "Report. The method DoIt should be overwritten."
         return $False
     }
 }
 
-
-function New-JtInvClient {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-    
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientObjects]::new([JtConfig]$JtConfig) 
-    [JtInvClientSoftware]::new([JtConfig]$JtConfig) 
-    [JtInvClientReport]::new([JtConfig]$JtConfig) 
-    [JtInvClientCsvs]::new([JtConfig]$JtConfig) 
-    [JtInvClientExport]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "report"
-}
-
 class JtInvClientChoco : JtInv {
 
-    JtInvClientChoco([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientChoco() : Base() {
         $This.ClassName = "JtInvClientChoco"
         # Output goes directly to "c:\_inventory\report"
     }
     
-    [boolean] DoIt() {
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
         
         [String]$MyCommand = ""
-        [String]$Label = "choco"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [JtIoFolder]$MyTarget = $This.FolderReport.GetSubfolder("choco", $True)
-        [String]$Out = $MyTarget.GetFilePath($Filename)
+
+        [String]$MyFilename = -join ([JtIo]::FilePrefix_Report, [JtIo]::FileExtension_Meta_Choco)
+        [JtIoFolder]$MyJtIoFolder_Output = $This.JtIoFolder_Report.GetJtIoFolder_Sub("choco", $True)
+        [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename)
         if ($env:ChocolateyInstall -eq "c:\ProgramData\chocolatey" ) {
-            $MyCommand = -join ('cmd.exe /C ', '"', 'choco list -li', '"', ' > ', '"', $Out, '"')
+            $MyCommand = -join ('cmd.exe /C ', '"', 'choco list -li', '"', ' > ', '"', $MyFilePath_Output, '"')
             Invoke-Expression -Command:$MyCommand  
         }
         else {
-            $MyCommand = -join ('cmd.exe /C ', '"', 'echo choco is not installed', '"', ' > ', '"', $Out, '"')
+            $MyCommand = -join ('cmd.exe /C ', '"', 'echo choco is not installed', '"', ' > ', '"', $MyFilePath_Output, '"')
             Invoke-Expression -Command:$MyCommand  
         }
-        return $true
+        return $True
     }
  
     [String]GetConfigName() {
@@ -133,37 +311,483 @@ class JtInvClientChoco : JtInv {
     }
 }
 
-function New-JtInvClientChoco {
 
+Function Get-JtInstalledSoftware {
+    Param(
+        [Alias('Computer', 'ComputerName', 'HostName')]
+        [Parameter(ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, Mandatory = $True, Position = 1)]
+        [String[]]$Name
+    )
+    Begin {
+        if (!($Name)) {
+            $Name = $env:COMPUTERNAME
+        }
+        $lmKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall", "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+        $lmReg = [Microsoft.Win32.RegistryHive]::LocalMachine
+        $cuKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall"
+        $cuReg = [Microsoft.Win32.RegistryHive]::CurrentUser
+    }
+    Process {
+        if (!(Test-Connection -ComputerName $Name -count 1 -quiet)) {
+            Write-JtLog_Error -Text "Unable to contact $Name. Please verify its network connectivity and try again." -Category ObjectNotFound -TargetObject $Computer
+            Break
+        }
+        $masterKeys = @()
+        $remoteCURegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($cuReg, $Name)
+        $remoteLMRegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($lmReg, $Name)
+        foreach ($key in $lmKeys) {
+            $regKey = $remoteLMRegKey.OpenSubkey($key)
+            foreach ($subName in $regKey.GetSubkeyNames()) {
+                foreach ($sub in $regKey.OpenSubkey($subName)) {
+                    $masterKeys += (New-Object PSObject -Property @{
+                            "ComputerName"     = $Name
+                            "Name"             = $sub.GetValue("displayname")
+                            "SystemComponent"  = $sub.GetValue("systemcomponent")
+                            "ParentKeyName"    = $sub.GetValue("parentkeyname")
+                            "Version"          = $sub.GetValue("DisplayVersion")
+                            "UninstallCommand" = $sub.GetValue("UninstallString")
+                            "InstallDate"      = $sub.GetValue("InstallDate")
+                            "RegPath"          = $sub.ToString()
+                        })
+                }
+            }
+        }
+        foreach ($key in $cuKeys) {
+            $regKey = $remoteCURegKey.OpenSubkey($key)
+            if ($Null -ne $regKey) {
+                foreach ($subName in $regKey.getsubkeynames()) {
+                    foreach ($sub in $regKey.opensubkey($subName)) {
+                        $masterKeys += (New-Object PSObject -Property @{
+                                "ComputerName"     = $Computer
+                                "Name"             = $sub.GetValue("displayname")
+                                "SystemComponent"  = $sub.GetValue("systemcomponent")
+                                "ParentKeyName"    = $sub.GetValue("parentkeyname")
+                                "Version"          = $sub.GetValue("DisplayVersion")
+                                "UninstallCommand" = $sub.GetValue("UninstallString")
+                                "InstallDate"      = $sub.GetValue("InstallDate")
+                                "RegPath"          = $sub.ToString()
+                            })
+                    }
+                }
+            }
+        }
+        $woFilter = { $null -ne $_.name -AND $_.SystemComponent -ne "1" -AND $null -eq $_.ParentKeyName }
+        $props = 'Name', 'Version', 'ComputerName', 'Installdate', 'UninstallCommand', 'RegPath'
+        $masterKeys = ($masterKeys | Where-Object $woFilter | Select-Object $props | Sort-Object Name)
+        $masterKeys
+    }
+    End { }
+}
+
+
+Function Get-JtXmlReportObject {
     Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name
     )
 
-    [JtInvClientChoco]::new([JtConfig]$JtConfig) 
+    [String]$MyFunctionName = "Get-JtXmlReportObject"
+
+    [String]$MyFolderPath = $FolderPath
+    [String]$MyName = $Name
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        return $Null
+    }
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
+
+    Write-JtLog -Where $MyFunctionName -Text "MyJtIoFolder: $MyJtIoFolder - MyName: $MyName"
+    
+    [JtIoFolder]$MyJtIoFolder_Xml = $MyJtIoFolder.GetJtIoFolder_Sub("objects")
+    if (!($MyJtIoFolder_Xml.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Folder is missing in MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
+        return $Null
+    }
+    
+    [String]$MyExtension = [JtIo]::FileExtension_Xml
+    [String]$MyFilename_Xml = -Join ($MyName, $MyExtension)
+    [String]$MyFilePath_Xml = $MyJtIoFolder_Xml.GetFilePath($MyFilename_Xml)
+    
+    Write-JtLog -Where $MyFunctionName -Text "MyName: $MyName - MyFilePath_Xml: $MyFilePath_Xml"
+    if (!(Test-JtIoFilePath -FilePath $MyFilePath_Xml)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Xml file is missing in MyFilePath_Xml: $MyFilePath_Xml"
+        return $Null
+    }
+    [System.Object]$MyObject = $Null
+    try {
+        $MyObject = Import-Clixml $MyFilePath_Xml
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Problem while reading MyFilePath_Xml: $MyFilePath_Xml"
+        return $Null
+    }
+    return [System.Object]$MyObject
 }
+
+
+
+
+Function New-JtConfigItem {
+
+    Param (
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Computer,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Disk,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Filter,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Pattern,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Source,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$System,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Target,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Template
+    )
+
+    [String]$MyFunctionName = "New-JtConfigItem"
+
+    [HashTable]$MyItem = New-Object HashTable
+    $MyItem.valid = $True
+
+    if ($Source) {
+        [String]$MySource = $Source
+        $MyItem.source = $MySource
+        if (!(Test-JtIoFolderPath -FolderPath $MyItem.source)) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MySource: $MySource"
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    
+    if ($target) {
+        [String]$MyTarget = $target
+        $MyItem.target = $MyTarget
+        [String]$MyFolderPath_Target = $MyTarget
+        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
+        if (!($MyJtIoFolder_Output.IsExisting())) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MyTarget: $MyTarget"
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($computer) {
+        $MyItem.computer = $computer
+        if ($computer.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! COMPUTER is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($disk) {
+        $MyItem.disk = $disk
+        if ($disk.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! DISK is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($filter) {
+        $MyItem.filter = $filter
+        if ($filter.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! FILTER is EMPTY."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($label) {
+        $MyItem.label = $label
+        if ($label.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! LABEL is EMPTY."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($partition) {
+        $MyItem.partition = $partition
+        if ($partition.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PARTITION is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($pattern) {
+        $MyItem.pattern = $pattern
+        if ($pattern.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PATTERN is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($template) {
+        $MyItem.template = $template
+        if ($template.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! TEMPLATE is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    return $MyItem
+}
+
+
+
+
+Function New-JtInvClient {
+
+    New-JtInvClientClean
+    New-JtInvClientReport
+    New-JtInvClientObjects
+    New-JtInvClientSoftware
+    New-JtInvClientCsvs
+    New-JtInvClientExport
+    
+    New-JtInvClientTimestamp  -Label "report"
+}
+
+
+Function New-JtInvClientChoco {
+
+    [JtInvClientChoco]::new()
+}
+
+
+Function New-JtInvClientClean {
+
+    [JtInvClientClean]::new()
+
+    New-JtInvClientTimestamp  -Label "clean"
+}
+
+
+Function New-JtInvClientConfig {
+
+    [JtInvClientConfig]::new()
+
+    New-JtInvClientTimestamp  -Label "config"
+}
+
+
+Function New-JtInvClientCsvs {
+
+    [JtInvClientCsvs]::new()
+
+    New-JtInvClientTimestamp  -Label "csv"
+}
+
+
+Function New-JtInvClientErrors {
+
+
+    [JtInvClientErrors]::new()
+
+    New-JtInvClientTimestamp  -Label "errors"
+}
+
+
+Function New-JtInvClientExport {
+
+
+    [JtInvClientExport]::new()
+    
+    New-JtInvClientTimestamp  -Label "export"
+}
+
+
+Function New-JtInvClientObjects {
+
+
+    [JtInvClientObjects]::new()
+
+    New-JtInvClientTimestamp  -Label "objects"
+}
+
+
+
+Function New-JtInvClientReport {
+
+    [JtInvClientReport]::new()
+
+    New-JtInvClientTimestamp  -Label "report"
+}
+
+
+Function New-JtInvClientSoftware {
+
+
+    [JtInvClientSoftware]::new()
+    
+    New-JtInvClientTimestamp  -Label "software"
+}
+
+
+Function New-JtInvClientTimestamp {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
+    )
+
+    [String]$MyLabel = $Label
+
+
+    [JtInvClientTimestamp]::new($MyLabel)
+}
+
+
+
+Function New-JtInvData {
+
+
+    [JtInvData]::new()
+    
+    New-JtInvClientTimestamp -Label "data"
+}
+
+
+
+
+Function New-JtInvFiles {
+
+
+    [JtInvFiles]::new()
+
+    New-JtInvClientTimestamp  -Label "files"
+}
+
+
+
+
+Function New-JtInvFolder {
+
+    [JtInvFolder]::new()
+
+    New-JtInvClientTimestamp  -Label "folder"
+
+}
+
+
+Function New-JtInvLengths {
+
+
+    [JtInvLengths]::new()
+    
+    New-JtInvClientTimestamp -Label "lengths"
+}
+
+
+Function New-JtInvLines {
+
+
+    [JtInvLines]::new()
+    
+    New-JtInvClientTimestamp  -Label "lines"
+
+}
+
+
+Function New-JtInvMd {
+
+
+    [JtInvMd]::new()
+    
+    New-JtInvClientTimestamp  -Label "JtMd"
+}
+
+
+Function New-JtInvMirror {
+
+
+    [JtInvMirror]::new()
+    
+    New-JtInvClientTimestamp  -Label "mirror"
+}
+
+
+Function New-JtInvPoster {
+
+
+    [JtInvPoster]::new()
+
+    New-JtInvClientTimestamp  -Label "poster"
+}
+
+
+Function New-JtInvRecover {
+
+
+    [JtInvRecover]::new()
+
+    New-JtInvClientTimestamp  -Label "recover"
+}
+
+
+
+Function New-JtInvReportsCombine {
+
+    [JtInvReportsCombine]::new()
+}
+
+
+Function New-JtInvReportsUpdate {
+
+    [JtInvReportsUpdate]::new()
+
+}
+
+
+
+Function New-JtInvSnapshot {
+    [JtInvSnapshot]::new()
+    
+    New-JtInvClientTimestamp  -Label "Snapshot"
+}
+
+
+
+Function New-JtInvWol {
+
+    [JtInvWol]::new()
+
+    New-JtInvClientTimestamp  -Label "wol"
+}
+
+
+
+Function New-JtInvVersion {
+    New-JtRobocopy -FolderPath_Input "%OneDrive%\0.INVENTORY\common" -FolderPath_Output "D:\Seafile\al-apps\apps\inventory\common"
+
+    Write-JtIoFile_Meta_Version -FolderPath_Output "%OneDrive%\0.INVENTORY\common"
+}
+
+
+
+
 
 
 class JtInvClientClean : JtInv {
 
-    [JtIoFolder]$FolderReport
-
-    JtInvClientClean([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientClean() : Base() {
         $This.ClassName = "JtInvClientClean"
     }
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
 
-        If ($This.FolderReport.IsExisting()) {
-            if ($This.FolderReport.GetPath() -eq [JtLog]::C_inventory_Report) {
-                $This.FolderReport.DoDeleteEverything()
-                Write-JtLog -Text ("# LOG Starting client...")
+        [String]$MyFolderPath_C_Inventory_Report = [JtLog]::FolderPath_C_inventory_Report
+        If ($This.JtIoFolder_Report.IsExisting()) {
+            if ($This.JtIoFolder_Report.GetPath() -eq $MyFolderPath_C_Inventory_Report) {
+                $This.JtIoFolder_Report.DoRemoveEverything()
+                Write-JtLog -Where $This.ClassName -Text "# LOG Starting client..."
             }
             else {
-                [String]$ErrorMsg = -join ("This should not happen. Illegal path for local report. Should be: ", [JtUtil]::C_inventory_Report)
-                Write-JtError -Text ($ErrorMsg)
-                Throw $ErrorMsg
+                [String]$MyMsg = -join ("This should not happen. Illegal path for local report. Should be: ", $MyFolderPath_C_Inventory_Report)
+                Write-JtLog_Error -Where $This.ClassName -Text $MyMsg
+                Throw $MyMsg
             }
             return $True  
         }
@@ -183,34 +807,18 @@ class JtInvClientClean : JtInv {
 }
 
 
-Function New-JtInvClientClean {
-    
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientClean]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "clean"
-}
-
-
 
 class JtInvClientConfig : JtInv {
 
     [String]$Out = ""
     [String]$XmlFiles = ""
 
-    JtInvClientConfig([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientConfig() : Base() {
         $This.ClassName = "JtInvClientConfig"
-        $JtConfig.DoPrintInfo()
     }
     
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
-
         return $True
     }
     
@@ -221,33 +829,21 @@ class JtInvClientConfig : JtInv {
     [String]GetReportLabel() {
         return "config"
     }
-
 }
 
-function New-JtInvClientConfig {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientConfig]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "config"
-}
 
 class JtInvClientCsvs : JtInv {
 
-    JtInvClientCsvs([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientCsvs() : Base() {
         $This.ClassName = "JtInvClientCsvs"
         # output goes directly to c:\_inventory\report
     }
 
-    [boolean]DoIt() {
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
 
-        New-JtCsvGenerator -JtIoFolder $This.FolderReport -Label $This.ClassName
+        [JtIoFolder]$MyJtIoFolder = New-JtIoFolder_Report
+        New-JtCsvGenerator -FolderPath_Input $MyJtIoFolder -FolderPath_Output $MyJtIoFolder -Label $This.ClassName
 
         return $True
     }
@@ -261,48 +857,45 @@ class JtInvClientCsvs : JtInv {
     }
 }
 
-function New-JtInvClientCsvs {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-    
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientCsvs]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "csv"
-}
-
-
 class JtInvClientErrors : JtInv {
 
-    JtInvClientErrors([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientErrors() : Base() {
         $This.ClassName = "JtInvClientErrors"
         # Output goes directly to c:\_inventory\report
     }
 
-
     [Boolean]DoCleanErrorFiles() {
-        [String]$MyFilter = -join ("*", [JtIo]::JtInvSuffix_Errors, [JtIo]::FilenameExtension_Meta)
-        $This.FolderReport.DoDeleteAllFiles($MyFilter)
-
-        return $true
+        [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Meta_Errors)
+        $This.JtIoFolder_Report.DoRemoveFiles_All($MyFilter)
+        return $True
     }
 
-    [boolean]DoIt() {
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
-
         $This.DoCleanErrorFiles()
 
-        [String]$Content = [JtLog]::CounterError
-        [String]$FileLabel = -join ([JtIo]::FilenamePrefix_Report, ".", $Content, ".", [JtIo]::JtInvSuffix_Errors)
-        [String]$OutputFilePath = $This.GetFolderTarget().GetPath()
+        [String]$MyFolderPath_Input = $This.GetFolderPath_Input()
+        [String]$MyFolderPath_Output = $This.GetFolderPath_Output()
+        
+        [String]$MyCounter = [JtLog]::CounterError
+        [String]$MyLabel = $MyCounter
+        [String]$MyPrefix = [JtIo]::FilePrefix_Report
+        [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Errors
 
-        New-JtIoFileMeta -Path $OutputFilePath -Label $FileLabel -Content $Content
 
-        return $true
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Prefix            = $MyPrefix
+            Label             = $MyLabel
+            Extension2        = $MyExtension2
+            Overwrite         = $True
+        }
+        Write-JtIoFile_Meta @MyParams
+
+        return $True
     }
+
 
     [String]GetConfigName() {
         return ""
@@ -313,62 +906,73 @@ class JtInvClientErrors : JtInv {
     }
 }
 
-
-function New-JtInvClientErrors {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientErrors]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "errors"
-}
-
-
 class JtInvClientExport  : JtInv {
 
-
-    JtInvClientExport ([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientExport () : Base() {
         $This.ClassName = "JtInvClientExport"
+    }
+
+
+        
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
+        }
+        
+        [String]$MyTagName = "export"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                target = $Entity.target
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+    
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
     }
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
-
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("export")) {
-            # [String]$JtInfo = $entity.'#text'
-
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target)
-            }
-            else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
-            }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-
         
-            If ($False -eq $FolderExport.IsExisting()) {
-                Write-JtError -Text ( -join ("Path is missing; MyTarget:", $FolderExport.GetPath()))
-                return $False
-            } 
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
 
-            [String]$SystemId = [JtIo]::GetSystemId()
-            [JtIoFolder]$JtIoFolderTargetSys = $FolderExport.GetSubfolder($SystemId, $True)
-        
-            [String]$MyInfo = ( -join ("DoExport in ", $This.ClassName))
-            New-JtRobocopyIo -IoSource $This.FolderReport -IoTarget $JtIoFolderTargetSys -Info $MyInfo
-            return $True
+        foreach ($MyItem in $MyArrayList) {
+            [JtIoFolder]$MyJtIoFolderExport = $Null
+            [String]$MyFolderPath_Target = $MyItem.target
+
+            if ($MyFolderPath_Target.Length -gt 0) {
+                [JtIoFolder]$MyJtIoFolderExport = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
+                Write-JtLog -Where $This.ClassName -Text "... Exporting results to: $MyJtIoFolderExport"
+            }
+
+            [String]$MySystemId = [JtIo]::GetSystemId()
+            [JtIoFolder]$MyJtIoFolder_OutputSys = $MyJtIoFolderExport.GetJtIoFolder_Sub($MySystemId, $True)
+
+            [String]$MyFolderPath_Output = $MyJtIoFolder_OutputSys.GetPath()
+            
+            [String]$MyInfo = "DoI (export) in $This.ClassName"
+            
+            [String]$MyFolderPath_Input = $This.JtIoFolder_Report.GetPath()
+            New-JtRobocopy -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output -Info $MyInfo
         }
         return $True
     }
@@ -382,40 +986,25 @@ class JtInvClientExport  : JtInv {
     }
 }
 
-
-function New-JtInvClientExport {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientExport ]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "export"
-}
-
-
 class JtInvClientObjects : JtInv {
 
-    JtInvClientObjects([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientObjects() : Base() {
         $This.ClassName = "JtInvClientObjects"
         # output goes directly to c:\_inventory\report
     }
 
-    hidden [boolean]DoWriteObjectToXml([String]$Label, $JtObject) {
-        $MyClass = $Label
-        $MyObject = $JtObject
-        [String]$XmlFilename = -join ($MyClass.ToLower(), [JtIo]::FilenameExtension_Xml)
+    hidden [Boolean]DoWriteObjectToXml([String]$TheLabel, $TheJtObject) {
+        [String]$MyLabel = $TheLabel
+        $MyObject = $TheJtObject
+        [String]$MyFilename_Xml = -join ($MyLabel.ToLower(), [JtIo]::FileExtension_Xml)
 
-        $FilePathXml = $This.GetFolderTarget().GetFilePath($XmlFilename)
-        Write-JtIo -Text ( -join ("Writing: ", $Label, " in FilePathXml:", $FilePathXml))
-        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
+        [String]$MyFilePath_Xml = $This.GetFolderPath_Output().GetFilePath($MyFilename_Xml)
+        Write-JtLog_File -Where $This.ClassName -Text "Writing: $MyLabel in FilePathXml" -FilePath $MyFilePath_Xml
+        Export-Clixml -InputObject  $MyObject -Path $MyFilePath_Xml
         return $True
     }
 
-
-    [boolean]DoIt() {
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
 
         $MyClass = "Win32_BIOS"
@@ -467,26 +1056,27 @@ class JtInvClientObjects : JtInv {
         $This.DoWriteObjectToXml($MyClass, $MyObject)
 
         $MyClass = "BitLocker"
-        [String]$CsvLabel = $MyClass.ToLower()
-        [String]$FilenameXml = -join ($CsvLabel, ".xml")
-        $FilePathXml = $This.GetFolderTarget().GetFilePath($FilenameXml)    
+        [String]$MyLabelCsv = $MyClass.ToLower()
+        [String]$MyExtension = [JtIo]::FileExtension_Xml
+        [String]$MyFilename_Xml = -join ($MyLabelCsv, $MyExtension)
+        [String]$MyFilePath_Xml = $This.GetFolderPath_Output().GetFilePath($MyFilename_Xml)    
         try {
-            $MyObject = Get-BitLockerVolume
+            $MyAlObject = Get-BitLockerVolume
 
-            $MyObject | Sort-Object -Property MountPoint | Format-Table -Property * 
+            $MyAlObject | Sort-Object -Property MountPoint | Format-Table -Property * 
         
-            New-JtCsvWriteArraylist -Label $CsvLabel -JtIoFolder $This.GetFolderTarget() -ArrayList $MyObject
+            [String]$MyFolderPath_Output = $This.GetFolderPath_Output()
+            Convert-JtAl_to_FileCsv -ArrayList $MyAlObject -FolderPath_Output $MyFolderPath_Output -Label $MyLabelCsv
 
-            $This.DoWriteObjectToXml($MyClass, $MyObject)
-            Export-Clixml -InputObject $MyObject -Path $FilePathXml
+            $This.DoWriteObjectToXml($MyClass, $MyAlObject)
+            Export-Clixml -InputObject $MyAlObject -Path $MyFilePath_Xml
         }
         catch {
-            Write-JtError -Text ("Problems with: BitLockerVolume -> Need admin rights...?")
+            Write-JtLog_Error -Where $This.ClassName -Text "Problems with: BitLockerVolume -> Need admin rights...?"
         }
 
         return $True
     }
-
 
     [String]GetConfigName() {
         return ""
@@ -495,269 +1085,263 @@ class JtInvClientObjects : JtInv {
     [String]GetReportLabel() {
         return "objects"
     }
-        
- 
 }
 
-function New-JtInvClientObjects {
 
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientObjects]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "objects"
-}
 
 class JtInvClientReport : JtInv {
     
-    [JtIoFolder]$FolderReport
-    [JtIoFolder]$FolderTarget
+    [JtIoFolder]$JtIoFolder_Output
 
-    JtInvClientReport([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientReport() : Base() {
         $This.ClassName = "JtInvClientReport"
     }
 
-    [boolean]DoCreateBcdeditMeta() {
+    [Boolean]DoCreateBcdeditMeta() {
         [String]$MyCommand = ""
-        [String]$Label = ""
-
-        [String]$Label = "systemid"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', 'bcdedit', [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('bcdedit.exe /enum ', ' > ', '"', $Out, '"')
+        # [String]$MyLabel = "systemid"
+        [String]$MyFilename = -join ([JtIo]::FilePrefix_Report, '.', 'bcdedit', [JtIo]::FileExtension_Meta_Report)
+        [String]$MyFilePath_Output = $This.JtIoFolder_Report.GetFilePath($MyFilename)
+        $MyCommand = -join ('bcdedit.exe /enum ', ' > ', '"', $MyFilePath_Output, '"')
         Invoke-Expression -Command:$MyCommand
 
         return $True
     }
 
-    [boolean]DoCreateDirMetas() {
-        [String]$MyTestPath = ""
+
+
+    [Boolean]DoCreateDirMetas() {
+        [String]$MyFolderPath_Test = ""
         [String]$MyCommand = ""
         
-        $MyTestPath = "c:\."
-        if (Test-Path $MyTestPath) {
-            $MyCommand = $This.GetDirCommand($MyTestPath)
+        $MyFolderPath_Test = "c:\."
+        if (Test-JtIoFolderPath -FolderPath $MyFolderPath_Test ) {
+            $MyCommand = $This.GetDirCommand($MyFolderPath_Test )
             Invoke-Expression -Command:$MyCommand
         }
 
-        $MyTestPath = "c:\users\."
-        if (Test-Path $MyTestPath) {
-            $MyCommand = $This.GetDirCommand($MyTestPath)
+        $MyFolderPath_Test = "c:\users\."
+        if (Test-JtIoFolderPath -FolderPath $MyFolderPath_Test ) {
+            $MyCommand = $This.GetDirCommand($MyFolderPath_Test )
             Invoke-Expression -Command:$MyCommand
         }
         
-        $MyTestPath = "d:\."
-        if (Test-Path $MyTestPath) {        
-            $MyCommand = $This.GetDirCommand($MyTestPath)
+        $MyFolderPath_Test = "d:\."
+        if (Test-JtIoFolderPath -FolderPath $MyFolderPath_Test ) {        
+            $MyCommand = $This.GetDirCommand($MyFolderPath_Test )
             Invoke-Expression -Command:$MyCommand
         }
 
-        $MyTestPath = "e:\."
-        if (Test-Path $MyTestPath) {        
-            $MyCommand = $This.GetDirCommand($MyTestPath)
+        $MyFolderPath_Test = "e:\."
+        if (Test-JtIoFolderPath -FolderPath $MyFolderPath_Test ) {        
+            $MyCommand = $This.GetDirCommand($MyFolderPath_Test )
             Invoke-Expression -Command:$MyCommand
         }
-     
         return $True
     }
     
-    [boolean]DoCreateMetas() {
+    [Boolean]DoCreateMetas() {
         [String]$MyCommand = ""
-        [String]$Label = ""
+        [String]$MyLabel = ""
 
-        [String]$Content = "hello world!"
-        [String]$C_Inventory_Report = $This.FolderReport.GetPath()
+        [String]$MyContent = "hello world!"
+        [String]$MyFolderPath_C_inventory_Report = $This.JtIoFolder_Report.GetPath()
 
-        [String]$Label = "version"
-        [String]$MyVersion = $This.GetVersion()
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $MyVersion, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$FilterVersion = -join ("*", '.', $Label, [JtIo]::FilenameExtension_Meta)
-        $This.FolderReport.DoDeleteAllFiles($FilterVersion)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        Set-Content -Path $Out -Value $Content
+        [String]$MyFolderPath_Input = $MyFolderPath_C_inventory_Report
+        [String]$MyFolderPath_Output = $MyFolderPath_C_inventory_Report
+
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "jt"
+            Value             = Get-JtVersion
+        }
+        Write-JtIoFile_Meta_Report @MyParams
 
         $MyIpInfo = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object { $null -ne $_.DefaultIPGateway }).IPAddress | select-object -first 1 
         [String]$MyIp = $MyIpInfo
-        [String]$Content = $MyIP
-        [String]$Label = "ip"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        Set-Content -Path $Out -Value $Content
+        [String]$MyIpOutput = $MyIp.Replace(".", "-")
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "ip"
+            Value             = $MyIpOutput
+        }
+        Write-JtIoFile_Meta_Report @MyParams
+        
+        [String]$MyLabel = -join ("user", ".", $env:Username)
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "user"
+            Value             = $env:Username
+        }
+        Write-JtIoFile_Meta_Report @MyParams
+        
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "id"
+            Value             = [JtIo]::GetSystemId()
+        }
+        Write-JtIoFile_Meta_Report @MyParams
 
-        [String]$Label = "obj"
-        [String]$MyIp3 = $MyIp
-        [String]$Content = $MyIP
-        [String]$Filename = -join ('ip', '.', $MyIp3, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        Set-Content -Path $Out -Value $Content
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "computer"
+            Value             = [JtIo]::GetComputername()
+        }
+        Write-JtIoFile_Meta_Report @MyParams
 
-        [String]$Label = "set"
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'set', '"', ' > ', '"', $Out, '"')
+        [String]$MyName = "set"
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
+        $MyCommand = -join ('cmd.exe /C ', '"', 'set', '"', ' > ', '"', $MyFilePath_Output, '"')
+        Invoke-Expression -Command:$MyCommand
+        
+        [String]$MyName = "winver"
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
+        $MyCommand = -join ('cmd.exe /C ', '"', 'ver', '"', ' > ' , '"', $MyFilePath_Output, '"')
         Invoke-Expression -Command:$MyCommand
 
-        [String]$Label = "win"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'ver', '"', ' > ' , '"', $Out, '"')
-        Invoke-Expression -Command:$MyCommand
+        $MyVer2 = Get-Content $MyFilePath_Output | Where-Object { $_.Trim() -ne '' }
+        # [String]$MyLabel = Convert-JtDotter $MyVer2 -PatternOut "3"
 
-        [String]$Label = "user"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'echo %username%', '"', ' > ', '"', $Out, '"')
-        Invoke-Expression -Command:$MyCommand
+        [String]$MyVersion = "verX"
+        if ($MyVer2 -match '\d+\.\d+\.\d+\.\d+') {
+            $MyVersion = $Matches[0]
+        }
+               
+        [String]$MyValue = Convert-JtDotter -Text $MyVersion -PatternOut "1.2.3.4" -SeparatorOut "-"
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "winver"
+            Value             = $MyValue
+        }
+        Write-JtIoFile_Meta_Report @MyParams
 
-        [String]$Label = "systemid"
-        [String]$SystemId = [JtIo]::GetSystemId()
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $systemId, ".", $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'echo %username%', '"', ' > ', '"', $Out, '"')
+        [String]$MyName = "ipconfig"
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
+        $MyCommand = -join ('cmd.exe /C ', '"', 'ipconfig /all', '"', '   > ', '"', $MyFilePath_Output, '"')
         Invoke-Expression -Command:$MyCommand
-
-        [String]$Label = "obj"
-        [String]$Computername = [JtIo]::GetComputername()
-        [String]$Filename = -join ("computer", '.', $Computername, ".", $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'echo ', $Computername, '"', ' > ', '"', $Out, '"')
+        
+        [String]$MyName = "w32tm"
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
+        $MyCommand = -join ('cmd.exe /C ', '"', 'w32tm /stripchart /computer:130.75.1.32 /samples:1', '"', '   > ', '"', $MyFilePath_Output, '"')
         Invoke-Expression -Command:$MyCommand
-
-        [String]$Label = "ipconfig"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'ipconfig /all', '"', '   > ', '"', $Out, '"')
-        Invoke-Expression -Command:$MyCommand
-
-        [String]$Label = "w32tm"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        $MyCommand = -join ('cmd.exe /C ', '"', 'w32tm /stripchart /computer:130.75.1.32 /samples:1', '"', '   > ', '"', $Out, '"')
-        Invoke-Expression -Command:$MyCommand
-
-        [String]$Label = "wsus"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
+        
+        [String]$MyName = "wsus"
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
         try {
-            $MyCommand = -join ('reg query ', '"', 'hklm\software\policies\microsoft\windows\windowsupdate', '"', ' /v ', '"', 'wuserver', '"', ' > ', '"', $Out, '"')
+            $MyCommand = -join ('reg query ', '"', 'hklm\software\policies\microsoft\windows\windowsupdate', '"', ' /v ', '"', 'wuserver', '"', ' > ', '"', $MyFilePath_Output, '"')
             Invoke-Expression -Command:$MyCommand   
         }
         catch {
-            $MyCommand = -join ('cmd.exe /C ', '"', 'echo wsus cannot be reported', '"', ' > ', '"', $Out, '"')
+            $MyCommand = -join ('cmd.exe /C ', '"', 'echo wsus cannot be reported', '"', ' > ', '"', $MyFilePath_Output, '"')
             Invoke-Expression -Command:$MyCommand   
         }
 
-        [String]$Label = "choco"
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
+        [String]$MyName = "choco"
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
         if ($env:ChocolateyInstall -eq "c:\ProgramData\chocolatey" ) {
-            $MyCommand = -join ('cmd.exe /C ', '"', 'choco list -li', '"', ' > ', '"', $Out, '"')
+            $MyCommand = -join ('cmd.exe /C ', '"', 'choco list -li', '"', ' > ', '"', $MyFilePath_Output, '"')
             Invoke-Expression -Command:$MyCommand  
         }
         else {
-            $MyCommand = -join ('cmd.exe /C ', '"', 'echo choco is not installed', '"', ' > ', '"', $Out, '"')
-            Invoke-Expression -Command:$MyCommand  
+            [String]$MyContent = "CHOCO IS NOT INSTALLED"
+            Add-Content -Path $MyFilePath_Output
         }
 
-        [String]$PathPublicDesktop = "c:\users\public\desktop"
-        [String]$MyVersionMeta = -join ($PathPublicDesktop, "\*", [JtIo]::FilenameExtension_Meta)
-        if (Test-Path $MyVersionMeta) {
-            $MyCommand = -join ('cmd.exe /C ', '"', 'copy ', $PathPublicDesktop, '\*', [JtIo]::FilenameExtension_Meta, ' ', $C_Inventory_Report, '\.', '"')   
-            Invoke-Expression -Command:$MyCommand    
-        }
+        # [String]$MyFolderPath_Public_Desktop = "c:\users\public\desktop"
+        # [String]$MyVersionMeta = -join ($MyFolderPath_Public_Desktop, "\*", [JtIo]::FileExtension_Meta_Cmd)
+        # if (Test-JtIoFolderPath -FolderPath $MyVersionMeta) {
+        #     $MyCommand = -join ('cmd.exe /C ', '"', 'copy ', $MyFolderPath_Public_Desktop, '\*', [JtIo]::FileExtension_Meta, ' ', $MyFolderPath_C_inventory_Report, '\.', '"')   
+        #     Invoke-Expression -Command:$MyCommand    
+        # }
         return $True
     }
 
-    [boolean]DoIt() {
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
 
         $This.DoCreateMetas()
         $This.DoCreateDirMetas()
         $This.DoCreateBcdeditMeta()
-        return $true
+        return $True
     }
 
 
     [String]GetConfigName() {
         return "JtInvClientReport"
     }
- 
+
+    [String]GetDirCommand([String]$TheFolderPath) {
+        [String]$MyFolderPath = $TheFolderPath
+        [String]$MyLabel = Convert-JtFolderPath_To_Label -FolderPath $MyFolderPath
+        [String]$MyName = -join ("dir", "_", $MyLabel)
+        [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
+        [String]$MyResult = -join ('cmd.exe /C ', '"', 'dir ', $MyFolderPath, ' > ', $MyFilePath_Output, '"')
+        return $MyResult
+    }
+
+
+    [String]GetFilePath_Txt([String]$TheName) {
+        [JtIoFolder]$MyJtIoFolder_Report = New-JtIoFolder_Report
+        [JtIoFolder]$MyJtIoFolder_Output = $MyJtIoFolder_Report
+
+        [String]$MyName = $TheName
+        [String]$MyPrefix = [JtIo]::FilePrefix_Report
+        [String]$MyExtension = [JtIo]::FileExtension_Txt
+        [String]$MyFilename = -join ($MyPrefix, '.', $MyName, $MyExtension)
+        [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename)
+        return $MyFilePath_Output
+    }
 
     [String]GetReportLabel() {
         return "report"
     }
-
-
-
-
-
-    [String]GetDirCommand([String]$Path) {
-        [String]$Result = ""
-        [String]$Label = [JtIo]::ConvertPathToLabel($Path)
-        [String]$Filename = -join ([JtIo]::FilenamePrefix_Report, '.', $Label, '.', 'dir', [JtIo]::FilenameExtension_Meta)
-        [String]$Out = $This.FolderReport.GetFilePath($Filename)
-        [String]$Result = -join ('cmd.exe /C ', '"', 'dir ', $Path, ' > ', $Out, '"')
-        return $Result
-    }
-
 }
 
-function New-JtInvClientReport {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-    
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientReport]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "report"
-}
 
 class JtInvClientSoftware : JtInv {
 
-    [JtIoFolder]$Target = $Null
-    [JtIoFolder]$Source = $Null
-
-    JtInvClientSoftware([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvClientSoftware() : Base() {
         $This.ClassName = "JtInvClientSoftware"
         # output goes directly to c:\_inventory\report
     }
 
-    [boolean]DoIt() {
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
 
         $MyObject = $NUll
         $MyObject = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort-Object DisplayName 
         $MyClass = "Uninstall64"
-        [String]$FileNameXml = -join ($MyClass.ToLower(), ".xml")
-        [String]$FileNameTxt = -join ($MyClass.ToLower(), ".txt")
+        [String]$MyFileName_Xml = -join ($MyClass.ToLower(), [JtIo]::FileExtension_Xml)
+        [String]$MyFileName_Txt = -join ($MyClass.ToLower(), [JtIo]::FileExtension_Txt)
 
-        $FilePathXml = $This.GetFolderTarget().GetFilePath($FileNameXml)
-        $FilePathTxt = $This.GetFolderTarget().GetFilePath($FileNameTxt)
+        $MyFilePath_Xml = $This.GetFolderPath_Output().GetFilePath($MyFileName_Xml)
+        $MyFilePathTxt = $This.GetFolderPath_Output().GetFilePath($MyFileName_Txt)
 
-        Write-JtIo -Text ( -join ("Writing TXT-File: ", $FilePathTxt))
-        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -Filepath $FilePathTxt
+        Write-JtLog_File -Where $This.ClassName -Text "Writing TXT-File." -FilePath $MyFilePathTxt
+        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -FilePath $MyFilePathTxt
 
-        Write-JtIo -Text ( -join ("Writing XML-File: ", $FilePathXml))
-        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
+        Write-JtLog_File -Where $This.ClassName -Text "Writing XML-File." -FilePath $MyFilePath_Xml
+        Export-Clixml -InputObject  $MyObject -Path $MyFilePath_Xml
         
         $MyObject = Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort-Object DisplayName 	
         $MyClass = "Uninstall32"
-        [String]$FileNameXml = -join ($MyClass.ToLower(), ".xml")
-        [String]$FileNameTxt = -join ($MyClass.ToLower(), ".txt")
+        [String]$MyFileName_Xml = -join ($MyClass.ToLower(), [JtIo]::FileExtension_Xml)
+        [String]$MyFileName_Txt = -join ($MyClass.ToLower(), [JtIo]::FileExtension_Txt)
         
-        $FilePathXml = $This.GetFolderTarget().GetFilePath($FileNameXml)
-        $FilePathTxt = $This.GetFolderTarget().GetFilePath($FileNameTxt)
+        $MyFilePath_Xml = $This.GetFolderPath_Output().GetFilePath($MyFileName_Xml)
+        $MyFilePathTxt = $This.GetFolderPath_Output().GetFilePath($MyFileName_Txt)
 
-        Write-JtIo -Text ( -join ("Writing TXT-File: ", $FilePathTxt))
-        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -Filepath $FilePathTxt
+        Write-JtLog_File -Where $This.ClassName -Text "Writing TXT-File." -FilePath $MyFilePathTxt
+        $MyObject | Sort-Object -Property DisplayName | Format-Table -Property DisplayName, DisplayVersion | Out-File -FilePath $MyFilePathTxt
 
-        Write-JtIo -Text ( -join ("Writing XML-File: ", $FilePathXml))
-        Export-Clixml -InputObject  $MyObject -Path $FilePathXml
+        Write-JtLog_File -Where $This.ClassName -Text "Writing XML-File." -FilePath $MyFilePath_Xml
+        Export-Clixml -InputObject  $MyObject -Path $MyFilePath_Xml
 
         return $True
     }
@@ -772,55 +1356,46 @@ class JtInvClientSoftware : JtInv {
     }
 }
 
-function New-JtInvClientSoftware {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientSoftware]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "software"
-}
-
 
 class JtInvClientTimestamp : JtInv {
     
     [String]$MetaLabel
     
-    JtInvClientTimestamp([JtConfig]$JtConfig, [String]$MyLabel) : Base($JtConfig) {
+    JtInvClientTimestamp([String]$TheLabel) : Base() {
         $This.ClassName = "JtInvClientTimestamp"
-        $This.MetaLabel = $MyLabel
+        $This.MetaLabel = $TheLabel
         # Output goes directly to c:\_inventory\report
-
-        $This.DoCreateMetaFile()
-    }
-
-    [boolean]DoIt() {
-        $This.DoLogRepoStart()
-        return $true
+        
+        [String]$MyLabel = $TheLabel
+        $This.DoCreateMetaTime($MyLabel)
     }
     
-    [boolean]DoCreateMetaFile() {
-        [String]$Timestamp = Get-JtTimestamp
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        return $True
+    }
+    
+    [Boolean]DoCreateMetaTime([String]$TheName) {
+        [String]$MyName = $TheName
         
-        [String]$Content = "Hello world!"
-        [String]$TheLabel = $This.MetaLabel
-        [String]$FileLabel = -join ([JtIo]::FilenamePrefix_Report, ".", $Timestamp, ".", $TheLabel, ".", [JtIo]::FilenameSuffix_Time)
-
-        [JtIoFolder]$FolderTimestamp = $This.FolderReport.GetSubfolder("timestamp", $True)
-        [String]$TargetPath = $FolderTimestamp.GetPath()
-
-        New-JtIoFileMeta -Path $TargetPath -Label $FileLabel -Content $Content
-        return $true
+        [String]$MySub = $this.GetReportLabel()
+        [JtIoFolder]$MyJtIoFolder_Input = $This.JtIoFolder_Report
+        [JtIoFolder]$MyJtIoFolder_Output = $This.JtIoFolder_Report.GetJtIoFolder_Sub($MySub, $True)
+        $MyParams = @{
+            FolderPath_Input  = $MyJtIoFolder_Input
+            FolderPath_Output = $MyJtIoFolder_Output
+            Name              = $MyName
+        }
+        Write-JtIoFile_Meta_Time @MyParams
+        return $True
     }
  
     [Boolean]DoCleanTimestamps() {
-        [String]$MyFilter = -join ("*", ".", $This.Label, ".", [JtIo]::FilenameSuffix_Time, [JtIo]::FilenameExtension_Meta)
+        [String]$MyFilter = -join ("*", ".", $This.MetaLabel, [JtIo]::FileExtension_Meta_Time)
         Write-Host "DoCleanTimestamps"        
-        $This.FolderReport.DoDeleteAllFiles($MyFilter)
-        return $true
+        $This.JtIoFolder_Report.DoRemoveFiles_All($MyFilter)
+        return $True
     }
 
     [String]GetConfigName() {
@@ -833,190 +1408,118 @@ class JtInvClientTimestamp : JtInv {
 }
 
 
-Function New-JtInvClientTimestamp {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig,
-        [Parameter(Mandatory = $true)]
-        [String]$Label
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientTimestamp]::new($JtConfig, $Label)
-}
-
-
-
 # $mySoftware = Get-JtInstalledSoftware $env:COMPUTERNAME
-
-
-
-class JtInvClientUpdate : JtInv {
-
-    [String]$DownloadUrlCApps = ""
-    [String]$Fp_C_Apps = ""
-
-    [JtIoFolder]$JtIoFolder_C_Apps
-
-    [String]$HelpUrlCApps = "https://seafile.projekt.uni-hannover.de/f/dc1f3a1f8d5d4d528e32/"
-
-    JtInvClientUpdate ([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvClientUpdate"
-        $This.JtIoFolder_C_Apps = [JtIoFolder]::new("c:\apps")
-    }
-
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
-        }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderSource.GetPath()))
-                return $False
-            }
-                
-            Write-JtLog -Text ( -join ("FolderSource:", $FolderSource.GetPath()))
-                
-            Write-JtLog -Text ( -join ("Target:", $This.JtIoFolder_C_Apps.GetPath()))
-
-            if ($This.JtIoFolder_C_Apps.IsExisting()) {
-                New-JtRobocopyIo -IoSource $FolderSource -IoTarget $This.JtIoFolder_C_Apps
-            }
-        } 
-        return $true
-    }
-
-    [String]GetConfigName() {
-        return "JtInvClientUpdate"
-    }
-
-    [String]GetReportLabel() {
-        return "update"
-    }
-}
-
-
-function New-JtInvClientUpdate {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-    [JtConfig]$JtConfig = New-JtConfig
-
-    [JtInvClientUpdate]::new([JtConfig]$JtConfig) 
-    
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "update"
-}
-
 
 class JtInvData : JtInv {
     
     [String]$Out = ""
     [String]$Computer
     
-    JtInvData([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvData() : Base() {
         $This.ClassName = "JtInvData"
         $This.Computer = $env:COMPUTERNAME
     }
-    
-    hidden [Boolean]DoWriteTheReport([JtIoFolder]$MyTarget, [String]$MyLabel, [JtIoFolder]$MySource) {
-        $ReportName = -join ("data", ".", $env:COMPUTERNAME.ToLower(), ".", $MyLabel)
-        [JtTblTable]$JtTblTable = New-JtTblTable -Label $ReportName
 
-        $SubFolders = $MySource.GetSubfolders($False)
-        foreach ($Folder in $SubFolders) {
-            [JtTblRow]$JtTblRow = $This.GetDataLine($Folder.GetPath())
-            $JtTblTable.AddRow($JtTblRow)
+    
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
         }
-        New-JtCsvWriteTbl -Label $JtTblTable.GetLabel() -JtIoFolder $MyTarget -JtTblTable $JtTblTable
-        return $True
+        
+        [String]$MyTagName = "data"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+                label  = $Entity.label
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+    
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
     }
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
-            # [String]$JtInfo = $Entity.'#text'
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
 
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            Write-JtLog -Text ( -join ("Source:", $Source))
-                
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
-            }
-            else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
-            }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-
-            [String]$Label = $Entity.label
-            [String]$MyLabel = ""
-            if ($Label.Length -lt 1) {
-                $MyLabel = $FolderSource.GetLabelForPath()
-            }
-            else {
-                $MyLabel = $Label
-            }
-            Write-JtLog -Text ( -join ("Label:", $MyLabel))
-
-            $This.DoWriteTheReport($FolderExport, $MyLabel, $FolderSource)
+        foreach ($MyItem in $MyArrayList) {
+            $This.DoWriteTheReport($MyItem.source, $MyItem.target, $MyItem.label)
         }
         return $True
     }
 
-    hidden [JtTblRow]GetDataLine([String]$Path) {
-        Write-JtLog -Text ( -join ("-- GetDataLine, Path:", $Path))
-        [JtTblRow]$JtTblRow = New-JtTblRow
-    
-        $Result = $Null
-        try {
-    
-            $Result = Get-ChildItem -Recurse $Path | Where-Object { -not $_.PSIsContainer } | Measure-Object -Property Length -Sum
+    hidden [Boolean]DoWriteTheReport([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, [String]$TheLabel) {
+        [String]$MyLabel = $TheLabel
+        [String]$MyFolderPath_Input = $TheFolderPath_Input
+        [String]$MyFolderPath_Output = $TheFolderPath_Output
+
+        [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+        Write-JtLog -Where $This.ClassName -Text "DoWriteTheReport. MyFolderPath_Input: $MyFolderPath_Input, MyFolderPath_Output: $MyFolderPath_Output, LABEL: $MyLabel"
+        [String]$MyReportName = -join ("data", ".", $env:COMPUTERNAME.ToLower(), ".", $MyLabel)
+        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyReportName
+
+        $MyAlJtIoFoldersFoldersSub = $MyJtIoFolder_Input.GetAlJtIoFolders_Sub($False)
+        foreach ($Folder in $MyAlJtIoFoldersFoldersSub) {
+            [JtIoFolder]$MyJtIoFolder = $Folder
+            [JtTblRow]$MyJtTblRow = $This.GetDataLine($MyJtIoFolder.GetPath())
+            $MyJtTblTable.AddRow($MyJtTblRow)
         }
-        catch {
-            Write-JtError -Text ( -join ("JtInvData, problem in GetDataLine with path:", $Path))
-        }
+        [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
+        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
+        return $True
+    }
+
+    hidden [JtTblRow]GetDataLine([String]$TheFolderPath) {
+        [String]$MyFolderPath = $TheFolderPath
+        [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
+        [String]$MyFoldername = $MyJtIoFolder.GetName()
+        Write-JtLog -Where $This.ClassName -Text "-- GetDataLine, MyFolderPath: $MyFolderPath"
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
     
-        $JtTblRow.Add("Path", $Path)
-        if ($Null -eq $Result) {
-            $JtTblRow.Add("Computer", $This.Computer)
-    
-            $JtTblRow.Add("Size", 0)
-            $JtTblRow.Add("SizeGB", 0)
-            $JtTblRow.Add("Files", 0)
-            $JtTblRow.Add("OK", 0)
+        [String]$MyComputername = Get-Computername
+        $MyJtTblRow.Add("Computer", $MyComputername)
+        $MyJtTblRow.Add("Foldername", $MyFoldername)
+        $MyJtTblRow.Add("Path", $MyFolderPath)
+
+        [Decimal]$MyDecFolderSize = Get-JtFolderPath_Info_SizeGb -FolderPath $MyFolderPath
+        [Decimal]$MyIntFilesCount = Get-JtFolderPath_Info_FilesCount -FolderPath $MyFolderPath
+
+        if ($Null -eq $MyDecFolderSize) {
+            # $MyJtTblRow.Add("Size", 0)
+            $MyJtTblRow.Add("SizeGB", 0)
+            $MyJtTblRow.Add("Files", 0)
+            $MyJtTblRow.Add("OK", 0)
         }    
         else {
-            $JtTblRow.Add("Computer", $This.Computer)
-            
-            $JtTblRow.Add("Size", $Result.Sum)
-            [String]$SizeGb = ConvertTo-JtStringToGb($Result.Sum)
-            $JtTblRow.Add("SizeGB", $SizeGB)
-            $JtTblRow.Add("Files", $Result.Count)
-            $JtTblRow.Add("OK", 1)
+            # $MyJtTblRow.Add("Size", $MyResult.Sum)
+            $MyJtTblRow.Add("SizeGB", $MyDecFolderSize)
+            $MyJtTblRow.Add("Files", $MyIntFilesCount)
+            $MyJtTblRow.Add("OK", 1)
         }    
-        return $JtTblRow
+        return $MyJtTblRow
     }    
 
     [String]GetConfigName() {
@@ -1026,230 +1529,135 @@ class JtInvData : JtInv {
     [String]GetReportLabel() {
         return "data"
     }
-    
-
-
-}
-
-function New-JtInvData {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvData]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "data"
 }
 
 
-class JtInvDownload : JtInv {
 
-    [JtIoFolder]$JtIoFolderDownload = $Null
+class JtTblFilelist : JtClass {
 
-    JtInvDownload([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvDownload"
-        $This.JtIoFolderDownload = [JtIoFolder]::new("C:\_inventory\download", $True)
-    }
+    #  "NAME.EXTENSION.PATH.PARENT_NAME"
 
-    
-    [boolean]DoIt() {
-        $This.DoLogRepoStart()
+
+    static [JtTblRow] GetRowForFile2([JtIoFile]$TheJtIoFile) {
+        #  "NAME.EXTENSION.PATH.PARENT_NAME"
+        [JtIoFile]$MyJtIoFile = $TheJtIoFile
+                
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
         
-        Write-JtLog -Text ( -join ("Downloading to:", $This.JtIoFolderDownload.GetPath()))
+        [String]$MyFilename = $MyJtIoFile.GetName()
+        $MyJtTblRow.Add("NAME", $MyFileName)
+        
+        [String]$MyExtension = $MyJtIoFile.GetExtension()
+        $MyJtTblRow.Add("EXTENSION", $MyExtension)
 
-        # * Download: [apps.exe](https://seafile.projekt.uni-hannover.de/f/b74545092bc24a9c9101/?dl=1)
-        # * Download: [apps.zip](https://seafile.projekt.uni-hannover.de/f/d31bffa68e0b445c9194/?dl=1)
+        [String]$MyFilePath = $MyJtIoFile.GetPath()
+        $MyJtTblRow.Add("PATH", $MyFilePath)
 
-        [String]$DownloadUrlAppsZip = "https://seafile.projekt.uni-hannover.de/f/d31bffa68e0b445c9194/?dl=1"
-        [String]$FileNameZip = "apps.zip"
-        [String]$TargetFilePathZip = $This.JtIoFolderDownload.GetFilePath($FileNameZip)
+        [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
+        [String]$MyFoldername_Parent = $MyJtIoFolder_Parent.GetName()
+        $MyJtTblRow.Add("PARENT_NAME", $MyFoldername_Parent)
 
-        (new-object System.Net.WebClient).DownloadFile($DownloadUrlAppsZip, $TargetFilePathZip)
-        return $true
+        return $MyJtTblRow
     }
 
+    static [JtTblRow] GetRowForFileUsingTemplate([JtIoFile]$TheJtIoFile, [String]$TheFilenameTemplate) {
+        [JtTblRow]$MyJtTblRowAll = Convert-JtIoFile_To_JtTblRow -FilePath $TheJtIoFile
 
-    [String]GetConfigName() {
-        return "JtInvDOWNLOAD"
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+        [String[]]$AlParts = $TheFilenameTemplate.Split(".")
+
+        foreach ($Element in $AlParts) {
+            [String]$MyPart = $Element
+
+            [String]$MyValue = $MyJtTblRowAll.GetValue($MyPart)
+            $MyJtTblRow.Add($MyPart, $MyValue)
+        }
+        return $MyJtTblRow
     }
 
-    [String]GetReportLabel() {
-        return "download"
-    }
-
-
-
-    [Boolean]DoCleanJtIoFolderDownload() {
-        $This.JtIoFolderDownload().DoDeleteAllFiles()
-        return $true
-    }
 
 }
-
-function New-JtInvDownload {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvDownload]::new([JtConfig]$JtConfig) 
-    
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "download"
-}
-
-
-
 
 class JtInvFiles : JtInv {
 
-    JtInvFiles ([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvFiles () : Base() {
         $This.ClassName = "JtInvFiles"
     }
 
-    static [JtTblRow] GetRowForFile([JtIoFile]$MyFile) {
-        #  "NAME.EXTENSION.PATH.PARENT_NAME"
-        [JtIoFile]$JtIoFile = $MyFile
-                
-        [JtTblRow]$JtTblRow = New-JtTblRow
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [String]$FileName = $JtIoFile.GetName()
-        $JtTblRow.Add("NAME", $FileName)
-        
-        [String]$Extension = $JtIoFile.GetExtension()
-        $JtTblRow.Add("EXTENSION", $Extension)
-
-        [String]$Path = $JtIoFile.GetPath()
-        $JtTblRow.Add("PATH", $Path)
-
-        [JtIoFolder]$ParentFolder = [JtIoFolder]::new($JtIoFile)
-        [String]$ParentName = $ParentFolder.GetName()
-        $JtTblRow.Add("PARENT_NAME", $ParentName)
-
-        return $JtTblRow
-    }
-
-    static [JtTblRow] GetRowForFileUsingTemplate([JtIoFile]$MyFile, [String]$Template) {
-        [JtTblRow]$JtTblRowAll = [JtInvFiles]::GetRowForFile($MyFile)
-
-        [JtTblRow]$JtTblRow = New-JtTblRow
-        [String[]]$Parts = $Template.Split(".")
-
-        foreach ($Element in $Parts) {
-            [String]$Part = $Element
-
-            [String]$Value = $JtTblRowAll.GetValue($Part)
-            $JtTblRow.Add($Part, $Value)
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
         }
-        return $JtTblRow
-    }
-    
+        
+        [String]$MyTagName = "files"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+                label  = $Entity.label
+                filter = $Entity.filter
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-    [Boolean]DoWriteCsvFileIn([System.Collections.ArrayList]$Files, [String]$MyLabel, [String]$MyTemplate, [JtIoFolder]$MyTarget) {
-        [JtTblTable]$JtTblTable = New-JtTblTable -Label "FileTable"      
-        foreach ($File in $Files) {
-            [JtIoFile]$JtIoFile = $File
-
-            [JtTblRow]$JtTblRow = $Null    
-            if ($MyTemplate.Length -lt 1) {
-                $JtTblRow = [JtInvFiles]::GetRowForFile($JtIoFile)
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
             }
             else {
-                $JtTblRow = [JtInvFiles]::GetRowForFileUsingTemplate($JtIoFile, $MyTemplate)
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
             }
-            $JtTblTable.AddRow($JtTblRow)
         }
-
-        New-JtCsvWriteTbl -Label $MyLabel -JtIoFolder $MyTarget -JtTblTable $JtTblTable
-        return $True
+        return $MyArrayList
     }
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
 
-        if ($Null -eq $ConfigXml) {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("folder")) {
-            # [String]$JtInfo = $entity.'#text'
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            [String]$MySource = $MyItem.source
+            [String]$MyLabel = $MyItem.label
+            [String]$MyTarget = $MyItem.target
+            [String]$MyFilter = $MyItem.filter
+            
+            [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MySource
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyTarget -Force
+            [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
 
-            [String]$Source = $entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            Write-JtLog -Text ( -join ("Source:", $Source))
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter -Recurse
 
-            if ($False -eq $FolderSource.IsExisting()) {
-                Write-JtError -Text ( -join ($This.ClassName, ". Error in GenerateCsvForFolder. Please edit XML in files!!!!"))
-                Write-JtError -Text ( -join ("Path not found:", $FolderSource.GetPath()))
-                return $False
-            }
+            [Int16]$MyIntCount = $MyAlJtIoFiles.Count
+            if ($MyIntCount -gt 0) {
+                Write-JtLog -Where $This.ClassName -Text "DoIt... Number of files: $MyIntCount in MyJtIoFolder: $MyJtIoFolder"
                 
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
+                [JtTblTable]$MyJtTblTable = Convert-JtAlJtIoFiles_to_JtTblTable -ArrayList $MyAlJtIoFiles -Label $MyLabel
+                
+                Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
             }
             else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
+                Write-JtLog_Error -Where $This.ClassName -Text "DoIt... Nothing to do. Number of files: $MyIntCount in MyJtIoFolder: $MyJtIoFolder"
             }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-
-            [String]$MyFilter = $entity.filter
-            Write-JtLog -Text ( -join ("Filter:", $MyFilter))
-
-            [String]$Label = $Entity.label
-            [String]$MyLabel = ""
-            if ($Label.Length -lt 1) {
-                $MyLabel = $FolderSource.GetLabelForName()
-            }
-            else {
-                $MyLabel = $Label
-            }
-            Write-JtLog -Text ( -join ("Label:", $MyLabel))
-
-            [String]$MyTemplate = ""
-            [String]$Template = $Entity.template
-            if ($Template.Length -lt 1) {
-                $MyTemplate = ""
-            }
-            else {
-                $MyTemplate = $Template
-            }
-            Write-JtLog -Text ( -join ("Template:", $MyTemplate))
-
-            [System.Collections.ArrayList]$Files = $This.GetFiles($FolderSource, $MyFilter)
-            $This.DoWriteCsvFileIn($Files, $MyLabel, $MyTemplate, $FolderExport)
         }
-        return $true
+        return $True
     }
+
 
     [String]GetConfigName() {
         return "JtInvFILES"
     }
-    
 
-
-    [System.Collections.ArrayList]GetFiles([JtIoFolder]$JtIoFolder, [String]$Filter) {
-        [System.Collections.ArrayList]$Files = $Null
-        [String]$MyFilter = $Filter
-        if ($Null -eq $Filter) {
-            $MyFilter = ""
-        }
-
-        if ($MyFilter.Length -gt 0) {
-            [System.Collections.ArrayList]$Files = $JtIoFolder.GetJtIoFilesWithFilter($MyFilter, $True)
-        }
-        else {
-            [System.Collections.ArrayList]$Files = $JtIoFolder.GetJtIoFiles($True)
-        }
-        return $Files
-    }
 
     [String]GetReportLabel() {
         return "files"
@@ -1257,204 +1665,142 @@ class JtInvFiles : JtInv {
 }
 
 
-function New-JtInvFiles {
+class JtInvFolder : JtInv {
 
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvFiles]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "files"
-}
-
-
-class JtInvFolders : JtInv {
-
-    JtInvFolders ([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvFolders"
+    JtInvFolder () : Base() {
+        $This.ClassName = "JtInvFolder"
     }
 
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
 
-    [Boolean]DoIt () {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList 
+        }
+
+        [String]$MyTagName = "folder"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList     
+    }
+
+    [Boolean]DoIt() {
         $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
+        [Xml]$MyConfigXml = $This.GetConfigXml()
 
-        if ($Null -eq $ConfigXml) {
+        if ($Null -eq $MyConfigXml) {
+            Write-JtLog_Error -Where $This.ClassName -Text "MyConfigXml is NULL"
             return $False
         }
 
+        [System.Collections.ArrayList]$MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            # [String]$MyJtInfo = $Entity.'#text'
 
-        [Hashtable]$Hashtable = New-Object Hashtable
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
-            # [String]$JtInfo = $Entity.'#text'
+            [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyItem.source
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyItem.target
 
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = New-JtIoFolder -Path $Source
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderSource.GetPath()))
-                return $False
-            }
-            Write-JtLog -Text ( -join ("FolderSource:", $FolderSource.GetPath()))
+            # [System.Collections.ArrayList]$MyAlFolderTypes = Convert-JtFolderPath_To_AlFoldertypes  -FolderPath $MyJtIoFolder_Input
+            # Write-JtLog -Where $This.ClassName -Text "Finding Foldertypes"
 
-            Get-JtIoFolderTypes -Path $FolderSource.GetPath()
-                
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
-            }
-            else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
-            }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
+            Update-JtFolderPath_Md_And_Meta -FolderPath_Input $MyJtIoFolder_Input -FolderPath_Output $MyJtIoFolder_Output
 
-            $HashTable.Add($Source, $target)
         } 
-
-$Hashtable
-
-
-        foreach ($Source in $Hashtable.keys) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderSource.GetPath()))
-                return $False
-            }
-            Write-JtLog -Text ( -join ("FolderSource:", $FolderSource.GetPath()))
-
-            Get-JtIoFolderTypes -Path $FolderSource.GetPath()
-                
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = $HashTable.item($source)
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
-            }
-            else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
-            }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-
-            [System.Collections.ArrayList]$FolderFiles = $FolderSource.GetFolderFiles()
-            Write-JtLog -Text ( -join ("Finding FolderFiles. Number of files found: ", $FolderFiles.Count))
-                    
-            foreach ($MyFile in $FolderFiles) {
-                [JtIoFile]$FileFolder = $Myfile
-                Write-JtLog -Text ( -join ("Path of FolderFile:", $MyFile.GetPath()))
-
-                [JtFacFolderRen]$JtFacFolderRen = [JtFacFolderRen]::new($FileFolder)
-                [JtIndex]$JtIndex = $JtFacFolderRen.GetJtIndex()
-
-                [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($FileFolder)
-                $JtIndex.DoIt($JtIoFolder)
-                
-                # Write-JtLog -Text ( -join ("Kind of folder: ", $JtFacFolderRen.GetKind()))
-                # Write-JtLog -Text ( -join ("Info for folder: ", $JtIndex.GetInfo()))
-                # Write-JtLog -Text ( -join ("Check for folder: ", $JtIndex.DoCheckFolder()))
-                # Write-JtLog -Text ( -join ("Clean special files... ", $JtIndex.DoCleanFilesInFolder()))
-                # Write-JtLog -Text ( -join ("Create special file... ", $JtIndex.DoWriteSpecialFileInFolder()))
-                # Write-JtLog -Text ( -join ("Create special file in... ", $FolderExport.GetPath(), " - ", $JtIndex.DoWriteSpecialFileIn($FolderExport)))
-                # Write-JtLog -Text ( -join ("Create table CSV file... ", $JtIndex.DoWriteCsvFileInFolder()))
-                # Write-JtLog -Text ( -join ("Create table CSV file in... ", $FolderExport.GetPath(), " - ", $JtIndex.DoWriteCsvFileIn($FolderExport)))
-                
-            }
-        } 
-        return $true
+        return $True
     }
 
 
     [String]GetConfigName() {
-        return "JtInvFOLDERS"
+        return "JtInvFolder"
     }
 
     [String]GetReportLabel() {
         return "folders"
     }
-
-
 }
 
-function New-JtInvFolders {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvFolders]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "folders"
-
-}
 
 class JtInvLengths : JtInv {
 
-    JtInvLengths([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvLengths() : Base() {
         $This.ClassName = "JtInvLengths"
     }
 
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
 
-        if ($Null -eq $ConfigXml) {
-            return $False
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList 
         }
 
-        foreach ($Entity in $ConfigXml.getElementsByTagName("lengths")) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath -Path $Source
-            Write-JtLog -Text ( -join ("Source:", $Source))
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Please edit XML for:", $FolderSource.GetPath()))
-                return $False
+        [String]$MyTagName = "lengths"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                label  = $Entity.label
+                target = $Entity.target
             }
-                
-                
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath -Path $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
             }
             else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
             }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-                    
-                
-            [JtTblTable]$JtTblTable = $This.GetTable($FolderSource)
-
-            [System.Collections.ArrayList]$List = $JtTblTable.GetObjects() | Sort-Object -Property @{e = { $_.Length -as [int] } } -Descending
-
-            [String]$Label = $Entity.label
-            [String]$MyLabel = ""
-            if ($Label.Length -lt 1) {
-                $MyLabel = $FolderSource.GetLabelForPath()
-            }
-            else {
-                $MyLabel = $Label
-            }
-            Write-JtLog -Text ( -join ("Label:", $Label))
-
-
-            New-JtCsvWriteTbl -Label $MyLabel -JtIoFolder $FolderExport -JtTblTable $JtTblTable
         }
-        return $true
+        return $MyArrayList     
     }
 
+
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+        
+        [System.Collections.ArrayList]$MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+
+        foreach ($Item in $MyArrayList) {
+            $MyItem = $Item
+
+            [String]$MySource = $MyItem.source
+            [String]$MyTarget = $MyItem.target
+            [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MySource
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyTarget
+            [String]$MyLabel = $MyItem.label
+            [JtTblTable]$MyJtTblTable = $This.GetTable($MyJtIoFolder_Input, $MyLabel)
+            
+            Write-JtLog -Where $This.ClassName -Text "MyLabel: $MyLabel, $MySource"
+            [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
+            Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
+        }
+        return $True
+    }
 
     [String]GetConfigName() {
         return "JtInvLENGTHS"
@@ -1464,98 +1810,80 @@ class JtInvLengths : JtInv {
         return "lengths"
     }
 
-    [JtTblTable]GetTable([JtIoFolder]$MyFolder) {
-        [JtTblTable]$JtTblTable = New-JtTblTable -Label "Lengths"
+    [JtTblTable]GetTable([JtIoFolder]$TheJtIoFolder, $TheLabel) {
+        [String]$MyLabel = $TheLabel
+        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
     
-        $MyFolders = $MyFolder.GetSubfolders($True)
-    
-        foreach ($Folder in $MyFolders) {
-            [JtTblRow]$JtTblRow = New-JtTblRow
-
-            [JtIoFolder]$JtIoFolder = $Folder
-    
-            $JtTblRow.Add("Foldername", $JtIoFolder.GetName()) | Out-Null
-
-            $JtTblRow.Add("Path", $JtIoFolder.GetPath()) | Out-Null
-            $JtTblRow.Add("Length", $JtIoFolder.GetPath().Length) | Out-Null
-    
-            $JtTblTable.AddRow($JtTblRow) | Out-Null
+        [JtIoFolder]$MyJtIoFolder = $TheJtIoFolder
+        $MyAlJtIoFolders = $MyJtIoFolder.GetAlJtIoFolders_Sub($True)
+        foreach ($Folder in $MyAlJtIoFolders) {
+            [JtIoFolder]$MyJtIoFolder = $Folder
+            [JtTblRow]$MyJtTblRow = New-JtTblRow
+            $MyJtTblRow.Add("Foldername", $MyJtIoFolder.GetName()) | Out-Null
+            $MyJtTblRow.Add("Path", $MyJtIoFolder.GetPath()) | Out-Null
+            $MyJtTblRow.Add("Length", $MyJtIoFolder.GetPath().Length) | Out-Null
+            $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
         }
-        return $JtTblTable
+        return $MyJtTblTable
     }
 }
 
-function New-JtInvLengths {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvLengths]::new([JtConfig]$JtConfig) 
-    
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "lengths"
-}
 
 class JtInvLines : JtInv {
 
-    JtInvLines ([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvLines () : Base() {
         $This.ClassName = "JtInvLines"
     }
-    
 
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
 
-        if ($Null -eq $ConfigXml) {
-            return $False
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList 
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("lines")) {
-            # [String]$JtInfo = $entity.'#text'
 
-            [String]$Source = $entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$MyFolder = [JtIoFolder]::new($Source)
-            Write-JtLog -Text ( -join ("Source:", $Source))
-                
-                
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
+        [String]$MyTagName = "files"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+                filter = $Entity.filter
+                label  = $Entity.label
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+                return $MyArrayList
             }
             else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
             }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-
-            [String]$Filter = $entity.filter
-            Write-JtLog -Text ( -join ("Filter:", $Filter))
-
-            [String]$Pattern = $entity.pattern
-            Write-JtLog -Text ( -join ("Pattern:", $Pattern))
-
-            [String]$Label = $Entity.label
-            [String]$MyLabel = ""
-            if ($Label.Length -lt 1) {
-                $MyLabel = $MyFolder.GetLabelForPath()
-            }
-            else {
-                $MyLabel = $Label
-            }
-            Write-JtLog -Text ( -join ("Label:", $Label))
-
-            [JtMd]::DoWriteJtMdCsv($MyFolder, $FolderExport, $MyLabel, $Filter, $Pattern)
-        } 
-        
-        return $true
+        }
+        return $MyArrayList     
     }
 
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
 
+        [System.Collections.ArrayList]$MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyItem.source
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyItem.target
+
+            [JtMd]::DoWriteJtMdCsv($MyJtIoFolder, $MyJtIoFolder_Output, $MyItem.label, $MyItem.filter, $MyItem.pattern)
+        } 
+        return $True
+    }
 
     [String]GetConfigName() {
         return "JtInvLINES"
@@ -1564,82 +1892,76 @@ class JtInvLines : JtInv {
     [String]GetReportLabel() {
         return "lines"
     }
-
-
 }
 
-function New-JtInvLines {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvLines]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "lines"
-
-}
 
 class JtInvMd : JtInv {
 
-
-    JtInvMd ([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvMd () : Base() {
         $This.ClassName = "JtInvMd"
     }
 
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
 
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList 
         }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("md")) {
-            # [String]$JtInfo = $Entity.'#text'
-    
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderSource.GetPath()))
-                return $False
+
+        [String]$MyTagName = "md"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source  = $Entity.source
+                pattern = $Entity.pattern
+                label   = $Entity.label
             }
-            Write-JtLog -Text ( -join ("FolderSource:", $FolderSource.GetPath()))
-                
-            [JtIoFolder]$FolderExport = $Null
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            if ($Target.Length -gt 0) {
-                [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+                return $MyArrayList
             }
             else {
-                [JtIoFolder]$FolderExport = $This.GetFolderTarget()
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
             }
-            Write-JtLog -Text ( -join ("... Exporting results to:", $FolderExport.GetPath()))
-                
-            [String]$Filter = "*.md"
-            Write-JtLog -Text ( -join ("Filter:", $Filter))
-                
-            # [String]$Label = $entity.label
-                
+        }
+        return $MyArrayList     
+    }
+
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+
+        [System.Collections.ArrayList]$MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyItem.source
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyItem.target
+
             # <path filter="*.web.md" label="support_index_az" pattern="[\[]({FILELABEL})[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))">D:\Seafile\al-public\SUPPORT</path>
-            [String]$Label = "JtMd.az"
-            Write-JtLog -Text ( -join ("Label:", $Label))
+            [String]$Filter = "*.md"
+            Write-JtLog -Where $This.ClassName -Text "Filter: $Filter"
+            [String]$MyLabel = "JtMd.az"
+            Write-JtLog -Where $This.ClassName -Text "Label: $MyItem.label"
             [String]$Pattern = "[\[]({FILELABEL})[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))"
-            Write-JtLog -Text ( -join ("Pattern:", $Pattern))
-            [JtMd]::DoWriteJtMdCsv($FolderSource, $FolderExport, $Label, $Filter, $Pattern)
+            Write-JtLog -Where $This.ClassName -Text "Pattern: $MyItem.Pattern"
+            [JtMd]::DoWriteJtMdCsv($MyJtIoFolder_Input, $MyJtIoFolder_Output, $MyItem.label, $MyItem.filter, $MyItem.pattern)
                 
             # <path filter="*.web.md" label="support_links" pattern="[\[][A-Za-z0-9_]*[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))">D:\Seafile\al-public</path>
-            [String]$Label = "JtMd.links"
-            Write-JtLog -Text ( -join ("Label:", $Label))
+            [String]$MyLabel = "JtMd.links"
+            Write-JtLog -Where $This.ClassName -Text "Label: $MyLabel"
             [String]$Pattern = "[\[][A-Za-z0-9_]*[\]][\(](https:\/\/)[A-Za-z0-9.\-\/]*(\))"
-            Write-JtLog -Text ( -join ("Pattern:", $Pattern))
-            [JtMd]::DoWriteJtMdCsv($FolderSource, $FolderExport, $Label, $Filter, $Pattern)
+            Write-JtLog -Where $This.ClassName -Text "Pattern: $Pattern"
+            [JtMd]::DoWriteJtMdCsv($MyJtIoFolder_Input, $MyJtIoFolder_Output, $MyItem.label, $MyItem.filter, $MyItem.pattern)
         }
-        return $true
+        return $True
     }
 
 
@@ -1650,214 +1972,137 @@ class JtInvMd : JtInv {
     [String]GetReportLabel() {
         return "JtMd"
     }
-
-
-
-}
-
-
-function New-JtInvMd {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-    
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvMd]::new([JtConfig]$JtConfig) 
-    
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "JtMd"
-}
-
-
-class JtInvMiete : JtInv {
-
-    [String]$TemplateFileExtension = [JtIo]::FilenameExtension_Folder
-
-    JtInvMiete ([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvMiete"
-    }
-
-
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
-        }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            Write-JtLog -Text ( -join ("Source:", $Source))
-
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Please edit XML for:", $FolderSource.GetPath()))
-                return $False
-            }
-
-            [String]$Target = $entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            Write-JtLog -Text ( -join ("Target:", $Target))
-            [JtIoFolder]$FolderTarget = [JtIoFolder]::new($Target)
-
-            foreach ($MyFolder in $FolderSource.GetSubfolders($True)) {
-                [JtIoFolder]$JtIoFolderMiete = $MyFolder
-                # $JtIoFolderMiete.DoOptimizeFilenames()
-
-                [JtTemplateFile]$JtTemplateFile = Get-JtTemplateFile -JtIoFolder $JtIoFolderMiete
-
-                Write-JtLog ( -join ($This.ClassName, " Folder:", $MyFolder.GetPath()))
-
-                if ($JtTemplateFile.IsValid()) {
-                    [JtIndex_Zahlung]$JtIndex = [JtIndex_Zahlung]::new($JtIoFolderMiete)
-                    $JtIndex.DoWriteInFolder()
-                    $JtIndex.DoWriteMdFile()
-                    $JtIndex.DoWriteSpecialFileIn($FolderTarget.GetSubfolder("sum", $True))
-                    $JtIndex.DoWriteMdFileIn($FolderTarget.GetSubfolder("md", $True))
-                    $JtIndex.DoWriteCsvFileIn($FolderTarget.GetSubfolder("csv", $True))
-                }
-            }
-        } 
-        return $true
-    }
-
-
-    [String]GetConfigName() {
-        return "JtInvMIETE"
-    }
-
-    [String]GetReportLabel() {
-        return "miete"
-    }
-
-    [String]GetName() {
-        [String]$Result = -join ("_MONAT.ART.OBJEKT.MIETER.MIETE.NEBENKOSTEN.BETRAG", [JtIo]::FilenameExtension_Whg)
-        return $Result
-    }
-
-
-}
-
-
-function New-JtInvMiete {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvMiete]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "miete"
 }
 
 
 class JtInvMirror : JtInv {
 
-    JtInvMirror ([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvMirror () : Base() {
         $This.ClassName = "JtInvMirror"
     }
 
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("mirror")) {
-            # [String]$JtInfo = $entity.'#text'
-                
-            [String]$Source = $entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            Write-JtLog -Text ( -join ("Source:", $Source))
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-                
-            [String]$Target = $entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            Write-JtLog -Text ( -join ("Target:", $Target))
-            [JtIoFolder]$FolderTarget = [JtIoFolder]::new($Target)
+        
+        [String]$MyTagName = "mirror"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            New-JtRobocopyIo -IoSource $FolderSource -IoTarget $FolderTarget
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
         }
-        return $true
+        return $MyArrayList
     }
 
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+
+        [System.Collections.ArrayList]$MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            New-JtRobocopy -FolderPath_Input $MyItem.source -FolderPath_Output $MyItem.target
+        }
+        return $True
+    }
 
     [String]GetConfigName() {
         return "JtInvMIRROR"
     }
 
-        
     [String]GetReportLabel() {
         return "mirror"
     }
-
-
-}
-
-function New-JtInvMirror {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvMirror]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "mirror"
-
 }
 
 
 class JtInvPoster : JtInv {
 
-    [String]$ExtensionFolder = ".job"
+    [String]$ExtensionFolder = [JtIo]::FileExtension_Folder
 
-
-    JtInvPoster ([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvPoster () : Base() {
         $This.ClassName = "JtInvPoster"
     }
 
-
-
-    [Boolean]DoIt () {
-        $This.DoLogRepoStart()
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
         }
-
-        foreach ($Entity in $ConfigXml.getElementsByTagName("poster")) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            Write-JtLog -Text ( -join ("Source:", $Source))
-
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Please edit XML for:", $FolderSource.GetPath()))
-                return $False
+        
+        [String]$MyTagName = "poster"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source   = $Entity.source
+                target   = $Entity.target
+                template = $Entity.template
             }
-
-            foreach ($Folder in $FolderSource.GetSubfolders($False)) {
-                [JtIoFolder]$JtIoFolder = $Folder
-                New-JtIndex_BxH -Path $JtIoFolder.GetPath()        
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+    
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
             }
-        } 
-        return $true
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
     }
 
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+
+        foreach ($MyItem in $MyArrayList) {
+            [String]$MyFolderPath_Input = $MyItem.source
+            [String]$MyFolderPath_Output = $MyItem.target
+            [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+            
+            [String]$MyFilename_Template = $MyItem.template
+
+            foreach ($Folder in $MyJtIoFolder_Input.GetAlJtIoFolders_Sub()) {
+                [JtIoFolder]$MyJtIoFolder_Sub = $Folder
+                [String]$MyFolderPath_Input = $MyJtIoFolder_Sub.GetPath()
+                Update-JtIndex_BxH -FolderPath_Input $MyFolderPath_Input -Filename_Template $MyFilename_Template
+                # New-JtIndex_BxH -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyJtIoFolder_Output -Filename_Template $MyFilename_Template
+                New-JtIndex_BxH -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyJtIoFolder_Output
+            }
+        } 
+        return $True
+    }
 
     [String]GetConfigName() {
         return "JtInvPOSTER"
@@ -1866,67 +2111,83 @@ class JtInvPoster : JtInv {
     [String]GetReportLabel() {
         return "poster"
     }
-
-
 }
 
-
-function New-JtInvPoster {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvPoster]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "poster"
-}
 
 class JtInvRecover : JtInv {
 
     [JtIoFolder]$Folder_C_Inv
 
-    JtInvRecover([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvRecover() : Base() {
         $This.ClassName = "JtInvRecover"
     }
 
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
+        }
+        
+        [String]$MyTagName = "recover"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source    = $Entity.source
+                disk      = $Entity.disk
+                partition = $Entity.partition
+                computer  = $Entity.computer
+                system    = $Entity.system
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
     
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
+    }
+
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
-
-        foreach ($Entity in $ConfigXml.getElementsByTagName("folder")) {
-            # [String]$JtInfo = $Entity.'#text'
-    
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFile]$Snafile = [JtIoFile]::new($Source)
-            if (!($Snafile.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! File missing; please edit XML for:", $Snafile.GetPath()))
-                return $False
-            }
-            Write-JtLog -Text ( -join ("Source:", $Snafile.GetPath()))
-                        
-            [Int32]$Disk = $entity.disk
-            [Int32]$Partition = $entity.partition
-            [String]$Computer = $entity.computer
-            [String]$System = $entity.system
-            [Boolean]$BlnSystem = $False
-            if (("true").Equals($System)) {
-                $BlnSystem = $True
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($Item in $MyArrayList) {
+            [String]$MyFilePath_Source = $Item.Source
+          
+            [Int32]$MyDisk = $Item.disk
+            [Int32]$MyPartition = $Item.partition
+            [String]$MyComputer = $Item.computer
+            [String]$MySystem = $Item.system
+            [Boolean]$MyBlnSystem = $False
+            if (("true").Equals($MySystem)) {
+                $MyBlnSystem = $True
             }
                     
-            Write-JtLog -Text ( -join ("Recover JtSnapshot. Disk:", $Disk, ", Partition:", $Partition, " Computer:", $Computer, ", Local folder:", $Source))
+            Write-JtLog -Where $This.ClassName -Text "Recover. MyDisk: $MyDisk, MyPartition: $MyPartition, MyComputer: $MyComputer, MyFilePath_Source: $MyFilePath_Source"
 
-            [JtSnap_Recover]$JtSnap_Recover = [JtSnap_Recover]::new($Snafile, $Disk, $Partition, $Computer, $BlnSystem)
-            $JtSnap_Recover.DoIt()
+            $MyParams = @{
+                FilePath  = $MyFilePath_Source
+                Disk      = $MyDisk
+                Partition = $MyPartition
+                Computer  = $MyComputer
+                BlnSystem = $MyBlnSystem
+            }
+            New-JtSnap_Recover @MyParams
         }
         return $True
     }
@@ -1939,234 +2200,233 @@ class JtInvRecover : JtInv {
     [String]GetReportLabel() {
         return "recover"
     }
-
-
-
 }
 
-function New-JtInvRecover {
 
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
+class JtInvReportsCombine : JtInv {
+    
+    JtInvReportsCombine() : Base() {
+        $This.ClassName = "JtInvReportsCombine"
+    }
 
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvRecover]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "recover"
-}
-
-class JtInvRename : JtInv {
-
-    [JtIoFolder]$Folder_C_Inv
-
-    JtInvRename([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvRename"
+    
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
+        }
+        
+        [String]$MyTagName = "combine"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+    
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
     }
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            [JtIoFolder]$MyFolderPath_Input = New-JtIoFolder -FolderPath $MyItem.source
+            Write-JtLog -Where $This.ClassName -Text "Source: $MyFolderPath_Input"
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyItem.target
+            
+            [JtIoFolder]$MyJtIoFolder_Base = $This.JtIoFolder_Base
+            [String]$MyFilter = -Join ([JtIo]::FilePrefix_Selection, ".", "*", [JtIo]::FileExtension_Csv)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Base -Filter $MyFilter
+            if ($MyAlJtIoFiles.Count -gt 0) {
+                ForEach ($File in $MyAlJtIoFiles) {
+                    [JtIoFile]$MyJtIoFile = $File
+                        
+                    Write-JtLog -Where $This.ClassName -Text "MyJtIoFile: $MyJtIoFile"
+                        
+                    [String]$MyColumnName = "SystemId"
+                        
+                    [JtIoFileCsv]$MyJtIoFileCsv = New-JtIoFile_Csv -FilePath $MyJtIoFile.GetPath()
 
-        # Muss noch angepasst werden... 
-        # BEGIN
- 
-        $SN = Get-WmiObject win32_bios | Select-Object -ExpandProperty SerialNumber
-        Write-Host "SN:"$SN
- 
-        [String]$ComputerNameOld = $env:computername
-        [String]$ComputerNameNew = $env:computername
- 
-        Switch ($SN ) {
-            8YH8032 { $ComputerNameNew = "al-its-pc-f01"; break }
-            1XH8032 { $ComputerNameNew = "al-its-pc-f02"; break }
-            CZH8032 { $ComputerNameNew = "al-its-pc-f03"; break }
-            FVH8032 { $ComputerNameNew = "al-its-pc-f04"; break }
-            GWH8032 { $ComputerNameNew = "al-its-pc-f05"; break }
-            DRH8032 { $ComputerNameNew = "al-its-pc-f06"; break }
-            7SH8032 { $ComputerNameNew = "al-its-pc-f07"; break }
-            FTH8032 { $ComputerNameNew = "al-its-pc-f08"; break }
-            HTH8032 { $ComputerNameNew = "al-its-pc-f09"; break }
-            CVH8032 { $ComputerNameNew = "al-its-pc-f10"; break }
-            7VH8032 { $ComputerNameNew = "al-its-pc-f11"; break }
-            1WH8032 { $ComputerNameNew = "al-its-pc-f12"; break }
-            9ZH8032 { $ComputerNameNew = "al-its-pc-f13"; break }
-            7TH8032 { $ComputerNameNew = "al-its-pc-f14"; break }
-            6WH8032 { $ComputerNameNew = "al-its-pc-f15"; break }
-            3ZH8032 { $ComputerNameNew = "al-its-pc-f16"; break }
-            6XH8032 { $ComputerNameNew = "al-its-pc-f17"; break }
-            5TH8032 { $ComputerNameNew = "al-its-pc-f18"; break }
-            6SH8032 { $ComputerNameNew = "al-its-pc-f19"; break }
-            9TH8032 { $ComputerNameNew = "al-its-pc-f20"; break }
-            JXH8032 { $ComputerNameNew = "al-its-pc-f21"; break }
-            3VH8032 { $ComputerNameNew = "al-its-pc-f22"; break }
-            FXH8032 { $ComputerNameNew = "al-its-pc-f23"; break }
-            CTH8032 { $ComputerNameNew = "al-its-pc-f24"; break }
-            5VH8032 { $ComputerNameNew = "al-its-pc-f25"; break }
-            DYH8032 { $ComputerNameNew = "al-its-pc-f26"; break }
-            3SH8032 { $ComputerNameNew = "al-its-pc-f27"; break }
-            1TH8032 { $ComputerNameNew = "al-its-pc-f28"; break }
-            GSH8032 { $ComputerNameNew = "al-its-pc-f29"; break }
-            2SH8032 { $ComputerNameNew = "al-its-pc-f30"; break }
-            BSH8032 { $ComputerNameNew = "al-its-pc-f31"; break }
-            HYH8032 { $ComputerNameNew = "al-its-pc-f32"; break }
-            4TH8032 { $ComputerNameNew = "al-its-pc-f33"; break }
-            1VH8032 { $ComputerNameNew = "al-its-pc-f34"; break }
-            6ZH8032 { $ComputerNameNew = "al-its-pc-f35"; break }
-     
-            H3LX3G2 { $ComputerNameNew = "al-its-pc-g01"; break }
-            H3M04G2 { $ComputerNameNew = "al-its-pc-g02"; break }
-            H3M24G2 { $ComputerNameNew = "al-its-pc-g03"; break }
-            H3M44G2 { $ComputerNameNew = "al-its-pc-g04"; break }
-            H3MX3G2 { $ComputerNameNew = "al-its-pc-g05"; break }
-            H3MY3G2 { $ComputerNameNew = "al-its-pc-g06"; break }
-            H3N14G2 { $ComputerNameNew = "al-its-pc-g07"; break }
-            H3NX3G2 { $ComputerNameNew = "al-its-pc-g08"; break }
-            H3P04G2 { $ComputerNameNew = "al-its-pc-g09"; break }
-            H3P44G2 { $ComputerNameNew = "al-its-pc-g10"; break }
-            H3PY3G2 { $ComputerNameNew = "al-its-pc-g11"; break }
-            # Nach Mainboard-Tausch in 10.2018 Namen getauscht: g12 und g19
-            H3SW3G2 { $ComputerNameNew = "al-its-pc-g12"; break }
-            H3QY3G2 { $ComputerNameNew = "al-its-pc-g13"; break }
-            H3R14G2 { $ComputerNameNew = "al-its-pc-g14"; break }
-            H3R34G2 { $ComputerNameNew = "al-its-pc-g15"; break }
-            H3RX3G2 { $ComputerNameNew = "al-its-pc-g16"; break }
-            H3RZ3G2 { $ComputerNameNew = "al-its-pc-g17"; break }
-            H3S14G2 { $ComputerNameNew = "al-its-pc-g18"; break }
-            # Nach Mainboard-Tausch in 10.2018 Namen getauscht: g12 und g19
-            H3Q34G2 { $ComputerNameNew = "al-its-pc-g19"; break }
-            H3SZ3G2 { $ComputerNameNew = "al-its-pc-g20"; break }
-    
-            1WM7MZ2 { $ComputerNameNew = "al-its-pc-h01"; break }
-            JWM7MZ2 { $ComputerNameNew = "al-its-pc-h02"; break } 
-            JVM7MZ2 { $ComputerNameNew = "al-its-pc-h03"; break } 
-            HWM7MZ2 { $ComputerNameNew = "al-its-pc-h04"; break } 
-            HVM7MZ2 { $ComputerNameNew = "al-its-pc-h05"; break } 
-            GWM7MZ2 { $ComputerNameNew = "al-its-pc-h06"; break } 
-            GVM7MZ2 { $ComputerNameNew = "al-its-pc-h07"; break } 
-            FWM7MZ2 { $ComputerNameNew = "al-its-pc-h08"; break } 
-            FVM7MZ2 { $ComputerNameNew = "al-its-pc-h09"; break } 
-
-            DWM7MZ2 { $ComputerNameNew = "al-its-pc-h10"; break } 
-            DVM7MZ2 { $ComputerNameNew = "al-its-pc-h11"; break } 
-            CWM7MZ2 { $ComputerNameNew = "al-its-pc-h12"; break } 
-            CVM7MZ2 { $ComputerNameNew = "al-its-pc-h13"; break } 
-            BWM7MZ2 { $ComputerNameNew = "al-its-pc-h14"; break } 
-            BVM7MZ2 { $ComputerNameNew = "al-its-pc-h15"; break } 
-            9XM7MZ2 { $ComputerNameNew = "al-its-pc-h16"; break } 
-            9WM7MZ2 { $ComputerNameNew = "al-its-pc-h17"; break } 
-            9VM7MZ2 { $ComputerNameNew = "al-its-pc-h18"; break } 
-            8XM7MZ2 { $ComputerNameNew = "al-its-pc-h19"; break } 
-            8WM7MZ2 { $ComputerNameNew = "al-its-pc-h20"; break } 
-    
-            8VM7MZ2 { $ComputerNameNew = "al-its-pc-h21"; break } 
-            7XM7MZ2 { $ComputerNameNew = "al-its-pc-h22"; break }
-            7WM7MZ2 { $ComputerNameNew = "al-its-pc-h23"; break }
-            7VM7MZ2 { $ComputerNameNew = "al-its-pc-h24"; break }
-            6XM7MZ2 { $ComputerNameNew = "al-its-pc-h25"; break }
-            6WM7MZ2 { $ComputerNameNew = "al-its-pc-h26"; break }
-            6VM7MZ2 { $ComputerNameNew = "al-its-pc-h27"; break }
-            5XM7MZ2 { $ComputerNameNew = "al-its-pc-h28"; break }
-            5WM7MZ2 { $ComputerNameNew = "al-its-pc-h29"; break }
-            5VM7MZ2 { $ComputerNameNew = "al-its-pc-h30"; break }
-    
-            4XM7MZ2 { $ComputerNameNew = "al-its-pc-h31"; break }
-            4WM7MZ2 { $ComputerNameNew = "al-its-pc-h32"; break }
-            4VM7MZ2 { $ComputerNameNew = "al-its-pc-h33"; break }
-            3XM7MZ2 { $ComputerNameNew = "al-its-pc-h34"; break }
-            3WM7MZ2 { $ComputerNameNew = "al-its-pc-h35"; break }
-            2XM7MZ2 { $ComputerNameNew = "al-its-pc-h36"; break }
-            2WM7MZ2 { $ComputerNameNew = "al-its-pc-h37"; break }
-            1XM7MZ2 { $ComputerNameNew = "al-its-pc-h38"; break }
-    
-    
-            82WLBS2 { $ComputerNameNew = "al-its-pc-h39"; break }
-            76WLBS2 { $ComputerNameNew = "al-its-pc-h40"; break }
-    
-            Default { "Serial not defined."; $ComputerNameNew = $ComputerNameOld }
+                    [System.Collections.ArrayList]$MyAlElements = $MyJtIoFileCsv.GetSelection($MyColumnName)
+                    [String]$MyFilename_Selection = $MyJtIoFileCsv.GetName()
+                    [String]$MyLabel_Selection = Convert-JtDotter -Text $MyFilename_Selection -PatternOut "2"
+                    [JtCsvTool]$MyJtCsvTool = [JtCsvTool]::new($MyFolderPath_Input, $MyJtIoFolder_Output, $MyLabel_Selection, $MyAlElements)
+                    $MyJtCsvTool.DoIt()
+                }
+            }
+            else {
+                Write-JtLog -Where $This.ClassName -Text "No selection files."
+            }
+        
+            [JtCsvTool]$MyJtCsvTool = [JtCsvTool]::new($MyFolderPath_Input, $MyJtIoFolder_Output)
+            $MyJtCsvTool.DoIt()
         }
+        return $False
+    }
 
+    [String]GetConfigName() {
+        return "JtInvReportsCombine"
+    }
 
-        Write-Host "Aktueller Name:" $env:computername
-        Write-Host "Neuer     Name:" $ComputerNameNew 
+    [String]GetReportLabel() {
+        return "combine"
+    }
+}
 
-        Switch ($ComputerNameNew ) {
-            $ComputerNameOld { Write-Host "Keine Aenderung." ; break }
-            Default { Write-Host "Umbenennen in:" $ComputerNameNew; RENAME-COMPUTER -computer $ComputerNameOld -newname $ComputerNameNew; RESTART-COMPUTER -force }
+class JtInvReportsUpdate : JtInv {
+
+    JtInvReportsUpdate() : Base() {
+        $This.ClassName = "JtInvReportsUpdate"
+        $This.DoIt()
+    }
+
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
         }
+        
+        [String]$MyTagName = "reports"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+    
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
+    }
 
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($Item in $MyArrayList) {
+            [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $Item.source
 
+            $MyAlJtIoSubfolders = $MyJtIoFolder_Input.GetAlJtIoFolders_Sub()
+            foreach ($Folder in $MyAlJtIoSubfolders) {
+                [JtIoFolder]$MyJtIoFolder_Report = $Folder
+                Write-JtLog -Where $This.ClassName -Text "DoIt for report. MyJtIoFolder_Report: $MyJtIoFolder_Report"
+                New-JtCsvGenerator -FolderPath_Input $MyJtIoFolder_Report -FolderPath_Output $MyJtIoFolder_Report
+            }
+        }
         return $True
     }
 
     [String]GetConfigName() {
-        return "JtInvRENAME"
+        return "JtInvReportsUpdate"
     }
-    
+  
     [String]GetReportLabel() {
-        return "rename"
+        return "reports"
     }
-
-
 }
-
-function New-JtInvRename {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvRename]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "rename"
-}
-
 
 
 
 class JtInvSnapshot : JtInv {
 
-    [JtIoFolder]$Folder_C_Inv
-
-    JtInvSnapshot([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvSnapshot() : Base() {
         $This.ClassName = "JtInvSnapshot"
-        $This.Folder_C_Inv = $JtConfig.Get_JtIoFolder_Inv()
+    }
+
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
+        }
+        
+        [String]$MyTagName = "snapshot"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                disk      = $Entity.disk
+                partition = $Entity.partition
+                target    = $Entity.target
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+    
+            if ($MyItem.valid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
     }
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("snapshot")) {
-            # [String]$JtInfo = $Entity.'#text'
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($Item in $MyArrayList) {
 
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-            [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target)
-            if (!($FolderExport.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Folder missing; please edit XML for:", $FolderExport.GetPath()))
-                return $False
+            [Int32]$MyDisk = $Item.disk
+            [Int32]$MyPartition = $Item.partition
+            [String]$MyFolderPath_Output = $Item.target
+
+            Write-JtLog -Where $This.ClassName -Text "Creating snapshot. MyDisk: $MyDisk, MyPartition: $MyPartition, MyFolderPath_Output: $MyFolderPath_Output"
+            $MyParams = @{
+                FolderPath_Output = $MyFolderPath_Output
+                Disk              = $MyDisk
+                Partition         = $MyPartition
             }
-                        
-            [Int32]$Disk = $entity.disk
-            [Int32]$Partition = $entity.partition
-
-            Write-JtLog -Text ( -join ("Creating JtSnapshot. Drive:", $Disk, ", Partition:", $Partition, ", Local folder:", $Target))
-
-            [JtSnapshot]$JtSnapshot = [JtSnapshot]::new($FolderExport)
-            $JtSnapshot.DoJtSnapPart($Disk, $Partition)
+            New-JtSnap_Partition @MyParams
         }
         return $True
     }
@@ -2183,39 +2443,19 @@ class JtInvSnapshot : JtInv {
 }
 
 
-function New-JtInvSnapshot {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvSnapshot]::new([JtConfig]$JtConfig) 
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "JtSnapshot"
-}
-
-
-
-
-
-
 class JtInvWol : JtInv {
 
-    [String]$WolExe = "C:\apps\al\archland\tasks\_wol\wol.exe"
+    [String]$FilePath_Wol_Exe = "C:\apps\al\archland\tasks\_wol\wol.exe"
 
-    JtInvWol([JtConfig]$JtConfig) : Base($JtConfig) {
+    JtInvWol() : Base() {
         $This.ClassName = "JtInvWol"
         # Output goes directly to "c:\_inventory\report"
     }
     
-    [Boolean]DoWol($Name, $Mac) {
+    [Boolean]DoWol($TheName, $TheMac) {
         [String]$MyCommand = ""
-        [String]$Label = ""
-
-        [String]$Label = "wol"
-        $MyCommand = -join ($This.WolExe, ' ', $Mac)
-        Write-JtLog -Text ("Trying to wake device ", $Name, " with MAC:", $Mac, " ...")
+        $MyCommand = -join ($This.FilePath_Wol_Exe, ' ', $TheMac)
+        Write-JtLog -Where $This.ClassName -Text "Trying to wake device $TheName with MAC:  $TheMac ..."
         Invoke-Expression -Command:$MyCommand
 
         return $True
@@ -2223,24 +2463,37 @@ class JtInvWol : JtInv {
 
     [Boolean]DoIt() {
         $This.DoLogRepoStart()
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
         
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
             return $False
         }
-        foreach ($entity in $ConfigXml.getElementsByTagName("device")) {
 
-            [String]$Device = $entity.'#text'
+        [String]$MyTagName = "wol"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            [HashTable]$MyItem = New-Object HashTable
 
-            [String]$Name = $entity.name
-            [String]$Mac = $entity.mac
-            [String]$Ip = $entity.ip
-
-            Write-JtLog -Text ( -join (" Name:", $Name, " Mac:", $Mac, " IP:", $Ip, "  ... DEVICE:", $Device))
-            $This.DoWol($Name, $Mac)
+            $MyItem.device = $entity.'#text'
+            if ($Null -eq $MyItem.device) {
+                Write-JtLog_Error -Where $This.ClassName -Text "Error!!! device is NULL. device: $MyItem.device"
+                return $False
+            }
+            if ($MyItem.device.length -lt 1) {
+                Write-JtLog_Error -Where $This.ClassName -Text "Error!!! device is "". device: $MyItem.device"
+                return $False
+            }
         }
-        return $true
+        foreach ($MyItem in $MyArrayList) {
+
+            $MyItem.name = $entity.name
+            $MyItem.mac = $entity.mac
+            $MyItem.ip = $entity.ip
+
+            Write-JtLog -Where $This.ClassName -Text "Name: $MyItem.name, Mac: $MyItem.mac, IP: $MyItem.ip, ... DEVICE: $MyItem.device"
+            $This.DoWol($MyItem.Name, $MyItem.Mac)
+        }
+        return $True
     }
  
 
@@ -2251,246 +2504,45 @@ class JtInvWol : JtInv {
     [String]GetReportLabel() {
         return "wol"
     }
-
-
-
 }
 
-function New-JtInvWol {
-
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-
-    [JtInvWol]::new([JtConfig]$JtConfig) 
-
-    New-JtInvClientTimestamp -JtConfig $JtConfig -Label "wol"
-
-}
-
-
-class JtInvClientCombine : JtInv {
-
-    
-    JtInvClientCombine([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvClientCombine"
-    }
-
-    [Boolean]DoIt() {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
-        }
-
-        [System.Collections.ArrayList]$CsvFiles = $This.FolderBase.GetJtIoFilesCsv()
-
-        # [JtIoFolder]$FolderReports = $null
-        # [JtIoFolder]$FolderCombine = $null
-
-
-        [JtIoFolder]$FolderSource = $null
-        [JtIoFolder]$FolderExport = $null
-
-        foreach ($Entity in $ConfigXml.getElementsByTagName("combine")) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            Write-JtLog -Text ( -join ("FolderSource (reports):", $FolderSource.GetPath()))
-                
-            [String]$Target = $Entity.target
-            $Target = ConvertTo-JtExpandedPath $Target
-
-   
-
-            [JtIoFolder]$FolderExport = [JtIoFolder]::new($Target, $True)
-            Write-JtLog -Text ( -join ("FolderExport (combine):", $FolderExport.GetPath()))
-        }
-
-        if ($Null -eq $FolderSource) {
-            Write-JtError -Text ("Error!!! FolderSource is null")
-            return $False
-        }
-        elseif ($False -eq $FolderSource.IsExisting()) {
-            Write-JtError -Text ( -join ("Error!!! FolderSource missing; please edit XML for:", $FolderSource.GetPath()))
-            return $False
-        }
-
-        if ($Null -eq $FolderExport) {
-            Write-JtError -Text ( -join ("Error!!! FolderExport missing; please edit XML for:", $FolderExport.GetPath()))
-            return $False
-        }
-        elseif ($False -eq $FolderExport.IsExisting()) {
-            Write-JtError -Text ( -join ("Error!!! FolderExport missing; please edit XML for:", $FolderExport.GetPath()))
-            return $False
-        }
-
-        [System.Collections.ArrayList]$SelectionFiles = $CsvFiles
-        if ($SelectionFiles.Count -gt 0) {
-            ForEach ($MyFile in $SelectionFiles) {
-                [JtIoFile]$SelectionFile = $MyFile
-
-                Write-JtLog ( -join ("SelectionFile: ", $SelectionFile.GetPath()))
-
-                [String]$ColumnName = "SystemId"
-
-                [JtIoFileCsv]$JtIoFileCsv = New-JtIoFileCsv -Path $SelectionFile.GetPath()
-                [System.Collections.ArrayList]$Elements = $JtIoFileCsv.GetSelection($ColumnName)
-                $Elements
-    
-                # [String]$SelectionFilename = [System.IO.Path]::GetFileName($SelectionFilePath)
-                [String]$SelectionFilename = $SelectionFile.GetName()
-                $SelectionNameParts = $SelectionFilename.Split(".")
-    
-                [String]$SelectionLabel = $SelectionNameParts[1]
-    
-                [JtCsvTool]$JtCsvTool = [JtCsvTool]::new($FolderSource, $FolderExport, $SelectionLabel, $Elements)
-                $JtCsvTool.DoIt()
-            }
-        }
-
-        [JtCsvTool]$JtCsvTool = [JtCsvTool]::new($FolderSource, $FolderExport)
-        $JtCsvTool.DoIt()
-        return $False
-    }
-
-    [String]GetConfigName() {
-        return "JtInvClient"
-    }
-
-    [String]GetReportLabel() {
-        return "combine"
-    }
-
-}
-
-
-Function New-JtInvClientCombine {
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-        
-        
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientCombine]::new([JtConfig]$JtConfig) 
-}
-
-
-
-
-
-class JtInvClientReports : JtInv {
-
-    JtInvClientReports([JtConfig]$JtConfig) : Base($JtConfig) {
-        $This.ClassName = "JtInvClientReports"
-    }
-
-    [Boolean]DoIt() {
-        $This.DoLogRepoStart()
-        
-        [Xml]$ConfigXml = $This.GetConfigXml()
-
-        if ($Null -eq $ConfigXml) {
-            return $False
-        }
-        foreach ($Entity in $ConfigXml.getElementsByTagName("reports")) {
-            # [String]$JtInfo = $Entity.'#text'
-
-            [String]$Source = $Entity.source
-            $Source = ConvertTo-JtExpandedPath $Source
-            [JtIoFolder]$FolderSource = [JtIoFolder]::new($Source)
-            if (!($FolderSource.IsExisting())) {
-                Write-JtError -Text ( -join ("Error!!! Source is missing; please edit XML for:", $FolderSource.GetPath()))
-                return $False
-            }
-
-            Write-JtLog -Text ( -join ("Using FolderSource (for reports):", $FolderSource.GetPath()))
-            $Subfolders = $FolderSource.GetSubfolders($False)
-            foreach ($Folder in $Subfolders) {
-                Write-JtLog -Text ( -join ("DoIt for report:", $Folder.GetPath()))
-                        
-                New-JtCsvGenerator -JtIoFolder $Folder
-            }
-        }
-        return $True
-    }
-
-
-    [String]GetConfigName() {
-        return "JtInvClient"
-    }
-  
-    [String]GetReportLabel() {
-        return "reports"
-    }
-}
-
-Function New-JtInvClientReports {
-    Param (
-        [Parameter(Mandatory = $false)]
-        [JtConfig]$JtConfig
-    )
-        
-    [JtConfig]$JtConfig = New-JtConfig
-    [JtInvClientReports]$Inv = [JtInvClientReports]::new([JtConfig]$JtConfig) 
-    $Inv.DoIt()
-
-    return $True
-}
 
 
 class FileElementXml : JtClass {
 
     hidden [xml]$Xml = $Null
     
-    FileElementXml([JtIoFile]$JtIoFile) {
-        [String]$FilePathXml = $JtIoFile.GetPath()
-        [xml]$This.Xml = Get-Content $FilePathXml -Encoding UTF8
+    FileElementXml([JtIoFile]$TheJtIoFile) {
+        [String]$MyFilePath_Xml = $TheJtIoFile.GetPath()
+        [xml]$This.Xml = Get-Content $MyFilePath_Xml -Encoding UTF8
     } 
 
     [String]GetValuePath() {
-        [String]$TagName = "path"
-        [String]$ThePath = ""
-        [xml]$XmlContent = $This.GetXml()
-        ForEach ($entity in $XmlContent.getElementsByTagName($TagName)) {
-            [String]$ThePath = $entity.'#text'
-                
-            $ThePath = $ThePath.Replace("%OneDrive%", $env:OneDrive)
-            return $ThePath
+        [String]$MyTagName = "path"
+        [String]$MyPath = ""
+        [xml]$MyXmlContent = $This.GetXml()
+        ForEach ($Entity in $MyXmlContent.getElementsByTagName($MyTagName)) {
+            [String]$MyPath = $Entity.'#text'
+            $MyPath = Convert-JtEnvironmentVariables -Text $MyPath
+            return $MyPath
         }
-        return $ThePath
+        return $MyPath
     }
 
     [System.Collections.ArrayList]GetValueListPaths() {
-        [System.Collections.ArrayList]$ArrayList = [System.Collections.ArrayList]::new()
-        [String]$TagName = "path"
-        [String]$ThePath = ""
-        [Xml]$XmlContent = $This.GetXml()
-        ForEach ($entity in $XmlContent.getElementsByTagName($TagName)) {
-            [String]$ThePath = $entity.'#text'
+        [System.Collections.ArrayList]$MyAl = [System.Collections.ArrayList]::new()
+        [String]$MyTagName = "path"
+        [String]$MyPath = ""
+        [Xml]$MyXmlContent = $This.GetXml()
+        ForEach ($entity in $MyXmlContent.getElementsByTagName($MyTagName)) {
+            [String]$MyPath = $entity.'#text'
                 
-            $ThePath = $ThePath.Replace("%OneDrive%", $env:OneDrive)
-            $ArrayList.Add($ThePath)
+            $MyPath = Convert-JtEnvironmentVariables -Text $MyPath
+            $MyAl.Add($MyPath)
         }
-        return $ArrayList
+        return $MyAl
     }
 
-    [String]GetValueForTag([String]$TagName) {
-        [String]$Result = ""
-        [xml]$XmlContent = $This.GetXml()
-        ForEach ($entity in $XmlContent.getElementsByTagName($TagName)) {
-            [String]$Result = $entity.'#text'
-            $Result = $Result.Replace("%OneDrive%", $env:OneDrive)
-            return $Result
-        }
-        return $Result
-    }
 
     [Xml]GetXml() {
         return $This.Xml
@@ -2499,73 +2551,7 @@ class FileElementXml : JtClass {
 
 
 
-class Gen_Csvs_To_CsvsAll : JtClass {
-
-    [JtIoFolder]$Source
-
-    
-    static hidden [Boolean]DoJoinCsvs([System.Collections.ArrayList]$CsvFiles, [JtIoFolder]$FolderOut, [String]$MyLabel) {
-        [JtTblTable]$JtTblTable = New-JtTblTable -Label $MyLabel
-        foreach ($CsvFile in $CsvFiles) {
-            [JtIoFile]$JtIoFile = $CsvFile
-            [String]$Filename = $JtIoFile.GetName() 
-            if (! ($Filename.StartsWith("all"))) {
-                $CsvFilePath = $JtIoFile.GetPath()
-                $Content = Import-Csv -Path $CsvFilePath -Delimiter ([JtUtil]::Delimiter)  
-                $Content
-                
-                [JtTblRow]$JtTblRow = New-JtTblRow
-                foreach ($Field in $Content) {
-                    foreach ($Element in $Field | Get-Member) {
-                        if ($element.MemberType -eq "NoteProperty") {
-                            $Name = $element.Name
-    
-                            $FieldLabel = $Element.Name
-                            $FieldValue = $Field.$Name
-    
-                            [JtField]$JtField = New-JtField -Label $FieldLabel
-                            $JtField.SetValue($FieldValue)
-    
-                            $JtTblRow.Add($JtField)
-                        }
-                    }
-                }
-                $JtTblTable.AddRow($JtTblRow) | Out-Null
-            }
-        }
-
-        New-JtCsvWriteTbl -Label $MyLabel -JtIoFolder $FolderOut -JtTblTable $JtTblTable
-        return $True
-    }  
-
-
-    Gen_Csvs_To_CsvsAll([JtIoFolder]$MySource) {
-        $This.ClassName = "Gen_Csvs_To_CsvsAll"
-        $This.Source = $MySource
-    }
-
-    [Boolean]DoIt() {
-        $This.DoLogRepoStart()
-
-        [JtIoFolder]$FolderCsv = $This.Source.GetSubfolder("csv")
-        [System.Collections.ArrayList]$CsvFiles = $FolderCsv.GetJtIoFiles()
-
-        [String]$MyLabel = "all"
-
-        [JtIoFolder]$FolderTarget = $This.Source
-        [Gen_Csvs_To_CsvsAll]::DoJoinCsvs($CsvFiles, $FolderTarget, $MyLabel)
-
-        return $True
-    }
-}
-
-
-
-
-
 # https://github.com/ThePoShWolf/Utilities/blob/master/Misc/Get-JtInstalledSoftware.ps1
-
-
 <#
 .SYNOPSIS
 	Get-JtInstalledSoftware retrieves a list of installed software
@@ -2600,87 +2586,38 @@ class Gen_Csvs_To_CsvsAll : JtClass {
     [Microsoft.Win32.RegistryKey]
     https://github.com/theposhwolf/utilities
 #>
-Function Get-JtInstalledSoftware {
-    Param(
-        [Alias('Computer', 'ComputerName', 'HostName')]
-        [Parameter(ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $true, Mandatory = $true, Position = 1)]
-        [String[]]$Name
-    )
-    Begin {
-
-        if (!($Name)) {
-            $Name = $env:COMPUTERNAME
-        }
-        $lmKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall", "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-        $lmReg = [Microsoft.Win32.RegistryHive]::LocalMachine
-        $cuKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall"
-        $cuReg = [Microsoft.Win32.RegistryHive]::CurrentUser
-    }
-    Process {
-        if (!(Test-Connection -ComputerName $Name -count 1 -quiet)) {
-            Write-JtError -Message "Unable to contact $Name. Please verify its network connectivity and try again." -Category ObjectNotFound -TargetObject $Computer
-            Break
-        }
-        $masterKeys = @()
-        $remoteCURegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($cuReg, $Name)
-        $remoteLMRegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($lmReg, $Name)
-        foreach ($key in $lmKeys) {
-            $regKey = $remoteLMRegKey.OpenSubkey($key)
-            foreach ($subName in $regKey.GetSubkeyNames()) {
-                foreach ($sub in $regKey.OpenSubkey($subName)) {
-                    $masterKeys += (New-Object PSObject -Property @{
-                            "ComputerName"     = $Name
-                            "Name"             = $sub.GetValue("displayname")
-                            "SystemComponent"  = $sub.GetValue("systemcomponent")
-                            "ParentKeyName"    = $sub.GetValue("parentkeyname")
-                            "Version"          = $sub.GetValue("DisplayVersion")
-                            "UninstallCommand" = $sub.GetValue("UninstallString")
-                            "InstallDate"      = $sub.GetValue("InstallDate")
-                            "RegPath"          = $sub.ToString()
-                        })
-                }
-            }
-        }
-        foreach ($key in $cuKeys) {
-            $regKey = $remoteCURegKey.OpenSubkey($key)
-            if ($regKey -ne $null) {
-                foreach ($subName in $regKey.getsubkeynames()) {
-                    foreach ($sub in $regKey.opensubkey($subName)) {
-                        $masterKeys += (New-Object PSObject -Property @{
-                                "ComputerName"     = $Computer
-                                "Name"             = $sub.GetValue("displayname")
-                                "SystemComponent"  = $sub.GetValue("systemcomponent")
-                                "ParentKeyName"    = $sub.GetValue("parentkeyname")
-                                "Version"          = $sub.GetValue("DisplayVersion")
-                                "UninstallCommand" = $sub.GetValue("UninstallString")
-                                "InstallDate"      = $sub.GetValue("InstallDate")
-                                "RegPath"          = $sub.ToString()
-                            })
-                    }
-                }
-            }
-        }
-        $woFilter = { $null -ne $_.name -AND $_.SystemComponent -ne "1" -AND $null -eq $_.ParentKeyName }
-        $props = 'Name', 'Version', 'ComputerName', 'Installdate', 'UninstallCommand', 'RegPath'
-        $masterKeys = ($masterKeys | Where-Object $woFilter | Select-Object $props | Sort-Object Name)
-        $masterKeys
-    }
-    End { }
-}
-
-
-Function New-JtInvMaster {
-    New-JtInvCombine
-    New-JtInvClientReports
-}
 
 
 
-Function New-JtInvVersion {
-    New-JtRobocopy -Source "%OneDrive%\0.INVENTORY\common" -Target "D:\Seafile\al-apps\apps\inventory\common"
-    [String]$Timestamp = Get-JtTimestamp
-    New-JtIoFileMeta -Path "%OneDrive%\0.INVENTORY\common" -Label $Timestamp
-    pause
-}
 
 
+Export-ModuleMember -Function Get-JtInstalledSoftware
+Export-ModuleMember -Function Get-JtXmlReportObject
+
+Export-ModuleMember -Function New-JtConfigItem
+
+Export-ModuleMember -Function New-JtInvClient
+Export-ModuleMember -Function New-JtInvClientChoco 
+Export-ModuleMember -Function New-JtInvClientClean
+Export-ModuleMember -Function New-JtInvClientConfig
+Export-ModuleMember -Function New-JtInvClientCsvs
+Export-ModuleMember -Function New-JtInvClientErrors
+Export-ModuleMember -Function New-JtInvClientExport
+Export-ModuleMember -Function New-JtInvClientObjects
+Export-ModuleMember -Function New-JtInvClientReport
+Export-ModuleMember -Function New-JtInvClientSoftware
+Export-ModuleMember -Function New-JtInvClientTimestamp
+Export-ModuleMember -Function New-JtInvReportsCombine
+Export-ModuleMember -Function New-JtInvReportsUpdate
+Export-ModuleMember -Function New-JtInvData
+Export-ModuleMember -Function New-JtInvFiles
+Export-ModuleMember -Function New-JtInvFolder
+Export-ModuleMember -Function New-JtInvLengths
+Export-ModuleMember -Function New-JtInvLines
+Export-ModuleMember -Function New-JtInvMd
+Export-ModuleMember -Function New-JtInvMirror
+Export-ModuleMember -Function New-JtInvPoster
+Export-ModuleMember -Function New-JtInvRecover
+Export-ModuleMember -Function New-JtInvSnapshot
+Export-ModuleMember -Function New-JtInvWol
+Export-ModuleMember -Function New-JtInvVersion

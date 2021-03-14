@@ -1,3 +1,4 @@
 <config>
-	<folder source="%OneDrive%\jt\testing\JtInvFiles" target="%OneDrive%\jt\testing\JtInvFiles"></folder>
+	<files label="OneDrive_Meta"             source="%OneDrive%"                      filter="*.meta"     target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></files>
+	<files label="Testing-JtInvFiles.folder" source="%OneDrive%\jt\testing\1.EXAMPLE" filter="*.folder"   target="c:\_inventory\out\Test-JtInvFiles"></files>
 </config>

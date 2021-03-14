@@ -1,0 +1,26 @@
+set ORDNER_QUELLE=c:\Seafile\al-apps\apps\customize\pools\template
+set ORDNER_ZIEL=c:\Seafile\al-apps\apps\customize\pools
+
+rem background.win10p-normal-f.root.jpg
+
+copy "%ORDNER_QUELLE%\g.win10p.pool.jpg"                 "%ORDNER_ZIEL%\g\win10p\pool.jpg"
+copy "%ORDNER_QUELLE%\g.win10p-spezial.pool.jpg"         "%ORDNER_ZIEL%\g\win10p-spezial\pool.jpg"
+copy "%ORDNER_QUELLE%\g.win10p.inventory.jpg"            "%ORDNER_ZIEL%\g\win10p\inventory.jpg"
+copy "%ORDNER_QUELLE%\g.win10p-spezial.inventory.jpg"    "%ORDNER_ZIEL%\g\win10p-spezial\inventory.jpg"
+copy "%ORDNER_QUELLE%\h.win10p.pool.jpg"                 "%ORDNER_ZIEL%\h\win10p\pool.jpg"
+copy "%ORDNER_QUELLE%\h.win10p-spezial.pool.jpg"         "%ORDNER_ZIEL%\h\win10p-spezial\pool.jpg"
+copy "%ORDNER_QUELLE%\h.win10p.inventory.jpg"            "%ORDNER_ZIEL%\h\win10p\inventory.jpg"
+copy "%ORDNER_QUELLE%\h.win10p-spezial.inventory.jpg"    "%ORDNER_ZIEL%\h\win10p-spezial\inventory.jpg"
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,7 +1,5 @@
 <config>
-	<folder label="c.onedrive" source="C:\Users\jostt\OneDrive"></folder>
-	<folder label="d.backup" source="D:\backup"></folder>
-	<folder label="e.backup" source="E:\backup"></folder>
-	<folder label="c.jost" source="C:\_jost"></folder>
-	<folder label="c.users" source="C:\Users"></folder>
+	<data label="c.onedrive" source="%OneDrive%" target="%OneDrive%\0.INVENTORY\01.OUTPUT\data"></data>
+	<data label="d.backup" source="D:\backup" target="%OneDrive%\0.INVENTORY\01.OUTPUT\data"></data>
+	<data label="c.users" source="C:\Users" target="%OneDrive%\0.INVENTORY\01.OUTPUT\data"></data>
 </config>

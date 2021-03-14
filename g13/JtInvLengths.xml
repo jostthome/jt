@@ -1,0 +1,4 @@
+<config>
+	<lengths label="OneDrive.%COMPUTERNAME%" source="%OneDrive%" target="%OneDrive%\0.INVENTORY\01.OUTPUT\lengths"></lengths>
+</config>
+

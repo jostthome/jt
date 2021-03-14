@@ -1,173 +1,228 @@
-using module JtClass
-using module JtUtil
+using module Jt  
+
+
+class JtConfig : JtClass {
+
+    [JtIoFolder]$JtIoFolder_Base
+    [JtIoFolder]$JtIoFolder_Report
+    [JtIoFolder]$JtIoFolder_Inv
+    
+    JtConfig() {
+        $This.ClassName = "JtConfig"
+        Write-JtLog -Where $This.ClassName -Text "START!"
+        
+        [String]$MyProjectPath = Get-JtFolderPath_Base
+
+        $This.JtIoFolder_Base = [JtIoFolder]::new($MyProjectPath)
+        $This.JtIoFolder_Report = New-JtIoFolder_Report
+        $This.JtIoFolder_Inv = New-JtIoFolder_Inv
+    }
+
+    [Boolean]DoPrintInfo() {
+        #        Write-Host "SHOULD BE LIKE: Get_JtIoFolder_Base   : D:\Seafile\al-apps\apps\inventory"
+        [String]$FolderPathBase = $This.Get_JtIoFolder_Base().GetPath()
+        Write-JtLog -Where $This.ClassName -Text "Path of JtIoFolder_Base: $FolderPathBase"
+        return $True
+    }
+    
+    # --------------------------------------------------------------------------------------
+    [JtIoFolder]Get_JtIoFolder_Base() {
+        return $This.JtIoFolder_Base
+    }
+
+    [JtIoFolder]Get_JtIoFolder_Inv() {
+        return $This.JtIoFolder_Inv
+    }
+
+    [JtIoFolder]Get_JtIoFolder_Report() {
+        return $This.JtIoFolder_Report
+    }
+}
+
+
+
+
 
 class JtIo : JtClass {
 
     hidden [String]$Path = ""
-    hidden [Boolean]$BlnExists = $true
+    hidden [Boolean]$BlnExists = $True
 
-    static [String]$FilenamePrefix_Anzahl = "zzz"
-    static [String]$FilenamePrefix_Area = "zzz"
-    static [String]$FilenamePrefix_Count = "zzz"
-    static [String]$FilenamePrefix_Csv = "zzz"
-    static [String]$FilenamePrefix_Files = "files"
-    static [String]$FilenamePrefix_Folder = "zzz"
-    static [String]$FilenamePrefix_Report = "report"
-    static [String]$FilenamePrefix_Sum = "zzz"
+    static [String]$FilePrefix_Anzahl = "zzz"
+    static [String]$FilePrefix_Betrag = "zzz"
+    static [String]$FilePrefix_Count = "zzz"
+    static [String]$FilePrefix_Csv = "zzz"
+    static [String]$FilePrefix_Folder = "zzz"
+    static [String]$FilePrefix_Report = "zzx"
+    static [String]$FilePrefix_Selection = "selection"
     
-    static [String]$FilenameSuffix_Time = "time"
-    static [String]$FilenameSuffix_Errors = "errors"
+    static [String]$FileSuffix_Time = "time"
+    static [String]$FileSuffix_Errors = "errors"
     
-    static [String]$FilenameExtension_Anzahl_Meta = ".anzahl.meta"
-    static [String]$FilenameExtension_Area = ".area"
-    static [String]$FilenameExtension_Betrag_Meta = ".betrag.meta"
-    static [String]$FilenameExtension_Count = ".count"
-    static [String]$FilenameExtension_Csv = ".csv"
-    static [String]$FilenameExtension_Folder = ".folder"
-    static [String]$FilenameExtension_Md = ".md"
-    static [String]$FilenameExtension_Meta = ".meta"
-    static [String]$FilenameExtension_Poster = ".poster"
-    static [String]$FilenameExtension_BxH_Meta = ".bxh.meta"
-    static [String]$FilenameExtension_BxH_Md = ".bxh.md"
-    static [String]$FilenameExtension_Sum = ".sum"
-    static [String]$FilenameExtension_Sum_Meta = ".sum.meta"
-    static [String]$FilenameExtension_Whg = ".whg"
-    static [String]$FilenameExtension_Zahlung_Meta = ".zahlung.meta"
-    static [String]$FilenameExtension_Zahlung_Md = ".zahlung.md"
-    static [String]$FilenameExtension_Xml = ".xml"
-    
+    static [String]$Filename_Template_BxH = "_NACHNAME.VORNAME.LABEL.PAPIER.BxH.folder"
+    static [String]$FileExtension_Csv = ".csv"
+    static [String]$FileExtension_Csv_Filelist = ".filelist.csv"
+    static [String]$FileExtension_Pdf = ".pdf"
+    static [String]$FileExtension_Jpg = ".jpg"
+    static [String]$FileExtension_Folder = ".folder"
+    static [String]$FileExtension_Folder_Anzahl = ".ANZAHL.folder"
+    static [String]$FileExtension_Folder_Betrag = ".BETRAG.folder"
+    static [String]$FileExtension_Folder_BxH = ".BxH.folder"
+    static [String]$FileExtension_Folder_Stand = ".STAND.folder"
+    static [String]$FileExtension_Folder_Zahlung = ".ZAHLUNG.folder"
+    static [String]$FileExtension_Meta = ".meta"
+    static [String]$FileExtension_Meta_Anzahl = ".anzahl.meta"
+    static [String]$FileExtension_Meta_Betrag = ".EU.meta"
+    static [String]$FileExtension_Meta_BxH = ".bxh.meta"
+    static [String]$FileExtension_Meta_Choco = ".choco.meta"
+    static [String]$FileExtension_Meta_Cmd = ".cmd.meta"
+    static [String]$FileExtension_Meta_Computer = ".computer.meta"
+    static [String]$FileExtension_Meta_Ip = ".ip.meta"
+    static [String]$FileExtension_Meta_Errors = ".errors.meta"
+    static [String]$FileExtension_Meta_Obj = ".obj.meta"
+    static [String]$FileExtension_Meta_Report = ".report.meta"
+    static [String]$FileExtension_Meta_Systemid = ".systemid.meta"
+    static [String]$FileExtension_Meta_Sum = ".sum.meta"
+    static [String]$FileExtension_Meta_Time = ".time.meta"
+    static [String]$FileExtension_Meta_User = ".user.meta"
+    static [String]$FileExtension_Meta_Version = ".version.meta"
+    static [String]$FileExtension_Meta_Win = ".win.meta"
+    static [String]$FileExtension_Meta_Zahlung = ".zahlung.meta"
+    static [String]$FileExtension_Md = ".md"
+    static [String]$FileExtension_Md_BxH = ".bxh.md"
+    static [String]$FileExtension_Md_Zahlung = ".zahlung.md"
+    static [String]$FileExtension_Txt = ".txt"
+    static [String]$FileExtension_Xml = ".xml"
 
     static hidden [String]$TimestampFormat = "yyyy-MM-dd_HH-mm-ss"
+
+    static [String]GetAliasForComputername([String]$Name) {
+        [String]$MyOut = $Name
+        # if ($In -eq "PC-3XTM5Y1") {
+        #     $Out = "AL-DEK-PC-DEK05"
+        # }
+        return $MyOut
+    }
+
+
+    static [String]GetDateForKlon([String]$TheFilename) {
+        [String]$MyFilename = $TheFilename
+
+
+        [String]$MyResult = ""
+
+        if ($Null -eq $MyFilename) {
+
+        }
+        else {
+            [String]$MyExtension = [JtIo]::FileExtension_Meta
+            [String]$MySuffix = -join (".", "klon", $MyExtension)
+            $MyResult = $MyFilename.Replace($MySuffix, "")
+            $MyResult = $MyResult.Replace("_", "")
+        }
+        return $MyResult
+    }
+
+    static [String]GetOrg1ForComputername([String]$TheComputername) {
+        [String]$MyResult = ""
+        if ($TheComputername) {
+            [String[]]$MyAlParts = $TheComputername.Split("-")
+            if ($MyAlParts.Count -gt 2) {
+                $MyResult = $MyAlParts[0]
+            }
+        }
+        return $MyResult
+    }
+    
+    static [String]GetOrg2ForComputername([String]$TheComputername) {
+        [String]$MyResult = ""
+        if ($TheComputername) {
+            [String[]]$MyAlParts = $TheComputername.Split("-")
+            if ($MyAlParts.Count -gt 2) {
+                $MyResult = $MyAlParts[1]
+            }
+        }
+        return $MyResult
+    }
+    
+    static [String]GetTypeForComputername([String]$TheComputername) {
+        [String]$MyResult = ""
+        if ($TheComputername) {
+            [String[]]$MyAlParts = $TheComputername.Split("-")
+            if ($MyAlParts.Count -gt 3) {
+                $MyResult = $MyAlParts[2]
+            }
+        }
+        return $MyResult
+    }
+
+
+
+
     static [String]GetComputername() {
-        [String]$Result = ""
-        $Result = $env:COMPUTERNAME
-        $Result = $Result.ToLower()
-        $Computername = $Result
+        [String]$MyResult = ""
+        $MyResult = $env:COMPUTERNAME
+        $MyResult = $MyResult.ToLower()
+        $Computername = $MyResult
         return $Computername
     }
 
-    static [String]ConvertPathToLabel([String]$Path) {
-        [String]$Result = $Path
-        $Result = $Result.Replace("%COMPUTERNAME%", $env:COMPUTERNAME)
-        $Result = $Result.Replace(":", "")
-        $Result = $Result.Replace("*", "")
-        $Result = $Result.Replace("\.", "")
-        $Result = $Result.Replace("\", "_")
-        $Result = $Result.Replace(".", "_")
-        $Result = $Result.Replace("__", "_")
-        return $Result
-    }
 
-    static [String]GetErrors([String]$Path) {
-        [String]$Result = "---"
+
+    static [String]GetErrors([String]$TheFolderPath) {
+        [String]$MyFolderPath = $TheFolderPath
+
+
+        [String]$MyResult = "---"
         
-        [String]$Match = -join ([JtIo]::FilenamePrefix_Report, '.*', '.', [JtIo]::FilenameSuffix_Errors, [JtIo]::FilenameExtension_Meta)
+        [String]$MyMatch = -join ([JtIo]::FilePrefix_Report, '.*', '.', [JtIo]::FileSuffix_Errors, [JtIo]::FileExtension_Meta)
         
-        $MyFiles = Get-ChildItem -Path $Path | Where-Object { $_.Name -match $Match }
+        $MyAlFiles = Get-ChildItem -Path $MyFolderPath | Where-Object { $_.Name -match $MyMatch }
         
-        if ($Null -ne $MyFiles) {
-            if ($MyFiles.Length -gt 0) {
-                $Filename = $MyFiles[0].Name
-                [String[]]$Parts = $Filename.Split(".")
-                $Result = $Parts[1]
+        if ($Null -ne $MyAlFiles) {
+            if ($MyAlFiles.Length -gt 0) {
+                $MyFilename = $MyAlFiles[0].Name
+                [String[]]$Parts = $MyFilename.Split(".")
+                $MyResult = $Parts[1]
             }
         }
-        return $Result
+        return $MyResult
     }
 
     static [String]GetLabelC() {
         $MyLabel = Get-WMIObject -Class Win32_Volume | Where-Object -Property DriveLetter -eq "C:" | Select-Object Label
         
-        [String] $LabelC = $MyLabel.Label
+        [String] $MyLabelC = $MyLabel.Label
         
-        return $LabelC
+        return $MyLabelC
     }
 
-    static [String]GetMediaTypeForValue($Value) {
-        [String]$Result = ""
+    static [String]GetMediaTypeForValue($TheValue) {
+        [String]$MyMediaType = ""
 
-        $Result = switch ($Value) { 
+        $MyMediaType = switch ($TheValue) { 
             3 { "HDD" }
             4 { "SSD" } 
-            default { $Value }
+            default { $TheValue }
         } 
 
-        return $Result
+        return $MyMediaType
     }
 
     static [String]GetSystemId() {
-        $LabelC = [JtIo]::GetLabelC()
-        $Computername = $env:COMPUTERNAME
+        $MyLabelC = [JtIo]::GetLabelC()
+        $MyComputername = $env:COMPUTERNAME
         
-        [String]$SystemId = ""
+        [String]$MySystemId = ""
         
-        $SystemId = -join ($Computername, ".", $LabelC)
-        $SystemId = $SystemId.ToLower()
-        return $SystemId
+        $MySystemId = -join ($MyComputername, ".", $MyLabelC)
+        $MySystemId = $MySystemId.ToLower()
+        return $MySystemId
     }
-
-
-    static [System.Collections.ArrayList]GetSelectedJtIoFiles([System.Array]$Folders, [System.Collections.ArrayList]$MySelection) {
-        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]@()
-        foreach ($Folder in $Folders) {
-            [JtIoFolder]$JtIoFolder = $Folder
-            $FullPath = $JtIoFolder.GetPath()
-            if ($Null -eq $MySelection) {
-                [JtIoFile]$JtIoFile = New-JtIoFile -Path $FullPath
-                $Result.Add($FullPath)
-            }
-            else {
-                [Boolean]$Compare = [JtIo]::IsJtIoFolderInSelection($JtIoFolder, $MySelection)
-                if ($True -eq $Compare) {
-                    [JtIoFile]$JtIoFile = New-JtIoFile -Path $FullPath
-                    $Result.Add($FullPath)
-                }
-            } 
-        }
-        return $Result
-    }
-    
-
-    static [Boolean]IsJtIoFolderInSelection([JtIoFolder]$TheFolder, [System.Collections.ArrayList]$Sel) {
-        if ($Null -eq $Sel) {
-            return $False
-        }
-        [Boolean]$Result = $False
-        foreach ($Element in $Sel) {
-            [String]$TheName = $Element.ToString()
-            [String]$Search = -join ("*", $TheName, "*")
-
-            [String]$FullPath = $TheFolder.GetPath()
-
-            if ($FullPath -like $Search) {
-                return $True
-            }
-        }
-        return $Result
-    }
-
-    static [System.Collections.ArrayList]GetSelectedJtIoFolders([System.Array]$Folders, [System.Collections.ArrayList]$MySelection) {
-        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]@()
-        foreach ($Folder in $Folders) {
-            [JtIoFolder]$JtIoFolder = $Folder
-            if ($Null -eq $MySelection) {
-                $Result.Add($JtIoFolder)
-            }
-            else {
-                [Boolean]$Compare = [JtIo]::IsJtIoFolderInSelection($JtIoFolder, $MySelection)
-                if ($True -eq $Compare) {
-                    $Result.Add($JtIoFolder)
-                }
-            } 
-        }
-        return $Result
-    }
-
 
     JtIo() {
         $This.ClassName = "JtIo"
     }
-
     
     [String]GetName() {
         Throw "GetName should be overwritten"
@@ -176,47 +231,38 @@ class JtIo : JtClass {
     
     [String]GetLabelForName() {
         [String]$MyName = $This.GetName()
-        [String]$Result = $MyName
-        $Result = $Result.Replace(":", "")
-        $Result = $Result.Replace("\", "_")
-        $Result = $Result.Replace("%COMPUTERNAME%", $env:COMPUTERNAME)
-        return $Result
-    }
-    
-    [String]GetLabelForPath() {
-        [String]$MyPath = $This.GetPath()
-        [String]$Result = [JtIo]::ConvertPathToLabel($MyPath)
-        return $Result
+        [String]$MyResult = $MyName
+        $MyResult = $MyResult.Replace(":", "")
+        $MyResult = $MyResult.Replace("\", "_")
+        $MyResult = $MyResult.Replace("%COMPUTERNAME%", $env:COMPUTERNAME)
+        return $MyResult
     }
     
     [String]GetPath() {
         [String]$MyPath = $This.Path
         return $MyPath
     }
-}
-    
 
-
-Function New-JtIo {
-    
-    [JtIo]::new()
+    [String]ToString() {
+        return $this.GetPath()
+    }
 }
 
 
 class JtIoFile : JtIo {
 
-    hidden [Boolean]$BlnExists = $true
+    hidden [Boolean]$BlnExists = $True
 
-    
-    JtIoFile([String]$MyPath) {
+    JtIoFile([String]$TheFilePath) {
         $This.ClassName = "JtIoFile"
-        $This.Path = ConvertTo-JtExpandedPath -Path $MyPath
-        $This.BlnExists = Test-Path -Path $MyPath
+        $This.Path = Convert-JtFilePathExpanded -FilePath $TheFilePath
+        $This.BlnExists = Test-JtIoPath -Path $TheFilePath
     }
     
-    [Boolean]DoRenameFile([String]$NewName) {
-        Write-JtIo -Text ( -join ("Renaming file to ", $NewName, " at path ", $This.GetPath()))
-        Rename-Item -Path $This.GetPath() -NewName $NewName
+    [Boolean]DoRenameFile([String]$FilenameNew) {
+        [String]$MyFilePath = $This.GetPath()
+        Write-JtLog_File -Where $This.ClassName -Text "Renaming file to $FilenameNew in ..." -FilePath $MyFilePath
+        Rename-Item -Path $MyFilePath -NewName $FilenameNew
         # [JtIoFile]$NewFile = [JtIoFile]::new($This.)
         return $True
     }
@@ -226,277 +272,68 @@ class JtIoFile : JtIo {
         return $This.BlnExists
     }
 
-    [Boolean]IsSpecialFile() {
-        [Boolean]$IsSpecial = $False
-        if ($This.GetName().Equals("desktop.ini")) {
-            $IsSpecial = $True
-            return $IsSpecial
-        }  
-        
-        [String]$MyExtension = $This.GetExtension()
-        
-        $MyList = New-Object System.Collections.Generic.List[System.Object]
-        $MyList.Add([JtIo]::FilenameExtension_Area)
-        $MyList.Add([JtIo]::FilenameExtension_Count)
-        $MyList.Add([JtIo]::FilenameExtension_Csv)
-        $MyList.Add([JtIo]::FilenameExtension_Folder)
-        $MyList.Add([JtIo]::FilenameExtension_Md)
-        $MyList.Add([JtIo]::FilenameExtension_Meta)
-        $MyList.Add([JtIo]::FilenameExtension_Whg)
-        $MyList.Add([JtIo]::FilenameExtension_Poster)
-        $MyList.Add([JtIo]::FilenameExtension_Sum)
-        
-        foreach ($Extension in $MyList) {
-            if ($Extension.Equals($MyExtension)) {
-                $IsSpecial = $True
-                return $IsSpecial
-            }
-        }
-        
-        return $IsSpecial
+    [String]GetExtension() {
+        [String]$MyResult = [System.IO.Path]::GetExtension($This.Path)
+        Return $MyResult
     }
     
-   
-    [String]GetExtension() {
-        [String]$Result = [System.IO.Path]::GetExtension($This.Path)
-        Return $Result
-    }
-
-
+    
     [String]GetExtension2() {
-        [String]$Path1 = $This.Path
-        [String]$Extension1 = [System.IO.Path]::GetExtension($Path1)
-        [String]$Path2 = $Path1.Replace($Extension1, "")
-        [String]$Extension2 = [System.IO.Path]::GetExtension($Path2)
-
-        [String]$Result = -join ($Extension2, $Extension1)
-        Return $Result
+        [String]$MyPath1 = $This.Path
+        [String]$MyExtension1 = [System.IO.Path]::GetExtension($MyPath1)
+        [String]$MyPath2 = $MyPath1.Replace($MyExtension1, "")
+        [String]$MyExtension2 = [System.IO.Path]::GetExtension($MyPath2)
+        
+        [String]$MyResult = -join ($MyExtension2, $MyExtension1)
+        Return $MyResult
     }
 
     [String]GetFileTimestamp() {
-        [String]$Timestamp = ""
-        [Boolean]$FileOk = $This.IsExisting
- 
-        if ($FileOk) {
-            [System.Object[]]$JtObjects = Get-ChildItem -Path $This.Path
-            [System.IO.FileSystemInfo]$File = $JtObjects[0]
-            $Timestamp = $File.LastWriteTime.ToString([JtIo]::TimestampFormat)
-        }
-        return $Timestamp
-    }
-
-    # First column has number 0
-    [String]GetFieldAtPos([String]$MyInput, [Int16]$MyPos) {
-        $MyInputParts = $MyInput.Split(".")
-
-        if ($MyInputParts.Count -lt $MyPos) {
-            return ""
-        }
-
-        return $MyInputParts[$MyPos]
-    }
-    
-    [String]GetInfoFromFileName_Age() {
-        [String]$TheFilename = $This.GetName()
-
-        [String]$MyAlter = "0"
+        [String]$MyTimestamp = ""
+        [Boolean]$MyBlnFileOk = $This.IsExisting
         
-        [String]$Year = $This.GetInfoFromFilename_Year()
-        if ($Year.Length -gt 0 ) {
-            $ThisDate = Get-Date
-            $ThisYear = $ThisDate.Year
-    
-            # Aus "20-04" soll "2020" werden.
-            $MySep = $Year.substring(2, 1)
-            if ($MySep -eq "-") {
-                $Year = -join ("20", $Year.substring(0, 2))
-            } 
-            try {
-                $MyAlter = $ThisYear - $Year
-            }
-            catch {
-                $MyAlter = "0"
-                Write-JtError -Text ( -join ("Problem with ThisYear:", $ThisYear, " in Filename:", $TheFilename))
-            }
+        if ($MyBlnFileOk) {
+            [System.Object[]]$MyAlJtObjects = Get-ChildItem -Path $This.Path
+            [System.IO.FileSystemInfo]$MyFile = $MyAlJtObjects[0]
+            $MyTimestamp = $MyFile.LastWriteTime.ToString([JtIo]::TimestampFormat)
         }
-        else {
-            return "0"
-        }
-        return $MyAlter
-    }
-
-  
-    
-    [String]GetInfoFromFileName_Count() {
-        [String]$TheFilename = $This.GetName()
-        $Parts = $TheFilename.Split(".")
-        [String]$MyCount = "0"
-        try {
-            [String]$MyInt = $Parts[$Parts.count - 2]
-            [Decimal]$DecInt = [Decimal]$MyInt / 1
-            $MyCount = $DecInt
-        }
-        catch {
-            Write-JtError -Text ( -join ("Problem with COUNT in file:", $TheFilename))
-            Write-JtError -Text ( -join ("FilePath:", $This.GetPath()))
-        }
-        return $MyCount
-    }
-
-    [Boolean]GetInfoFromFileName_Count_IsValid() {
-        [Boolean]$Result = $True
-        [String]$TheFilename = $This.GetName()
-        $Parts = $TheFilename.Split(".")
-        [String]$MyCount = "0"
-        try {
-            [String]$MyInt = $Parts[$Parts.count - 2]
-            [Decimal]$DecInt = [Decimal]$MyInt / 1
-            $MyCount = $DecInt
-        }
-        catch {
-            Write-JtError -Text ( -join ("Problem with COUNT - not valid - in file:", $TheFilename))
-            $Result = $False
-        }
-        return $Result
+        return $MyTimestamp
     }
     
-    [String]GetInfoFromFileName_Dim() {
-        [String]$TheFilename = $This.GetName()
-        $Parts = $TheFilename.Split(".")
-        [String]$MyDim = ""
-        try {
-            [String]$MyDim = $Parts[$Parts.count - 2]
-            $MyDim = $MyDim.Replace("x", " x ")
-        }
-        catch {
-            Write-JtError -Text ( -join ("Problem with Dim in file:", $TheFilename))
-            Write-JtError -Text ( -join ("FilePath:", $This.GetPath()))
-        }
-        return $MyDim
-    }
-
-    [String]GetInfoFromFileName([String]$JtTemplateFileName, [String]$TheFilename, [String]$Field) {
-        [String]$Result = ""
-        $TemplateParts = $JtTemplateFileName.Split(".")
-
-        for ([Int16]$i = 0; $i -lt $TemplateParts.Count; $i = $i + 1 ) {
-            [String]$TemplatePart = $TemplateParts[$i]
-            if ($TemplatePart -eq $Field) {
-                $Result = $This.GetFieldAtPos($TheFilename, $i)
-            }
-
-        }
-        return $Result
-    }
-    
-    [String]GetInfoFromFileName_Euro() {
-        [String]$TheFilename = $This.GetName()
-        $Parts = $TheFilename.Split(".")
-        [String]$MyEuro = ""
-        try {
-            [String]$MyCents = $Parts[$Parts.count - 2]
-            $MyCents = $MyCents.Replace("_", "")
-            [Decimal]$MyEuroDec = [Decimal]$MyCents / 100
-            [String]$MyEuro = $MyEuroDec.ToString("0.00")
-            $MyEuro = $MyEuro.Replace(".", ",")
-        }
-        catch {
-            Write-JtError -Text ( -join ("Problem with EURO in file:", $TheFilename))
-            Write-JtError -Text ( -join ("FilePath:", $This.GetPath()))
-        }
-        return $MyEuro
-    }
-    
-    [Boolean]GetInfoFromFileName_Euro_IsValid() {
-        [Boolean]$Result = $True
-        [String]$TheFilename = $This.GetName()
-        $Parts = $TheFilename.Split(".")
-        [String]$MyEuro = ""
-        try {
-            [String]$MyCents = $Parts[$Parts.count - 2]
-            $MyCents = $MyCents.Replace("_", "")
-            [Decimal]$MyEuroDec = [Decimal]$MyCents / 100
-            [String]$MyEuro = $MyEuroDec.ToString("0.00")
-            $MyEuro = $MyEuro.Replace(".", ",")
-        }
-        catch {
-            Write-JtError -Text ( -join ("Problem with EURO - not valid - in file:", $TheFilename))
-            $Result = $False
-        }
-        return $Result
-    }
-    
-    [String]GetInfoFromFileName_Paper() {
-        [String]$TheFilename = $This.GetName()
-        $Parts = $TheFilename.Split(".")
-        [String]$MyPaper = "xxxx"
-        try {
-            [String]$MyPaper = $Parts[$Parts.count - 3]
-        }
-        catch {
-            Write-JtError -Text ( -join ("Problem with PAPIER in file:", $TheFilename))
-            Write-JtError -Text ( -join ("FilePath:", $This.GetPath()))
-        }
-        return $MyPaper
-    }
-    
-    [String]GetInfoFromFilename_Year() {
-        [String]$TheFilename = $This.GetName()
-        
-        [String]$MyJahr = $TheFilename.substring(0, 4)
-        
-        try {
-            # Aus "20-04" soll "2020" werden.
-            $MySep = $MyJahr.substring(2, 1)
-            if ($MySep -eq "-") {
-                $MyJahr = -join ("20", $MyJahr.substring(0, 2))
-            } 
-        }
-        catch {
-            $MyJahr = ""
-            Write-JtError -Text ( -join ("Problem with file:", $TheFilename))
-        }
-        return $MyJahr
-    }
 
     [String]GetLabelForFilename() {
-        [String]$Result = ""
+        [String]$MyResult = ""
         $Elements = $This.GetName().Split(".")
-        [String]$Result = $Elements[0]
+        [String]$MyResult = $Elements[0]
                 
-        return $Result
+        return $MyResult
     }
 
     [String]GetName() {
-        [String]$Result = [System.IO.Path]::GetFileName($This.Path)
-        Return $Result
+        [String]$MyResult = [System.IO.Path]::GetFileName($This.Path)
+        Return $MyResult
     }
 
     [String]GetNameWithoutExtension() {
-        [String]$Result = $This.GetName()
+        [String]$MyResult = $This.GetName()
 
-        $Result = $Result.Replace($This.GetExtension(), "")
+        $MyResult = $MyResult.Replace($This.GetExtension(), "")
 
-        Return $Result
+        Return $MyResult
     }  
     
     
     [String]GetPathOfFolder() {
-        [String]$Result = $This.GetPath()
-        $Result = $Result.Replace( -join ("\", $This.GetName()), "")
-        return $Result
+        [String]$MyResult = $This.GetPath()
+        $MyResult = $MyResult.Replace( -join ("\", $This.GetName()), "")
+        return $MyResult
+    }
+
+    [JtIoFolder]GetJtIoFolder_Parent() {
+        return [JtIoFolder]::new($This)
     }
 }
 
-Function New-JtIoFile {
-    
-    Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path
-    )
-
-    [JtIoFile]::new($Path)
-}
 
 class JtIoFileCsv : JtIoFile {
     
@@ -504,29 +341,20 @@ class JtIoFileCsv : JtIoFile {
         $This.ClassName = "JtIoFileCsv"
     }
 
-    [System.Collections.ArrayList]GetSelection([String]$Column) {
+    [System.Collections.ArrayList]GetSelection([String]$MyColumn) {
+        [String]$MyPath = $This.GetPath()
+
         $MyArrayList = [System.Collections.ArrayList]@()
 
-        $Csv = Import-Csv -Path $This.Path -Delimiter ([JtUtil]::Delimiter)
-        $Elements = $Csv | Select-Object -Property $Column | Sort-Object -Property $Column
+        $Csv = Import-Csv -Path $MyPath -Delimiter ([JtClass]::Delimiter)
+        $Elements = $Csv | Select-Object -Property $MyColumn | Sort-Object -Property $MyColumn
 
         foreach ($Element in $Elements) {
-            [String]$TheElement = $Element.$Column
-            # [JtIoFile]$MyFile = [JtIoFile]::new($Element)
-            $MyArrayList.Add($TheElement)
+            [String]$MyColumn = $Element.$MyColumn
+            $MyArrayList.Add($MyColumn)
         }
         return $MyArrayList
     }
-}
-
-Function New-JtIoFileCsv {
-    
-    Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path
-    )
-
-    [JtIoFileCsv]::new($Path)
 }
 
 
@@ -534,372 +362,308 @@ class JtIoFolder : JtIo {
 
     [System.IO.FileSystemInfo]$File = $Null
 
-    static hidden [DateTime]GetReportFolderDateTime([String]$Path) {
-        [String]$ThePath = ConvertTo-JtExpandedPath -Path $Path
-        [System.DateTime]$FileDate = Get-Date
-        [Boolean]$FileOk = Test-Path -Path $ThePath
+    static hidden [DateTime]GetReportFolderDateTime([String]$FolderPath) {
+        [String]$MyFolderPath = Convert-JtFolderPathExpanded -FolderPath $FolderPath
+        [System.DateTime]$MyFileDate = Get-Date
 
-        [String]$MyFilter = -join ("*", [JtIo]::FilenameExtension_Md)
+        [Boolean]$MyBlnFileOk = Test-JtIoPath -Path $MyFolderPath
+
+        [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Md)
  
-        if ($FileOk) {
-            [System.Object[]]$JtObjects = Get-ChildItem -Path $ThePath -File -Filter $MyFilter 
-            if ($JtObjects.Count -gt 0) {
-                [System.IO.FileSystemInfo]$MyFile = $JtObjects[0]
+        if ($MyBlnFileOk) {
+            [System.Object[]]$MyAlJtObjects = Get-ChildItem -Path $MyFolderPath -File -Filter $MyFilter 
+            if ($MyAlJtObjects.Count -gt 0) {
+                [System.IO.FileSystemInfo]$MyFile = $MyalJtObjects[0]
                 [System.DateTime]$MyDate = $MyFile.LastWriteTime
-                $FileDate = $MyDate
+                $MyFileDate = $MyDate
             }
         }
-        return $FileDate
+        return $MyFileDate
     }
     
-    JtIoFolder([String]$MyPath) {
+    JtIoFolder([String]$TheFolderPath) {
         $This.ClassName = "JtIoFolder"
-        $This.Path = ConvertTo-JtExpandedPath -Path $MyPath
-        $This.BlnExists = Test-Path -Path $This.Path
-        if ($False -eq $This.BlnExists) {
-            Write-JtError -Text ( -join ("JtIoFolder does NOT exist:", $This.Path))
+        [String]$MyFolderPath = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath
+        [Boolean]$MyBlnExists = Test-JtIoPath -Path $MyFolderPath
+        if ($False -eq $MyBlnExists) {
+            Write-JtLog_Error -Where $This.ClassName -Text "Folder does NOT exist. MyFolderPath: $MyFolderPath"
         }
         else {
-            [System.Object[]]$JtObjects = Get-ChildItem -Path $This.Path 
-            if ($Null -eq $JtObjects) {
-                # Write-JtError -Text ( -join ("Array of dirs is null:", $This.Path))
+            [System.Object[]]$MyAlJtObjects = Get-ChildItem -Path $MyFolderPath
+            if ($Null -eq $MyAlJtObjects) {
+                # Write-JtLog_Error -Where $This.ClassName -Text "Array of dirs is null: $This.Path"
             }
             else {
-                $This.File = $JtObjects[0]
+                $This.File = $MyAlJtObjects[0]
             }
         }
+        $This.Path = $MyFolderPath
+        $This.BlnExists = $MyBlnExists
     }
 
-    JtIoFolder([String]$MyPath, [Boolean]$BlnCreate) {
+    JtIoFolder([String]$TheFolderPath, [Boolean]$BlnCreate) {
         $This.ClassName = "JtIoFolder"
-        $This.Path = ConvertTo-JtExpandedPath -Path $MyPath
-        $This.BlnExists = Test-Path -Path $This.Path
-
-        if ($False -eq $This.BlnExists) {
-            if ($True -eq $BlnCreate) {
-                Write-JtIo -Text ( -join ("Creating new folder (when calling JtIoFolder):", $This.Path))
-                if ($This.Path.StartsWith("\\")) {
-                    Write-JtError -Text ( -join ("Trying to create folder on server:", $This.Path))
+        [String]$MyFolderPath = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath
+        $This.Path = $MyFolderPath
+        [Boolean]$MyBlnExists = Test-JtIoPath -Path $MyFolderPath
+        if (!($MyBlnExists)) {
+            if ($BlnCreate) {
+                if ($MyFolderPath.StartsWith("\\")) {
+                    Write-JtLog_Error -Where $This.ClassName -Text "Trying to create folder on server: $MyFolderPath"
+                    New-Item -type Directory -Force -Path $MyFolderPath
                 }
                 else {
-                    New-Item -type Directory -Force -Path $This.Path
+                    Write-JtLog_Folder -Where $This.ClassName -Text "Creating new folder." -FolderPath $MyFolderPath
+                    New-Item -type Directory -Force -Path $MyFolderPath
                 }
-                $This.BlnExists = Test-Path -Path $This.Path
             }
         }
 
-        $This.BlnExists = Test-Path -Path $This.Path
-
-        if ($False -eq $This.BlnExists) {
-
+        $MyBlnExists = Test-JtIoPath -Path $MyFolderPath
+        if ($MyBlnExists) {
+            [System.Object[]]$MyAlJtObjects = Get-Item -Path $MyFolderPath
+            $This.File = $MyAlJtObjects[0]
         }
         else {
-            [System.Object[]]$JtObjects = Get-Item -Path $This.Path
-            $This.File = $JtObjects[0]
+            # Write-JtLog_Error -Where $This.ClassName -Text "Path does not exist: $MyFolderPath"
+            $This.File = $Null
         }
+        $This.Path = $MyFolderPath
+        $This.BlnExists = $MyBlnExists
     }
 
-    JtIoFolder([JtIoFile]$JtIoFile) {
+    JtIoFolder([JtIoFile]$TheJtIoFile) {
+        [JtIoFile]$MyJtIoFile = $TheJtIoFile
         $This.ClassName = "JtIoFolder"
-
-        [String]$FilePath = $JtIoFile.GetPath()
-        [String]$ParentPath = (Get-Item $FilePath).Directory.FullName
-
-        $This.Path = ConvertTo-JtExpandedPath -Path $ParentPath
-        $This.BlnExists = Test-Path -Path $This.Path
-        if ($False -eq $This.BlnExists) {
-            Write-JtError -Text ( -join ("JtIoFolder (from file). Path does NOT exist:", $This.Path))
+        if (!($MyJtIoFile.IsExisting())) {
+            $This.File = $Null
+            $This.Path = $Null
+            $This.BlnExists = $True
         }
         else {
-            # [System.Object[]]$JtObjects = Get-Item -Path $This.Path 
-            # $This.File = $JtObjects[0]
-
-            $This.File = Get-Item -Path $This.Path 
+            [String]$MyFilePath = $MyJtIoFile.GetPath()
+            [String]$MyFilename = $MyJtIoFile.GetName()
+            [String]$MyReplace = -join ("\", $MyFilename)
+            [String]$MyFolderPath = $MyFilePath.Replace($MyReplace, "")
+            [String]$MyFolderPathParent = $MyFolderPath
+            $This.File = Get-Item -Path $MyFolderPathParent
+            $This.Path = $MyFolderPathParent
+            $This.BlnExists = $True
         }
     }
+
     
 
-    [Boolean]DoCleanFiles([String]$ThePrefix, [String]$TheExtension) { 
-        [String]$OutputFilePrefix = $ThePrefix
-        [String]$OutputFileExtension = $TheExtension
-    
-        # [String]$MyFolderName = $This.GetName()
-        # [String]$MyFilter = -join ($OutputFilePrefix, ".", $MyFolderName, ".", "*", $OutputFileExtension)
-        [String]$MyFilter = -join ($OutputFilePrefix, ".", "*", $OutputFileExtension)
-        return $This.DoDeleteAllFiles($MyFilter)
-    }
-
-
-    [Boolean]DoDeleteAllFiles() {
+    [Boolean]DoRemoveFiles_All() {
+        [String]$MyFolderPath = $This.GetPath()
         if ($This.IsExisting()) {
-            [String]$AllFiles = -join ($This.GetPath(), "\", "*.*")
-            Write-JtIo -Text ( -join ("Deleting content of:", $AllFiles))
+            [String]$MyFolderPath_FilesAll = -join ($MyFolderPath, "\", "*.*")
+            Write-JtLog_Folder -Where $This.ClassName -Text "DoRemoveFiles_All. Deleting content." -FolderPath $MyFolderPath_FilesAll
             try {
-                Get-ChildItem -Path $AllFiles -File | Remove-Item -Force
+                Get-ChildItem -Path $MyFolderPath_FilesAll -File | Remove-Item -Force
             }
             catch {
-                [String]$Msg = -join ("Error while deleting files in ", $This.GetPath())
-                Write-JtError -Text ($Msg)
+                Write-JtLog_Error -Where $This.ClassName -Text "Error while deleting files in MyFolderPath: $MyFolderPath"
                 return $False
             }
             
             return $True
         }
         else {
-            Write-JtError -Text ( -join ("Trying to delete all files in folder, but folder does not exist:", $This.GetPath()))
+            Write-JtLog_Error -Where $This.ClassName -Text "Trying to remove all files in folder, but folder does not exist: $MyFolderPath"
             return $False
         }
     }
 
-    [Boolean]DoDeleteAllFiles([String]$Filter) {
-        Write-JtIo -Text ( -join ("Deleting content of:", $This.GetPath(), " using filter:", $Filter))
+    [Boolean]DoRemoveFiles_All([String]$TheFilter) {
+        [String]$MyFilter = $TheFilter
+        [String]$MyFolderPath = $This.GetPath()
+        Write-JtLog_Folder -Where $This.ClassName -Text "Deleting content using filter: $MyFilter" -FolderPath $MyFolderPath
         try {
-            Get-Childitem -Path $This.Path -Filter $Filter -File | Remove-Item -Filter $Filter -Force
+            Get-Childitem -Path $MyFolderPath -Filter $MyFilter -File | Remove-Item -Filter $MyFilter -Force
         }
         catch {
-            [String]$Msg = -join ("Error while deleting files in ", $This.GetPath())
-            Write-JtError -Text ($Msg)
+            Write-JtLog_Error -Where $This.ClassName -Text "Error while deleting files in $MyFolderPath"
             return $False
         }
         
         return $True
     }
+
+
+    [Boolean]DoRemoveFiles_Some([String]$ThePrefix, [String]$TheExtension) { 
+        [String]$MyFilePrefix = $ThePrefix
+        [String]$MyExtension = $TheExtension
     
-    [Boolean]DoDeleteEverything() {
-        [String]$AllFiles = -join ($This.GetPath(), "\", "*")
-        Write-JtIo -Text ( -join ("Deleting all files in:", $AllFiles))
+        # [String]$MyFolderName = $This.GetName()
+        # [String]$MyFilter = -join ($FilePrefix, ".", $MyFolderName, ".", "*", $FileExtension)
+        [String]$MyFilter = -join ($MyFilePrefix, ".", "*", $MyExtension)
+        return $This.DoRemoveFiles_All($MyFilter)
+    }
+    
+    [Boolean]DoRemoveEverything() {
+        [String]$MyFolderPath = $This.GetPath()
+        [String]$MyFolderPathFilesAll = -join ($MyFolderPath, "\", "*")
+        Write-JtLog_Folder -Where $This.ClassName -Text "DoRemoveEverything. Deleting all files." -FolderPath $MyFolderPathFilesAll
     
         try {
-            Remove-Item  $AllFiles -Include "*.*" -Recurse -Force
+            Remove-Item $MyFolderPathFilesAll -Include "*.*" -Recurse -Force
         }
         catch {
-            [String]$Msg = -join ("Error while deleting EVERYTHING in ", $This.GetPath())
-            Write-JtError -Text ($Msg)
-            Write-JtIo -Text ($Msg)
+            [String]$MyMsg = "DoRemoveEverything. Error while deleting EVERYTHING."
+            Write-JtLog_Error -Where $This.ClassName -Text $MyMsg 
+            Write-JtLog_Folder -Where $This.ClassName -Text $MyMsg -FolderPath $MyFolderPath
             return $False
         }
         return $True
     }
 
-    [Boolean]DoOptimizeFilenames() {
-        [Boolean]$Result = $True
-        foreach ($TheNFile in $This.GetNormalFiles()) {
-            [JtIoFile]$TheNormalFile = [JtIoFile]$TheNFile
-            [String]$MyFilename = $TheNormalFile.GetName()
-                
-            $OptimalFilename = ConvertTo-LabelToFilename $MyFilename
-                
-            if ($MyFilename -eq $OptimalFilename) {
-                Write-JtLog -Text ( -join ($MyFilename, " is ok."))
-            }
-            else {
-                Write-JtError -Text ( -join ($MyFilename, " should is renamed to:", $OptimalFilename))
-                $TheNormalFile.DoRenameFile($OptimalFilename)
-            }
-        }
-        return $Result
-    }
-    
-    [JtIoFile]GetJtIoFile([String]$MyFilename) {
-        [String]$NewPath = -join ($This.GetPath(), "\", $MyFilename)
-        [JtIoFile]$JtIoFile = [JtIoFile]::new($NewPath)
-        
-        return $JtIoFile
+    [JtIoFile]GetJtIoFile([String]$TheFilename) {
+        [String]$MyFilename = $TheFilename
+        [String]$MyPathFileNew = -join ($This.GetPath(), "\", $MyFilename)
+        [JtIoFile]$MyJtIoFile = [JtIoFile]::new($MyPathFileNew)
+        return $MyJtIoFile
     }
     
     [System.Collections.ArrayList]GetJtIoFiles() {
         return $This.GetJtIoFiles($False)
     }
 
-    [System.Collections.ArrayList]GetJtIoFiles([Boolean]$DoRecurse) {
+    [System.Collections.ArrayList]GetJtIoFiles([Boolean]$TheBlnRecurse) {
+        [System.Collections.ArrayList]$MyAlJtIoFiles = [System.Collections.ArrayList]::new()
+        [Boolean]$MyBlnRecurse = $TheBlnRecurse
+        [String]$MyFolderPath = $This.GetPath()
         if (!($This.IsExisting())) {
-            Write-JtError -Text ( -join ("GetJtIoFiles. Folder does not exist:", $This.GetPath()))
-            Write-JtError -Text ("GetJtIoFiles. Please edit XML in lines!!!!")
-            #            Throw $ErrorMsg
-            #            Exit
+            Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFiles. Folder does not exist FolderPath: $MyFolderPath"
         }
         
-        [System.Object[]]$Files = $Null
+        [System.Object[]]$MyAlFiles = $Null
         
-        if ($True -eq $DoRecurse) {
-            $Files = Get-ChildItem -Path $This.GetPath() -file -Recurse | Sort-Object -Property Name
+        if ($True -eq $MyBlnRecurse) {
+            $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file -Recurse | Sort-Object -Property Name
         }
         else {
-            $Files = Get-ChildItem -Path $This.GetPath() -file | Sort-Object -Property Name
+            $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file | Sort-Object -Property Name
         }
         
-        [System.Collections.ArrayList]$MyFiles = [System.Collections.ArrayList]::new()
-        
-        foreach ($File in $Files) {
-            [String]$ThePath = $File.fullname
-            [JtIoFile]$JtIoFile = [JtIoFile]::new($ThePath)
-            $MyFiles.Add($JtIoFile)
+        foreach ($File in $MyAlFiles) {
+            [String]$MyFilePath = $File.fullname
+            [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath
+            $MyAlJtIoFiles.Add($MyJtIoFile)
         }
-        return $MyFiles
+        return $MyAlJtIoFiles
     }
 
-    [System.Collections.ArrayList]GetJtIoFilesWithExtension([String]$MyExtension) {
-        [String]$MyFilter = -join ("*", $MyExtension)
-        return $This.GetJtIoFilesWithFilter($MyFilter, $False)
+    [System.Collections.ArrayList]GetJtIoFiles_Filter([String]$TheFilter) {
+        return $This.GetJtIoFiles_Filter($TheFilter, $False)
     }
 
-    [System.Collections.ArrayList]GetJtIoFilesWithFilter([String]$MyFilter) {
-        return $This.GetJtIoFilesWithFilter($MyFilter, $False)
-    }
-
-    [System.Collections.ArrayList]GetJtIoFilesWithFilter([String]$MyFilter, [Boolean]$DoRecurse) {
-        [System.Collections.ArrayList]$Result = [System.Collections.ArrayList]::new()
+    [System.Collections.ArrayList]GetJtIoFiles_Filter([String]$TheFilter, [Boolean]$TheBlnRecurse) {
+        [String]$MyMethodName = "GetJtIoFiles_Filter"
+        [String]$MyFolderPath = $This.GetPath()
+        [String]$MyFilter = $TheFilter
+        [Boolean]$MyBlnRecurse = $TheBlnRecurse
         
+        Write-JtLog -Where $This.ClassName -Text "$MyMethodName. MyFolderPath: $MyFolderPath FILTER: $MyFilter"
         if (!($This.IsExisting())) {
-            [String]$ErrorMsg =  -join ("GetJtIoFilesWithFilter. Not existing. PATH:", $This.GetPath(), " FILTER:", $Myfilter)
-            Write-JtError -Text $ErrorMsg
-            Write-JtError -Text ("GetJtIoFilesWithFilter. Please edit XML in lines!!!!")
-            Throw $ErrorMsg
+            [String]$MyMsg = "$MyMethodName. Not existing. MyFolderPath: $MyFolderPath FILTER: $MyFilter"
+            Write-JtLog_Error -Where $This.ClassName -Text $MyMsg
+            Throw $MyMsg
             #            Exit
-            return $Result
+            return $MyAlJtIoFiles
         }
         if ($Null -eq $MyFilter) {
-            Write-JtError -Text ("Filter is null in GetJtIoFiles!!!")
+            Write-JtLog_Error -Where $This.ClassName -Text "$MyMethodName. Filter is NULL!!!"
+            $MyFilter = ""
         }
-        else {
-            [System.Object[]]$MyFiles = $Null
-            if ($MyFilter.Length -gt 0) {
-                if ($True -eq $DoRecurse) {
-                    [System.Object[]]$MyFiles = Get-ChildItem -Path $This.GetPath() -file -Filter $MyFilter -Recurse | Sort-Object -Property Name
-                }
-                else {
-                    Write-JtLog ( -join ("GetJtIoFilesWithFilter - Path:", $This.GetPath(), " Filter:", $MyFilter))
-                    [System.Object[]]$MyFiles = Get-ChildItem -Path $This.GetPath() -file -Filter $MyFilter | Sort-Object -Property Name
-                }
+        
+        [System.Object[]]$MyAlFiles = $Null
+        if ($MyFilter.Length -gt 0) {
+            if ($True -eq $MyBlnRecurse) {
+                $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file -Filter $MyFilter -Recurse | Sort-Object -Property Name
             }
             else {
-                if ($True -eq $DoRecurse) {
-                    [System.Object[]]$MyFiles = Get-ChildItem -Path $This.GetPath() -file -Recurse | Sort-Object -Property Name
-                }
-                else {
-                    [System.Object[]]$MyFiles = Get-ChildItem -Path $This.GetPath() -file | Sort-Object -Property Name
-                }
-
-            }
-            foreach ($File in $MyFiles) {
-                [String]$ThePath = $File.fullname
-                [JtIoFile]$JtIoFile = [JtIoFile]::new($ThePath)
-                $Result.Add($JtIoFile)
+                # Write-JtLog -Where $This.ClassName -Text "GetJtIoFiles_Filter. Filter: $MyFilter, Path: $MyPath"
+                $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file -Filter $MyFilter | Sort-Object -Property Name
             }
         }
-        return $Result
-    }
-    
-    [System.Collections.ArrayList]GetJtIoFilesCsv() {
-        [String]$MyFilter = "*.csv"
-        return $This.GetJtIoFilesWithFilter($MyFilter)
-    }
-    
-    [System.Collections.ArrayList]GetJtIoFilesXml() {
-        [String]$MyFilter = "*.xml"
-        return $This.GetJtIoFilesWithFilter($MyFilter)
+        else {
+            if ($True -eq $MyBlnRecurse) {
+                # Write-JtLog -Where $This.ClassName -Text "GetJtIoFiles_Filter. Filter: empty, Recurse: TRUE, PATH: $MyPath"
+                $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file -Recurse | Sort-Object -Property Name
+            }
+            else {
+                Write-JtLog -Where $This.ClassName -Text "GetJtIoFiles_Filter. Filter: empty, Recurse: FALSE, PATH: $MyFolderPath"
+                $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file | Sort-Object -Property Name
+            }
+            
+        }
+
+        [System.Collections.ArrayList]$MyAlJtIoFiles = [System.Collections.ArrayList]::new()
+        foreach ($File in $MyAlFiles) {
+            [String]$MyFilePath = $File.fullname
+            [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath
+            $MyAlJtIoFiles.Add($MyJtIoFile)
+        }
+        return $MyAlJtIoFiles
     }
 
-    [String]GetFilePath([String]$Filename) {
-        [String]$ThePath = $This.GetPath()
-        [String]$Result = -join ($ThePath, "\", $Filename)
-        return $Result
+    [String]GetFilePath([String]$TheFilename) {
+        [String]$MyFilename = $TheFilename
+        [String]$MyPath = $This.GetPath()
+        [String]$MyFilePath = -join ($MyPath, "\", $MyFilename)
+        $MyFilePath = Convert-JtEnvironmentVariables -Text $MyFilePath
+        return $MyFilePath
     }
     
     [String]GetFileTimestamp() {
-        [String]$Timestamp = ""
-        [Boolean]$FileOk = $This.IsExisting()
+        [String]$MyTimestamp = ""
+        [Boolean]$MyBlnFileOk = $This.IsExisting()
         
-        if ($FileOk) {
-            
-            $Timestamp = $This.File.LastWriteTime.ToString([JtIo]::TimestampFormat)
+        if ($MyBlnFileOk) {
+            $MyTimestamp = $This.File.LastWriteTime.ToString([JtIo]::TimestampFormat)
         }
-        return $Timestamp
-    }
-
-    # Case sensitive
-    # .pdf, .PDF are different types
-    [System.Collections.ArrayList]JtTblTable() {
-        [System.Collections.ArrayList]$Folders = $This.GetSubFolders()
-
-        $Filetypes = [System.Collections.ArrayList]::new()
-
-        foreach ($AnyFolder in $Folders) {
-            [System.Collections.ArrayList]$FileTypesInFolder = $AnyFolder.GetFiletypesInFolder()
-            foreach ($Type in $FileTypesInFolder) {
-                [String]$MyType = $Type
-                if ($Filetypes.contains($MyType)) {
-
-                }
-                else {
-                    $Filetypes.add($MyType)
-                }
-            }
-        }
-        return $Filetypes
+        return $MyTimestamp
     }
 
     # Case insensitive
     # .pdf, .PDF are the same
-    [System.Collections.ArrayList]GetFiletypesInFolder() {
-        $Filetypes = [System.Collections.ArrayList]::new()
-
-        $Files = $This.GetJtIoFiles()
-        foreach ($AnyFile in $Files) {
-            [JtIoFile]$MyFile = $AnyFile
+    [System.Collections.ArrayList]GetAlExtensions() {
+        $MyAlJtIoFiles = $This.GetJtIoFiles()
+        
+        [JtList]$MyJtList = New-JtList
+        foreach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
             # $File.GetPath()
-            $Type = $MyFile.GetExtension()
-            $Type = $Type.ToLower()
-            if ($Filetypes.contains($Type)) {
-
-            }
-            else {
-                $Filetypes.add($Type)
-            }
-        }
-        return $Filetypes
-    }
-
-
-    [System.Collections.ArrayList]GetFiletypesInSubFolders() {
-        [System.Collections.ArrayList]$AllTypes = [System.Collections.ArrayList]::new()
-
-        [System.Collections.ArrayList]$Subfolders = $This.GetSubFolders()
-        foreach ($AnyFolder in $Subfolders) {
-            [JtIoFolder]$MyFolder = $AnyFolder
-
-            [System.Collections.ArrayList]$Types = $MyFolder.GetFileTypesInFolder() 
-            foreach ($AnyType in $Types) {
-                # $File.GetPath()
-                [String]$Type = [String]$AnyType
-                if ($AllTypes.contains($Type)) {
-
-                }
-                else {
-                    $AllTypes.add($Type)
-                }
-            }
-        }
-        return $AllTypes
-    }
-
-    [System.Collections.ArrayList]GetFolderFiles() {
-        [String]$MyFilter = -join ("*", [JtIo]::FilenameExtension_Folder)
-        [System.Collections.ArrayList]$FolderFiles = $This.GetJtIoFilesWithFilter($MyFilter, $True) 
-        return $FolderFiles
-    }
-
-    [String]GetFolderSize() {
-        $sum = 0
-        if ( (Test-Path $This.GetPath()) -and (Get-Item $This.GetPath()).PSIsContainer ) {
-            $Measure = Get-ChildItem $This.GetPath() -Recurse -Force -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum
+            $MyExtension = $MyJtIoFile.GetExtension()
+            $MyExtension = $MyExtension.ToLower()
             
-            $Sum = $Measure.Sum
+            $MyJtList.Add($MyExtension)
         }
-        # "{0:N2} GB" -f ((gci Downloads | measure Length -s).Sum /1GB)
-        [String]$Result = "{0:N2} MB" -f ($Sum / 1MB)
-        return $Result
+        [System.Collections.ArrayList]$MyAlFiletypes = $MyJtList.GetValues()
+        return $MyAlFiletypes
     }
+
+
+    [System.Collections.ArrayList]GetAlExtensions_Recurse() {
+        [JtList]$MyJtList = New-JtList
+
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Sub = $This.GetAlJtIoFolders_Sub()
+        foreach ($Folder in $MyAlJtIoFolders_Sub ) {
+            [JtIoFolder]$MyJtIoFolder = $Folder
+
+            [System.Collections.ArrayList]$MyAlTypes = $MyJtIoFolder.GetAlExtensions()
+            foreach ($Extension in $MyAlTypes) {
+                [String]$MyExtension = $Extension
+                $MyJtList.Add($MyExtension)
+            }
+        }
+        [System.Collections.ArrayList]$MyAlTypes = $MyJtList.GetValues()
+        return $MyAlTypes
+    }
+
+
+
     
     [DateTime]GetLastModified() {
         return [JtIoFolder]::GetReportFolderDateTime($This.GetPath())
@@ -909,215 +673,849 @@ class JtIoFolder : JtIo {
         return (Get-Item -Path $This.Path).Name
     }
     
-    [System.Collections.ArrayList]GetNormalFiles() {
-        [System.Collections.ArrayList]$AllFiles = $This.GetJtIoFiles($False)
-        
-        [System.Collections.ArrayList]$TheFiles = [System.Collections.ArrayList]::new()
-        foreach ($MyFile in $AllFiles) {
-            [JtIoFile]$JtIoFile = $MyFile
-            
-            [Boolean]$IsSpecial = $JtIoFile.IsSpecialFile()
-            
-            if ($False -eq $IsSpecial) {
-                # Write-Host "No special file: " $JtIoFile.GetName()
-                $TheFiles.Add($JtIoFile)
+    [JtIoFolder]GetJtIoFolder_Parent() {
+        [String]$MyFolderPath_Parent = (Get-Item $This.GetPath()).parent.FullName
+        [JtIoFolder]$MyJtIoFolder_Parent = New-JtIoFolder -FolderPath $MyFolderPath_Parent
+        return $MyJtIoFolder_Parent
+    }
+    
+    [JtIoFolder]GetJtIoFolder_Sub([String]$MyName, [Boolean]$BlnCreate) {
+        [String]$MyFolderPath = $This.GetPath()
+        [String]$MyFolderPathNew = -join ($MyFolderPath, "\", $MyName)
+        [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPathNew
+        if ($MyJtIoFolder.IsExisting()) {
+            return $MyJtIoFolder
+        }
+        if ($BlnCreate) {
+            # Write-JtLog_Folder -Where $This.ClassName -Text "GetJtIoFolder_Sub. Creating new folder." -FolderPath $MyFolderPathNew
+            [JtIoFolder]$MyJtIoFolder = [JtIoFolder]::new($MyFolderPathNew, $True)
+            if ($MyJtIoFolder.IsExisting()) {
+                return $MyJtIoFolder
             }
         }
-        return $TheFiles
-    }
-    
-    [JtIoFolder]GetParentFolder() {
-        [String]$ParentPath = (Get-Item $This.GetPath()).parent.FullName
-        [JtIoFolder]$ParentFolder = [JtIoFolder]::new($ParentPath)
-        return $ParentFolder
-    }
-    
-    [JtIoFolder]GetSubfolder([String]$MyName, [Boolean]$BlnCreate) {
-        [String]$NewPath = -join ($This.GetPath(), "\", $MyName)
-        if (Test-Path -Path $NewPath) {
-            [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($NewPath)
-            return $JtIoFolder
+        if (!(Test-JtIoPath -Path $MyFolderPathNew)) {
+            # Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFolder_Sub. Subfolder does not exist! PATH: $MyFolderPathNew"
         }
-        if ($True -eq $BlnCreate) {
-            Write-JtIo -Text ( -join ("Creating new folder (when calling GetSubfolder):", $NewPath))
-            [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($NewPath, $True)
-            if (Test-Path -Path $NewPath) {
-                [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($NewPath)
-                return $JtIoFolder
+        return $MyJtIoFolder
+    }
+
+    [JtIoFolder]GetJtIoFolder_Sub([String]$TheFoldername) {
+        [String]$MyFoldername = $TheFolderName
+        return $This.GetJtIoFolder_Sub($MyFoldername, $False)
+    }
+    
+    [System.Collections.ArrayList]GetAlJtIoFolders_Sub() {
+        return $This.GetAlJtIoFolders_Sub($False)
+    }
+
+    [System.Collections.ArrayList]GetAlJtIoFolders_Sub([Boolean]$TheBlnRecurse) {
+        [System.Collections.ArrayList]$MyAlJtIoFolders_Sub = [System.Collections.ArrayList]::new()
+        [Boolean]$MyBlnRecurse = $TheBlnRecurse
+
+        if ($This.IsExisting()) {
+            if ($True -eq $MyBlnRecurse) {
+                $MyAlSubfolders = Get-ChildItem -Path $This.GetPath() -Directory -Recurse
+                foreach ($Subfolder In $MyAlSubfolders) {
+                    $MySubfolder = $Subfolder
+                    [String]$MyFolderPath = $MySubfolder.fullname
+                    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderpath
+                    $MyAlJtIoFolders_Sub.add($MyJtIoFolder)
+                }    
             }
             else {
-                Write-JtError -Text ( -join ("Error while creating folder (when calling GetSubfolder):", $NewPath))
-                return $null
+                $MyAlSubfolders = Get-ChildItem -Path $This.GetPath() -Directory 
+                foreach ($Subfolder In $MyAlSubfolders) {
+                    [String]$MyFolderPath = $Subfolder.fullname
+                    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderpath
+                    $MyAlJtIoFolders_Sub.add($MyJtIoFolder)
+                }    
             }
         }
+        else {
+            Write-JtLog_Error -Where $This.ClassName -Text "GetAlJtIoFolders_Sub. Folder is not existing! $This.Path"
+        }
+        return $MyAlJtIoFolders_Sub
+    }  
+
+    [Boolean]IsExisting() {
+        [Boolean]$MyBlnExists = [System.IO.Directory]::Exists($This.GetPath())
+        $This.BlnExists = $MyBlnExists
+        return $MyBlnExists
+    }
+}
+
+Function Convert-JtIoFilenamesAtFolderPath {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+    )
+
+    [String]$MyFunctionName = "Convert-JtFilenames"
+
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath_Input
+    $MyAlJtIoFiles = $MyJtIoFolder.GetJtIoFiles()
+
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFileNormal = $File
+        [String]$MyFilename = $MyJtIoFileNormal.GetName()
+            
+        $MyFilenameOptimal = Convert-JtLabel_To_Filename -Label $MyFilename
+            
+        if ($MyFilename -eq $MyFilenameOptimal) {
+            #            Write-JtLog -Where $MyFunctionName -Text "FILE: $MyFilename is ok."
+        }
+        else {
+            Write-JtLog_Error -Where $MyFunctionName -Text "FILE: $MyFilename is renamed to FilenameOptimal: $MyFilenameOptimal"
+            $MyJtIoFileNormal.DoRenameFile($MyFilenameOptimal)
+        }
+    }
+}
+
+
+
+Function Get-JtChildItem {
+
+    Param (
+        [Cmdletbinding()]
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Filter,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Recurse,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Normal
+    )
+
+
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
+    [String]$MyFilter = $Filter
+    
+    [System.Collections.ArrayList]$MyAlJtIoFiles = $MyJtIoFolder.GetJtIoFiles_Filter($MyFilter, $Recurse)
+
+    if ($Normal) {
+        [System.Collections.ArrayList]$MyAlJtIoFilesFiltered = [System.Collections.ArrayList]::new()
+        [System.Collections.ArrayList]$MyAlJtIoFilesAll = $MyAlJtIoFiles
+        foreach ($File in $MyAlJtIoFilesAll) {
+            [JtIoFile]$MyJtIoFile = $File
+            
+            [Boolean]$MyBlnIsSpecial = Test-JtIoSpecial -FilePath $MyJtIoFile
+            
+            if (! ($MyBlnIsSpecial)) {
+                $MyAlJtIoFilesFiltered.Add($MyJtIoFile) | Out-Null
+            }
+        }
+        $MyAlJtIoFiles = $MyAlJtIoFilesFiltered
+    }
+    return , $MyAlJtIoFiles
+}
+
+
+Function Get-JtFolderPath_Info_FilesCount {
+    Param (
+        [Cmdletbinding()]
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    [String]$MyFunctionName = "Get-JtFolderPath_Info_FilesCount"
+
+    [String]$MyFolderPath = $FolderPath
+    Write-JtLog -Where $MyFunctionName -Text "-- MyFolderPath: $MyFolderPath"
+    try {
+        $MyResult = Get-ChildItem -Recurse $MyFolderPath | Where-Object { -not $_.PSIsContainer } | Measure-Object -Property Length -Sum
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "GetDataLine. Problem with MyFolderPath: $MyFolderPath"
+    }
+    # $MyJtTblRow.Add("Size", $MyResult.Sum)
+    [Int32]$MyFilesCount = $MyResult.Count
+    return $MyFilesCount
+}
+
+
+
+
+Function Get-JtFolderPath_Info_Level {
+    Param (
+        [Cmdletbinding()]
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    # [String]$MyFunctionName = "Get-JtFolderPath_Info_Level"
+
+    [String]$MyFolderPath = $FolderPath
+    
+    $MyAlLevels = $MyFolderPath.Split("\")
+    [Int16]$MyIntLevel = $MyAlLevels.Count
+
+    [Int16]$MyIntLevelInternal = $MyIntLevel - 3
+
+    return $MyIntLevelInternal
+}
+
+Function Get-JtFolderPath_Info_SizeGb {
+    Param (
+        [Cmdletbinding()]
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    [String]$MyFunctionName = "Get-JtFolderPath_Info_SizeGb"
+
+    [String]$MyFolderPath = $FolderPath
+    Write-JtLog -Where $MyFunctionName -Text "-- MyFolderPath: $MyFolderPath"
+    [Decimal]$MyDecSizeGb = 0
+    try {
+        $MyResult = Get-ChildItem -Recurse $MyFolderPath | Where-Object { -not $_.PSIsContainer } | Measure-Object -Property Length -Sum
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "GetDataLine. Problem with MyFolderPath: $MyFolderPath"
+    }
+    # $MyJtTblRow.Add("Size", $MyResult.Sum)
+    [Decimal]$MyDecSizeGb = Convert-JtString_To_DecGb -Text $MyResult.Sum
+    return $MyDecSizeGb
+}
+
+
+
+
+Function Get-JtFolderPath_inv {
+    Return "c:\_inventory"
+}
+
+Function Get-JtFolderPath_inv_report {
+    Return "c:\_inventory\report"
+}
+
+Function Get-JtFolderPath_inv_out {
+    Return "c:\_inventory\out"
+}
+
+
+
+
+Function Get-JtIoFolder_Work {
+
+    param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Boolean]$Init
+    )
+
+    # [String]$FolderPathWork = -join ("%temp%", "\", "Jt", "\", $Name)
+    [String]$MyFolderPath_Inv = Get-JtFolderPath_Inv
+    [String]$MyFolderPath_Work = -join ($MyFolderPath_Inv, "\", "out", "\", $Name)
+    [JtIoFolder]$MyJtIoFolderWork = New-JtIoFolder -FolderPath $MyFolderPath_Work -Force
+
+    if (!($MyJtIoFolderWork.IsExisting())) {
+        Throw "WorkFolder does not exist. MyJtIoFolderWork: $MyJtIoFolderWork"
+    }
+
+    if ($Init) {
+        if ($True -eq $Init) {
+            $MyJtIoFolderWork.DeDeleteEveryThing()
+        }
+    }
+    Return $MyJtIoFolderWork
+}
+
+
+
+
+Function Get-JtReportLogDate {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    [String]$MyFunctionName = "Get-JtReportLogDate"
+
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
+    [String]$MyFolderPath = $MyJtIoFolder.GetPath()
+
+    if (!($MyJtIoFolder.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist! PATH: $MyFolderPath"
         return $Null
     }
 
-    [JtIoFolder]GetSubfolder([String]$MyName) {
-        return $This.GetSubfolder($MyName, $False)
+    [String]$MyIsoDate = "2000-01-01"
+    [DateTime]$MyDateFile = Get-Date $MyIsoDate
+
+        
+    [String]$MyFilter = -join ("*", ".", "log", [JtIo]::FileExtension_Md)
+
+    $MyAlJtIoFiles = $MyJtIoFolder.GetJtIoFiles_Filter($MyFilter)
+    if ($MyAlJtIoFiles.Count -gt 0) {
+        [JtIoFile]$MyJtIoFile = $MyAlJtIoFiles[0]
+        [String]$MyFilename = $MyJtIoFile.GetName()
+
+        [String]$MyIsoDate = $MyFilename.Substring(4, 10)
+        [datetime]$MyDateFile = Get-Date $MyIsoDate
+
     }
-    
-    
-    [System.Collections.ArrayList]GetSubfolders() {
-        return $This.GetSubfolders($False)
+    else {
+        Write-JtLog_Error -Where $MyFunctionName -Text "No log file found in PATH: $MyFolderPath"
+    }
+    return [DateTime]$MyDateFile
+}
+
+Function Get-JtReportLogDaysAgo {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
+    [String]$MyFolderPath = $MyJtIoFolder.GetPath()
+    if (!($MyJtIoFolder.IsExisting())) {
+        Write-JtLog_Error -Text "Get-JtReportLogDaysAgo. Folder does not exist! MyFolderPath: $MyFolderPath"
+        return 999
     }
 
-    [System.Collections.ArrayList]GetSelectedSubfolders([System.Collections.ArrayList]$MySelection) {
-        [System.Collections.ArrayList]$TheSubfolders = $This.GetSubfolders($False)
-        [System.Collections.ArrayList]$TheSelectedFolders = [JtIo]::GetSelectedJtIoFolders($TheSubfolders, $MySelection)
-        return $TheSelectedFolders
+    [int16]$MyIntAgo = 0
+
+    $MyDateFile = Get-JtReportLogDate -FolderPath $MyFolderPath
+    $MyTypeName = $MyDateFile.getType().Name
+
+    if ($MyTypeName -eq "DateTime") {
+        $MyTimeAgo = (Get-Date) - ($MyDateFile)
+        $MyIntAgo = $MyTimeAgo.Days
+    }
+    else {
+        $MyIntAgo = 998
+    }
+    return $MyIntAgo
+}
+
+
+class JtRobocopy : JtClass {
+
+    [String]$RoboExe = -join ($env:windir, '\system32\', 'robocopy.exe')
+
+    hidden [String]$FolderPath_Input = ""
+    hidden [String]$FolderPath_Output = ""
+    hidden [String]$Info = ""
+    hidden [Boolean]$ExitOnError = $False
+    
+    JtRobocopy([JtIoFolder]$TheJtIoFolder_Input, [JtIoFolder]$TheJtIoFolder_Output) {
+        $This.ClassName = "JtRobocopy"
+        [JtIoFolder]$MyJtIoFolder_Input = $TheJtIoFolder_Input
+        [JtIoFolder]$MyJtIoFolder_Output = $TheJtIoFolder_Output
+
+        $This.DoInit([String]$MyJtIoFolder_Input, [String]$MyJtIoFolder_Output, $False) 
     }
     
-    [System.Collections.ArrayList]GetSubfolders([Boolean]$Recurse) {
-        [System.Collections.ArrayList]$Output = [System.Collections.ArrayList]::new()
+    JtRobocopy([String]$TheFolderPath_Input, [String]$TheFolderPath_Output) {
+        $This.ClassName = "JtRobocopy"
+        $This.DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $False) 
+    }
+    
+    JtRobocopy([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $ExitOnError) {
+        $This.ClassName = "JtRobocopy"
+        $This.DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $ExitOnError) 
+    }
         
-        if ($This.IsExisting()) {
-            if ($True -eq $Recurse) {
-                $Subfolders = Get-ChildItem -Path $This.GetPath() -Directory -Recurse
-                foreach ($MyLine In $Subfolders) {
-                    [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($MyLine.fullname)
-                    $Output.add( $JtIoFolder)
-                }    
-            }
-            else {
-                $Subfolders = Get-ChildItem -Path $This.GetPath() -Directory 
-                foreach ($MyLine In $Subfolders) {
-                    [JtIoFolder]$JtIoFolder = [JtIoFolder]::new($MyLine.fullname)
-                    $Output.add( $JtIoFolder)
-                }    
-            }
+    hidden [Boolean]DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $ExitOnError) {
+        $This.ExitOnError = $ExitOnError
+        $This.FolderPath_Input = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath_Input
+        $This.FolderPath_Output = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath_Output
+        return $True
+    }
+    
+    [Boolean]SetInfo([String]$MyInfo) {
+        $This.Info = $MyInfo
+        return $True
+    }
+    
+    [Boolean]DoIt() {
+        [String]$MyInfo = $This.Info
+        Write-JtLog -Where $This.ClassName -Text "MyInfo: $MyInfo"
+        [String]$MyFolderPath_Input = $This.FolderPath_Input 
+        [String]$MyFolderPath_Output = $This.FolderPath_Output 
+        Write-JtLog -Where $This.ClassName -Text "DoIt. MyFolderPath_Input: $MyFolderPath_Input ; MyFolderPath_Output: $MyFolderPath_Output"
+        
+        # [String]$BACKUP_NAME = "mirror"
+
+
+        [String]$PARAMETER = ""
+        <# 
+
+        [String]$LOG_PATH = $env:TEMP
+        [String]$LOG_FILENAME = 'mirror.log'
+        [String]$LOG_FILE = -join ($LOG_PATH, "\", $LOG_FILENAME)
+
+        # Bestimmte Verzeichnisse sollen nicht gesichert werden:
+        [String]$EXCLUDE_DIRS = '$Recycle.Bin "System Volume Information" "Temporary Internet Files" nobackup'
+ 
+        # Bestimmte Dateien sollen nicht gesichert werden:
+        [String]$EXCLUDE_FILES = -join ($LOG_FILE, ' ', 'pagefile.sys hibernfil.sys thumbcache_32.db thumbcache_96.db thumbcache_256.db thumbcache_1024.db')
+
+        # /A-:HS 
+        # ... verhindert, dass unsichtbare Ordner entstehen.
+
+        [String]$PARAMETER = -join ('/XJ /NP /FFT /TEE /S /COPY:DT /w:2 /r:2 /MIR /A-:HS /Log:', """", $LOG_FILE, """", ' ', '/XD', ' ', $EXCLUDE_DIRS, ' ', '/XF', ' ', $EXCLUDE_FILES)
+        $PARAMETER = -join ('/w:2', ' ', '/r:2', ' ', '/MIR ')
+ #>
+
+        $MyArgs = -join (' /MIR ', ' /w:2 ', ' ', ' /r:2 ', ' ', '"', $This.FolderPath_Input, '"', ' ', '"', $This.FolderPath_Output, '"')
+
+        [String]$TheFolderPath_Output = $This.FolderPath_Output
+        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $TheFolderPath_Output -Force
+        [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
+        if (Test-JtIoFolderPath -FolderPath $MyFolderPath_Output) {
+            Write-JtLog -Where $This.ClassName -Text "DoIt. MyArgs: $MyArgs"
+            Start-Process -NoNewWindow -FilePath $This.RoboExe -ArgumentList $MyArgs -Wait 
+            return $True
         }
-        return $Output
-    }
-    
-    [Boolean]IsExisting() {
-        $This.BlnExists = [System.IO.Directory]::Exists($This.GetPath())
-        return $This.BlnExists
+        else {
+            Write-JtLog_Error -Where $This.ClassName -Text "ERROR! JtRobocopy. No access: $This.FolderPath_Output"
+            if ($This.ExitOnError -eq $True) {
+                Exit
+            }
+            return $False
+        }
     }
 }
 
+Function New-JtConfig {
+    [JtConfig]::new()
+}
 
-function New-JtIoFileMeta {
-        
+Function New-JtIo {
+    [JtIo]::new()
+}
+
+Function New-JtIoFile {
     Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path,
-        [Parameter(Mandatory = $true)]
-        [String]$Label,
-        [Parameter(Mandatory = $False)]
-        [String]$Content
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
     )
 
-    [String]$MyContent
-    if (!($Content)) {
-        $MyContent = "Hello World!"
-    }
-    else {
-        $MyContent = $Content
-    }
-
-    [String]$Extension = [JtIo]::FilenameExtension_Meta
-    [String]$FileName = -join ($Label, $Extension)
-    [JtIoFolder]$MyFolder = New-JtIoFolder -Path $Path
-    
-    [String]$OutputFilePath = $MyFolder.GetFilePath($FileName)
-    Write-JtIo -Text ( -join ("Writing file:", $OutputFilePath))
-    $Content | Out-File -FilePath $OutputFilePath -Encoding utf8
+    [JtIoFile]::new($FilePath)
 }
 
-function New-JtIoFileVersionMeta {
-        
+
+Function New-JtIoFile_Csv {
     Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path,
-        [Parameter(Mandatory = $False)]
-        [String]$Content
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
     )
 
-    [String]$MyContent
-    if (!($Content)) {
-        $MyContent = "Hello World!"
-    }
-    else {
-        $MyContent = $Content
-    }
-
-    [String]$MyPath = ConvertTo-JtExpandedPath -Path $Path
-    
-
-    [String]$MyType = "version"
-    [String]$MyTimestamp = Get-JtDate
-    [String]$MyLabel = -join ("_", $MyTimestamp, ".", "version")
-    [String]$MyFilter = -join ("*", ".", $MyType, [JtIo]::FilenameExtension_Meta)
-    [JtIoFolder]$TargetFolder = New-JtIoFolder -Path $MyPath
-    
-    $TargetFolder.DoDeleteAllFiles($MyFilter)
-
-    New-JtIoFileMeta -Path $MyPath -Label $MyLabel -Content $MyContent
-
+    [JtIoFileCsv]::new($FilePath)
 }
 
 
-Function ConvertTo-JtIoBetterFilenames {
-    Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path
-    )
 
-    [JtIoFolder]$TheFolder = [JtIoFolder]::new($Path)
-
-    $TheFolder.DoOptimizeFilenames()
-}
 
 Function New-JtIoFolder {
     Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path,
-        [Parameter(Mandatory = $false)]
-        [Boolean]$Force
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Force
     )
-
-    [JtIoFolder]::new($Path, $Force)
+ 
+    [JtIoFolder]::new($FolderPath, $Force)
 }
 
-Function New-JtIoFolderInv {
+Function New-JtIoFolder_Inv {
 
-    New-JtIoFolder -Path "c:\_inventory" -Force $True
+    [String]$MyFolderPath = Get-JtFolderPath_Inv
+
+    New-JtIoFolder -FolderPath $MyFolderPath -Force
 }
 
-Function New-JtIoFolderReport {
+Function New-JtIoFolder_Report {
 
-    New-JtIoFolder -Path "c:\_inventory\report" -Force $True
+
+    [String]$MyFolderPath = Get-JtFolderPath_Inv_Report
+    New-JtIoFolder -FolderPath $MyFolderPath -Force
 }
 
-Function Get-JtIoFolderTypes {
+
+Function New-JtRobocopy {
+    
     Param (
-        [Parameter(Mandatory = $true)]
-        [String]$Path
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Info
     )
 
-    [String]$MyFilter = "*.folder"
-    [JtIoFolder]$MyFolder = New-JtIoFolder -Path $Path
-    [System.Collections.ArrayList]$MyFiles = $MyFolder.GetJtIoFilesWithFilter($MyFilter, $True)
+    [JtRobocopy]$MyJtRobocopy = [JtRobocopy]::new($FolderPath_Input, $FolderPath_Output)
+    if ($Info) {
+        $MyJtRobocopy.SetInfo($Info)
+    }
+    $MyJtRobocopy.DoIt()
 
-    [Hashtable]$Ext = New-Object Hashtable
+}
 
-    foreach ($File in $MyFiles) {
-        $File.GetPath()
-        # $File.GetName()
-        # $File.GetExtension()
-        # $File.GetExtension2()    
-        $Value = $File.GetExtension2()
-        if (!($Ext.Contains($Value))) {
-            $Ext.add($Value, $Value)
-        }
+Function New-JtRobocopy_Date {
+    
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Info
+    )
+
+    [String]$MyDate = Get-JtDate 
+    [String]$MyFolderPath_OutputDate = -Join ($FolderPath_Output, ".", $MyDate)
+
+    [JtRobocopy]$MyJtRobocopy = [JtRobocopy]::new($FolderPath_Input, $MyFolderPath_OutputDate)
+    if (!($Info)) {
+        
+    }
+    else {
+        $MyJtRobocopy.SetInfo($Info)
+    }
+    $MyJtRobocopy.DoIt()
+
+}
+
+Function New-JtRobocopy_Element_Extension_Folder {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRobocopy_Element_Extension_Folder"
+    
+    
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+    
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
+
+    if (!($MyJtIoFolder_Input.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist. MyJtIoFolder_Input: $MyJtIoFolder_Input"
+        return
+    }
+
+    if (!($MyJtIoFolder_Output.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist. MyJtIoFolder_Output: $MyJtIoFolder_Output"
+        return
+    }
+    
+    Write-JtLog -Where $MyFunctionName -Text "Preparing... MyJtIoFolder_Output: $MyJtIoFolder_Output"
+
+    [String]$MyExtension = [JtIo]::FileExtension_Folder
+    [String]$MyFilter = -join ("*", $MyExtension)
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Filter $MyFilter -Recurse
+    
+    [Int16]$MyIntCount = $MyAlJtIoFiles.Count
+    Write-JtLog -Where $MyFunctionName -Text "Number of files found with MyExtension: $MyExtension - MyIntCount: $MyIntCount"
+    Write-JtLog -Where $MyFunctionName -Text "MyJtIoFolder_Input: $MyJtIoFolder_Input"
+
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile = $File
+        [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
+
+        [String]$MyFolderPath_Robo_Input = $MyJtIoFolder_Parent.GetPath()
+
+        [String]$MySubPath = $MyFolderPath_Robo_Input -ireplace [regex]::Escape($MyFolderPath_Input), ""
+
+        [String]$MyFolderPath_Robo_Output = -Join ($MyJtIoFolder_Output, $MySubPath)
+
+        New-JtIoFolder -FolderPath $MyFolderPath_Robo_Output -Force
+        Write-JtLog -Where $MyFunctionName -Text "MyFolderPath_Robo_Input: $MyFolderPath_Robo_Input"
+        Write-JtLog -Where $MyFunctionName -Text "MyFolderPath_Robo_Output: $MyFolderPath_Robo_Output"
+
+        New-JtRobocopy -FolderPath_Input $MyFolderPath_Robo_Input -FolderPath_Output $MyFolderPath_Robo_Output
+    }
+}
+
+Function New-JtIoCollectFilesWithExtension {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Extension
+    )
+
+    [String]$MyFunctionName = "New-JtIoCollectFilesWithExtension"
+    [String]$MyExtension = $Extension
+    
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $FolderPath_Input
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $FolderPath_Output -Force
+
+    [String]$MyFilter = -join ("*", $MyExtension)
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Filter $MyFilter -Recurse
+
+    [Int16]$IntCount = $MyAlJtIoFiles.Count
+    Write-JtLog -Where $MyFunctionName -Text "Number of files found with EXTENSION: $MyExtension - COUNT: $IntCount in PathInput: $MyJtIoFolder_Input"
+    
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile_Folder = $File
+
+        # Write-JtLog -Where $MyFunctionName -Text "Path of JtIoFile_Folder: $MyJtIoFile_Folder"
+
+        [String]$MyFilename = $MyJtIoFile_Folder.GetName()
+
+        [String]$MyFilePath_Input = $MyJtIoFile_Folder.GetPath()
+        [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename)
+
+        Copy-Item $MyFilePath_Input $MyFilePath_Output
+    }
+}
+
+
+Class JtComputername {
+
+    [String]$Computername = $Null
+
+    JtComputername([String]$TheName) {
+        [String]$MyName = $TheName
+        [String]$MyComputername = $MyName.ToLower()
+        $This.Computername = $MyComputername
 
     }
-    return $Ext.Keys
 
+
+    [String]GetOrg() {
+        [String]$MyComputername = $This.Computername
+        [String]$MyResult = ""
+        if ($MyComputername) {
+            if ($MyComputername.Length -gt 5) {
+                $MyResult = $MyComputername.Substring(0, 6)
+            }
+        }
+        return $MyResult
+    }
+
+    [String]GetOrg1() {
+        [String]$MyComputername = $This.Computername
+        [String]$MyResult = ""
+        if ($MyComputername) {
+            [String[]]$Parts = $MyComputername.Split("-")
+            if ($Parts.Count -gt 2) {
+                $MyResult = $Parts[0]
+            }
+        }
+        return $MyResult
+    }
+
+    [String]GetOrg2() {
+        [String]$MyComputername = $This.Computername
+        [String]$MyResult = ""
+        if ($MyComputername) {
+            [String[]]$MyAlParts = $MyComputername.Split("-")
+            if ($MyAlParts.Count -gt 2) {
+                $MyResult = $MyAlParts[1]
+            }
+        }
+        return $MyResult
+    }
+
+    [String]GetType() {
+        [String]$MyComputername = $This.Computername
+
+        [String]$MyResult = ""
+        if ($MyComputername) {
+            [String[]]$MyAlParts = $MyComputername.Split("-")
+            if ($MyAlParts.Count -gt 3) {
+                $MyResult = $MyAlParts[2]
+            }
+        }
+        return $MyResult
+    }
+}
+Function New-JtComputername {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name
+    )
+
+    [JtComputername]::New($Name)
+}
+
+Function Remove-JtIoFiles_Meta {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
+
+    [String]$MyFilePrefix = [JtIo]::FilePrefix_Folder
+    [String]$MyExtension = [JtIo]::FileExtensionMeta
+    $MyJtIoFolder.DoRemoveFiles_Some($MyFilePrefix, $MyExtension)
 }
 
 
 
-Export-ModuleMember -Function ConvertTo-JtIoBetterFilenames, Get-JtIoFolderTypes, New-JtIo, New-JtIoFile, New-JtIoFileCsv, New-JtIoFileMeta, New-JtIoFileVersionMeta, New-JtIoFolder, New-JtIoFolderInv, New-JtIofolderReport
+
+Function Test-JtIoPath {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Path
+    )
+
+    return Test-Path -Path $Path
+}
+
+
+Function Test-JtIoFilePath {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $FilePath
+
+    [String]$MyFilePath = $MyJtIoFile.GetPath()
+
+    return Test-Path -Path $MyFilePath
+}
+
+Function Test-JtIoFolderPath {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Boolean]$Force
+    )
+
+    [JtIoFolder]$MyJtIoFolder = $Null
+   
+    if (!($Force)) {
+        $MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
+    }
+    else {
+        $MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath -Force $Force
+    }
+
+    [String]$MyFolderPath = $MyJtIoFolder.GetPath()
+
+    return Test-Path -Path $MyFolderPath
+}
+
+
+Function Test-JtIoSpecial {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $FilePath
+    [String]$MyFilename = $MyJtIoFile.GetName()
+
+    [Boolean]$MyBlnIsSpecial = $False
+    if ($MyFilename.Equals("desktop.ini")) {
+        $MyBlnIsSpecial = $True
+        return $MyBlnIsSpecial
+    }  
+
+    if ($MyFilename.StartsWith("zzz.")) {
+        $MyBlnIsSpecial = $True
+        return $MyBlnIsSpecial
+    }  
+        
+    [String]$MyExtension = [System.IO.Path]::GetExtension($MyFilename)
+        
+    $MyList = New-Object System.Collections.Generic.List[System.Object]
+    $MyList.Add([JtIo]::FileExtension_Csv)
+    $MyList.Add([JtIo]::FileExtension_Folder)
+    $MyList.Add([JtIo]::FileExtension_Md)
+    $MyList.Add([JtIo]::FileExtension_Meta)
+        
+    foreach ($Extension in $MyList) {
+        if ($Extension.Equals($MyExtension)) {
+            $MyBlnIsSpecial = $True
+            return $MyBlnIsSpecial
+        }
+    }
+        
+    return $MyBlnIsSpecial
+}
+
+Function Convert-JtIoFile_Md_To_Pdf {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Input
+    )
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $MyFolderPath_Input
+    
+    [String]$MyFilename_Input = $Filename_Input
+    
+    [String]$MyExtension_Md = [JtIo]::FileExtension_Md
+    [String]$MyExtension_Pdf = [JtIo]::FileExtension_Pdf
+    
+    
+    [String]$MyFilename_Output = $MyFilename_Input.Replace($MyExtension_Md, $MyExtension_Pdf)
+    
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+    [String]$MyFilePath_Input = $MyJtIoFolder_Input.GetFilePath($MyFilename_Input)
+
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+    
+
+    # miktex has do be installed.
+    # choco install miktex -y
+        [String]$MyCommand = -join ('pandoc.exe -s -V geometry:margin=0.2in -o "', $MyFilePath_Output, '" "', $MyFilePath_Input, '"')
+        $MyCommand
+        Invoke-Expression -Command:$MyCommand
+
+        return $True
+    }
+
+
+Function Convert-JtFolderPath_To_Label {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+        )
+        
+        [String]$MyFolderPath = $FolderPath
+        
+        [String]$MyResult = $MyFolderPath
+        [String]$MyComputername = $env:COMPUTERNAME
+        $MyResult = $MyResult.Replace("%COMPUTERNAME%", $MyComputername)
+        $MyResult = $MyResult.Replace(":", "")
+        $MyResult = $MyResult.Replace("*", "")
+        $MyResult = $MyResult.Replace("\.", "")
+        $MyResult = $MyResult.Replace("\", "_")
+        $MyResult = $MyResult.Replace(".", "_")
+        $MyResult = $MyResult.Replace("__", "_")
+        return $MyResult
+    }
+    
+    
+    
+    Export-ModuleMember -Function Convert-JtIoFile_Md_To_Pdf
+Export-ModuleMember -Function Convert-JtIoFilenamesAtFolderPath
+Export-ModuleMember -Function Convert-JtFolderPath_To_Label
+
+Export-ModuleMember -Function Get-JtChildItem
+
+Export-ModuleMember -Function Get-JtFolderPath_Info_FilesCount
+Export-ModuleMember -Function Get-JtFolderPath_Info_Level
+Export-ModuleMember -Function Get-JtFolderPath_Info_SizeGb
+
+Export-ModuleMember -Function Get-JtFolderPath_Inv
+Export-ModuleMember -Function Get-JtFolderPath_Inv_Out
+Export-ModuleMember -Function Get-JtFolderPath_Inv_Report
+
+Export-ModuleMember -Function Get-JtReportLogDate
+Export-ModuleMember -Function Get-JtReportLogDaysAgo
+
+Export-ModuleMember -Function New-JtComputername
+Export-ModuleMember -Function New-JtConfig 
+Export-ModuleMember -Function New-JtIo
+Export-ModuleMember -Function New-JtIoCollectFilesWithExtension
+Export-ModuleMember -Function New-JtIoFile
+Export-ModuleMember -Function New-JtIoFile_Csv
+
+Export-ModuleMember -Function New-JtIoFolder
+Export-ModuleMember -Function New-JtIoFolder_Inv
+Export-ModuleMember -Function New-JtIoFolder_Report
+Export-ModuleMember -Function Get-JtIoFolder_Work
+
+
+Export-ModuleMember -Function New-JtRobocopy
+Export-ModuleMember -Function New-JtRobocopy_Date
+Export-ModuleMember -Function New-JtRobocopy_Element_Extension_Folder
+
+Export-ModuleMember -Function Remove-JtIoFiles_Meta
+
+
+# Export-ModuleMember -Function Test-JtIoPath
+Export-ModuleMember -Function Test-JtIoFilePath
+Export-ModuleMember -Function Test-JtIoFolderPath
+Export-ModuleMember -Function Test-JtIoSpecial
+
+
 

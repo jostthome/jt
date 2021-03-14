@@ -1,0 +1,7 @@
+<config>
+	<folder source="%OneDrive%\BANK" target="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\BANK"></folder>
+	<folder source="%OneDrive%\FAMILIE" target="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\FAMILIE"></folder>
+	<folder source="%OneDrive%\IMMO" target="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\IMMO"></folder>
+	<folder source="%OneDrive%\STEUER" target="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\STEUER"></folder>
+	<folder source="%OneDrive%\VERSICHERUNG" target="%OneDrive%\0.INVENTORY\01.OUTPUT\folder\VERSICHERUNG"></folder>
+</config>
