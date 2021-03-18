@@ -115,14 +115,14 @@ class JtMd : JtClass{
 
     static [Boolean]DoWriteJtMdCsv([JtIoFolder]$TheJtIoFolderWork, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabel, [String]$TheFilter, [String]$ThePattern) {
         [System.Collections.ArrayList]$MyAlList = [System.Collections.ArrayList]::new()
-        [String]$MyJtIoFolderWork = $TheJtIoFolderWork
+        [String]$MyJtIoFolder_Work = $TheJtIoFolderWork
         
         [String]$MyFolderPath_Output = $TheJtIoFolder_Output.GetPath()
         [String]$MyFilter = $TheFilter
         [String]$MyLabel = $TheLabel
         [String]$MyPattern = $ThePattern
 
-        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolderWork -Filter $MyFilter -Recurse
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Work -Filter $MyFilter -Recurse
         [System.Collections.ArrayList]$MyAlList = [JtMd]::GetList($MyAlJtIoFiles, $MyPattern)
 
         Convert-JtAl_to_FileCsv -ArrayList $MyAlList -FolderPath_Output $MyFolderPath_Output -Label $MyLabel  
@@ -173,6 +173,42 @@ class JtMdDocument {
 }
 
 
+Function Convert-JtIoFile_Md_To_Pdf {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Input
+    )
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $MyFolderPath_Input
+    
+    [String]$MyFilename_Input = $Filename_Input
+    
+    [String]$MyExtension_Md = [JtIo]::FileExtension_Md
+    [String]$MyExtension_Pdf = [JtIo]::FileExtension_Pdf
+    
+    
+    [String]$MyFilename_Output = $MyFilename_Input.Replace($MyExtension_Md, $MyExtension_Pdf)
+    
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+    [String]$MyFilePath_Input = $MyJtIoFolder_Input.GetFilePath($MyFilename_Input)
+
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+    
+
+    # miktex has do be installed.
+    # choco install miktex -y
+    [String]$MyCommand = -join ('pandoc.exe -s -V geometry:margin=0.2in -o "', $MyFilePath_Output, '" "', $MyFilePath_Input, '"')
+    $MyCommand
+    Invoke-Expression -Command:$MyCommand
+
+    return $True
+}
+
+
+
 Function New-JtMdDocument {
 
     Param (
@@ -214,9 +250,6 @@ Function Get-JtDataTable_Info_Column_Width {
     return , $MyIntResult
 }
 
-
-
-
 class JtMdTable : JtClass {
 
     [String]$Vertical = "|"
@@ -242,6 +275,20 @@ class JtMdTable : JtClass {
 
         [String]$MySpacer = "                                                                                                                                 "
         [String]$MyOut = ( -join ($MyInput, $MySpacer)).Substring(0, $MyColWidth)
+
+
+        [String]$MyResult = $MyOut
+        return $MyResult 
+    }
+
+    [String]GetFormattedLineOutput([Int32]$TheIntCol, [String]$TheInput) {
+        [String]$MyInput = $TheInput
+        [Int32]$MyIntCol = $TheIntCol
+
+        [int32]$MyColWidth = $This.GetColWidth($This.Datatable, $MyIntCol)
+
+        [String]$MySpacer = "                                                                                                                                 "
+        [String]$MyOut = ( -join ($MyInput, $MySpacer)).Substring(0, $MyColWidth + 2)
 
 
         [String]$MyResult = $MyOut
@@ -307,7 +354,7 @@ class JtMdTable : JtClass {
         
         [Int32]$i = 0
         foreach ($Element in $TheArrayList) {
-            [String]$MyOutput = $This.GetFormattedOutput($i, $MyHor)
+            [String]$MyOutput = $This.GetFormattedLineOutput($i, $MyHor)
             # [String]$TheElement = $Hor
             $MyLine.Add($MyOutput)
             $MyLine.Add($MyVert)
@@ -341,8 +388,6 @@ class JtMdTable : JtClass {
     }
 }
 
-
-
 Function New-JtMdTable {
 
     Param (
@@ -358,5 +403,6 @@ Function New-JtMdTable {
 
 }
 
+Export-ModuleMember -Function Convert-JtIoFile_Md_To_Pdf
 Export-ModuleMember -Function New-JtMdDocument
 Export-ModuleMember -Function New-JtMdTable

@@ -499,8 +499,22 @@ Function Convert-JtDotter {
     Return $MyResult
 }
 
-Function Convert-JtFilename_To_IntAlter {
+Function Convert-JtFilename_To_DecBetrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
 
+    # [String]$MyFunctionName = "Convert-JtFilename_To_DecBetrag"
+
+    [String]$MyFilename = $Filename
+
+    [String]$MyElement = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
+    [String]$MyPreis = $MyElement.Replace("_", ".")
+    [Decimal]$MyDecPreis = [Decimal]$MyPreis
+    return $MyDecPreis
+}
+
+Function Convert-JtFilename_To_IntAlter {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
     )
@@ -535,22 +549,6 @@ Function Convert-JtFilename_To_IntAnzahl {
     return $MyCount
 }
 
-Function Convert-JtFilename_To_DecBetrag {
-
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    # [String]$MyFunctionName = "Convert-JtFilename_To_DecBetrag"
-
-    [String]$MyFilename = $Filename
-
-    [String]$MyElement = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
-    [String]$MyPreis = $MyElement.Replace("_", ".")
-    [Decimal]$MyDecPreis = [Decimal]$MyPreis
-    return $MyDecPreis
-}
-
 Function Convert-JtInt_To_00 {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Int]$Int
@@ -574,7 +572,6 @@ Function Convert-JtInt_To_000 {
 }
 
 Function Convert-JtIp_To_Ip3 {
-
     Param (
         [Parameter(Mandatory = $False)][ValidateNotNull()][String]$Ip
     )
@@ -642,10 +639,7 @@ Function Convert-JtFilename_To_Info_With_Template {
     $MyAlTemplateParts = $MyFilename_Template.Split(".")
 
     for ([Int16]$i = 0; $i -lt $MyAlTemplateParts.Count; $i = $i + 1 ) {
-        [String]$MyTemplatePart = $MyAlTemplateParts[$i]
-        if ($MyField -eq $MyTemplatePart) {
-            $MyResult = Get-JtFldAtPos -Text $MyFilename -Pos $i
-        }
+        $MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
 
     }
     return $MyResult
@@ -724,7 +718,6 @@ Function Convert-JtFilename_To_Papier {
 }
 
 Function Convert-JtFilePathExpanded {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
     )
@@ -735,7 +728,6 @@ Function Convert-JtFilePathExpanded {
 } 
 
 Function Convert-JtFolderPathExpanded {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
     )
@@ -747,14 +739,13 @@ Function Convert-JtFolderPathExpanded {
 
 
 Function Convert-JtPart_To_Decimal {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
 
     [String]$MyFunctionName = "Convert-JtPart_To_Decimal"
 
-    [String]$MyText = $Text
+    [String]$MyText = $Part
 
     if ($Part) {
         $MyText = $MyText.Replace("_", ",")
@@ -774,14 +765,11 @@ Function Convert-JtPart_To_Decimal {
 
 
 Function Convert-JtPart_To_DecBetrag {
-
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
 
     [String]$MyPart = $Part
-
 
     [Boolean]$BlnValid = Test-JtPart_Is_Valid_Betrag -Part $MyPart
     if(! ($BlnValid)) {
@@ -791,36 +779,7 @@ Function Convert-JtPart_To_DecBetrag {
     [String]$MyText = $MyPart.Replace("_", ".")
     [Decimal]$MyDecResult = Convert-JtString_To_Betrag -Text $MyText
 
-
-
     Return $MyDecResult
-}
-
-Function Convert-JtString_ToPart {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
-    )
-
-    [String]$MyText = $Text
-    [String]$MyResult = $MyText
-    Return $MyResult
-}
-
-
-Function Convert-JtLabel_To_Filename {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
-    )
-
-    [String]$MyResult = $Label
-    $MyResult = Convert-JtReplaceUmlaute $MyResult
-    $MyResult = $MyResult.Replace(",", "_")
-    $MyResult = $MyResult.Replace(" ", "_")
-    $MyResult = $MyResult.Replace("+", "_plus_")
-    $MyResult = $MyResult.Replace("&", "_und_")
-    $MyResult = $MyResult.Replace("__", "_")
-    $MyResult = $MyResult.Trim()
-    return $MyResult
 }
 
 
@@ -864,42 +823,24 @@ Function Convert-JtPath_To_Parts {
 }
 
 
-
-# quelle https://www.datenteiler.de/powershell-umlaute-ersetzen/
-# needs file encoding UTF8 with BOM
-Function Convert-JtReplaceUmlaute {
-
+Function Convert-JtLabel_To_Filename {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
     )
 
+    [String]$MyResult = $Label
+    $MyResult = Convert-JtText_German_To_International $MyResult
+    $MyResult = $MyResult.Replace(",", "_")
+    $MyResult = $MyResult.Replace(" ", "_")
+    $MyResult = $MyResult.Replace("+", "_plus_")
+    $MyResult = $MyResult.Replace("&", "_und_")
+    $MyResult = $MyResult.Replace("__", "_")
+    $MyResult = $MyResult.Trim()
+    return $MyResult
+}
 
-    $UmlautObject = New-Object PSObject | Add-Member -MemberType NoteProperty -Name Name -Value $Text -PassThru
-    
-    # hash tables are by default case insensitive
-    # we have to create a new hash table object for case sensitivity 
-    
-    $characterMap = New-Object system.collections.hashtable
-    $characterMap.ä = "ae"
-    $characterMap.ö = "oe"
-    $characterMap.ü = "ue"
-    $characterMap.Ä = "Ae"
-    $characterMap.Ö = "Oe"
-    $characterMap.Ü = "Ue"         
-    $characterMap.ß = "ss"
-    
-    foreach ($property  in 'Name') { 
-        foreach ($key in $characterMap.Keys) {
-            $UmlautObject.$property = $UmlautObject.$property -creplace $key, $characterMap[$key] 
-        }
-    }
-    
-    # $UmlautObject
-    return $UmlautObject.Name
-} # Replace-Umlaute 
 
 Function Convert-JtString_To_Betrag {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
     )
@@ -922,46 +863,6 @@ Function Convert-JtString_To_Betrag {
         Write-JtLog_Error -Where $MyFunctionName -Text "Convert problem. MyText: $MyText"
         return [String]"0,00".ToString()
     }
-    return $MyResult
-}
-
-
-
-Function Convert-JtTextTemplate {
-
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Table,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Path,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Url
-
-    )
-
-    # [String]$MyFunctionName = "Convert-JtTextTemplate"
-
-    [String]$MyText = $Text 
-    [String]$MyResult = $MyText
-
-    [String]$MyPath = $Path
-    if($MyPath) {
-        [String]$MyPath_Output = $MyPath.Replace("\", "/")
-    $MyResult = $MyResult.Replace("<path>", $MyPath_Output)
-    }
-
-    [String]$MyUrl = $Url
-    if($MyUrl) {
-    [String]$MyUrl_Output = -join("<", $MyUrl, ">")
-    $MyResult = $MyResult.Replace("<url>", $MyUrl_Output)
-    }
-
-    [String]$MyTable = $Table
-    if($MyTable) {
-    $MyResult = $MyResult.Replace("<table>", $MyTable)
-    }
-
-    [String]$MyDate = Get-JtDateNormal
-    $MyResult = $MyResult.Replace("<date>", $MyDate)
-
     return $MyResult
 }
 
@@ -991,7 +892,7 @@ Function Convert-JtString_To_ColHeader {
 
 
     [String]$MyResult = -Join ($MyPrefix, $MyText, $MySuffix)
-    $MyResult = Convert-JtReplaceUmlaute -Text $MyResult
+    $MyResult = Convert-JtText_German_To_International -Text $MyResult
     return $MyResult
 }
 
@@ -1011,7 +912,7 @@ Function Convert-JtString_To_Decimal {
         Return $MyDecResult
     }
     # $MyText = $MyText.Replace(".", "")
-    $MyText = $MyText.Replace(",", "")
+    $MyText = $MyText.Replace(",", ".")
     if ($MyText.Length -lt 1) {
         Write-JtLog -Where $MyFunctionName -Text "MyText is empty. Not expected..."
         return 0
@@ -1050,6 +951,100 @@ Function Convert-JtString_To_DecGb {
     return $MyDecGiga
 } 
 
+
+# quelle https://www.datenteiler.de/powershell-umlaute-ersetzen/
+# needs file encoding UTF8 with BOM
+Function Convert-JtText_German_To_International {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
+    )
+
+    $UmlautObject = New-Object PSObject | Add-Member -MemberType NoteProperty -Name Name -Value $Text -PassThru
+    
+    # hash tables are by default case insensitive
+    # we have to create a new hash table object for case sensitivity 
+    
+    $characterMap = New-Object system.collections.hashtable
+    $characterMap.ä = "ae"
+    $characterMap.ö = "oe"
+    $characterMap.ü = "ue"
+    $characterMap.Ä = "Ae"
+    $characterMap.Ö = "Oe"
+    $characterMap.Ü = "Ue"         
+    $characterMap.ß = "ss"
+    
+    foreach ($property  in 'Name') { 
+        foreach ($key in $characterMap.Keys) {
+            $UmlautObject.$property = $UmlautObject.$property -creplace $key, $characterMap[$key] 
+        }
+    }
+    
+    # $UmlautObject
+    return $UmlautObject.Name
+} # Replace-Umlaute 
+
+
+Function Convert-JtText_Remove_Digits {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
+    )
+
+    [String]$MyText = $Text
+    [String]$MyResult = $MyText
+$MyResult = $MyResult.Replace("0", "")
+$MyResult = $MyResult.Replace("1", "")
+$MyResult = $MyResult.Replace("2", "")
+$MyResult = $MyResult.Replace("3", "")
+$MyResult = $MyResult.Replace("4", "")
+$MyResult = $MyResult.Replace("5", "")
+$MyResult = $MyResult.Replace("6", "")
+$MyResult = $MyResult.Replace("7", "")
+$MyResult = $MyResult.Replace("8", "")
+$MyResult = $MyResult.Replace("9", "")
+    return $MyResult
+}
+
+
+
+Function Convert-JtText_Template {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Table,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Path,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Url
+
+    )
+
+    # [String]$MyFunctionName = "Convert-JtText_Template"
+
+    [String]$MyText = $Text 
+    [String]$MyResult = $MyText
+
+    [String]$MyPath = $Path
+    if($MyPath) {
+        [String]$MyPath_Output = $MyPath.Replace("\", "/")
+    $MyResult = $MyResult.Replace("<path>", $MyPath_Output)
+    }
+
+    [String]$MyUrl = $Url
+    if($MyUrl) {
+    [String]$MyUrl_Output = -join("<", $MyUrl, ">")
+    $MyResult = $MyResult.Replace("<url>", $MyUrl_Output)
+    }
+
+    [String]$MyTable = $Table
+    if($MyTable) {
+    $MyResult = $MyResult.Replace("<table>", $MyTable)
+    }
+
+    [String]$MyDate = Get-JtDateNormal
+    $MyResult = $MyResult.Replace("<date>", $MyDate)
+
+    return $MyResult
+}
+
+
+
 Function Get-JtDate {
     
     $D = Get-Date
@@ -1081,22 +1076,6 @@ Function Get-JtDevMode {
     else {
         return $False
     }
-}
-
-Function Get-JtFldAtPos {
-
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Int16]$Pos
-    )
-    
-    $MyInputParts = $Text.Split(".")
-
-    if ($MyInputParts.Count -lt $Pos) {
-        return ""
-    }
-
-    return $MyInputParts[$Pos]
 }
 
 
@@ -1194,7 +1173,7 @@ Function Get-JtTimestamp {
 }
 
 Function Get-JtVersion {
-    return "2021-03-12"
+    return "2021-03-18"
 }
 
 
@@ -1478,27 +1457,6 @@ Function Test-JtFilename_Betrag_IsValid {
     return $MyResult
 }
 
-Function Convert-JtText_Remove_Digits {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
-    )
-
-    [String]$MyText = $Text
-    [String]$MyResult = $MyText
-$MyResult = $MyResult.Replace("0", "")
-$MyResult = $MyResult.Replace("1", "")
-$MyResult = $MyResult.Replace("2", "")
-$MyResult = $MyResult.Replace("3", "")
-$MyResult = $MyResult.Replace("4", "")
-$MyResult = $MyResult.Replace("5", "")
-$MyResult = $MyResult.Replace("6", "")
-$MyResult = $MyResult.Replace("7", "")
-$MyResult = $MyResult.Replace("8", "")
-$MyResult = $MyResult.Replace("9", "")
-    return $MyResult
-}
-
-
 
 Function Test-JtPart_Is_Valid_Decimal {
     Param (
@@ -1701,33 +1659,7 @@ Function Write-JtLog_Folder_Error {
         [JtLog]$MyJtLog = [JtLog]::new($MyText)
         $MyJtLog.DoPrintFolder($MyFilePath, $MyFilePath_Check)
     }
-    
 }
-
-
-Function Write-JtIoIntern {
-
-    Param (
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Where,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filepath
-    )
-    
-    [String]$MyText = $Text
-    [String]$MyWhere = $Where
-    [String]$MyFilePath = $FilePath
-
-    if ($Where) {
-        [JtLog]$MyJtLog = [JtLog]::new($MyText, $MyWhere)
-        $MyJtLog.DoPrintIntern($MyFilePath)
-    }
-    else {
-        [JtLog]$MyJtLog = [JtLog]::new($MyText)
-        $MyJtLog.DoPrintIntern($MyFilePath)
-    }
-
-}
-
 
 Function Write-JtLog_File {
 
@@ -1895,17 +1827,16 @@ Export-ModuleMember -Function Convert-JtIp_To_Ip3
 Export-ModuleMember -Function Convert-JtLabel_To_Filename
 Export-ModuleMember -Function Convert-JtPath_To_Parts
 Export-ModuleMember -Function Convert-JtPart_To_DecBetrag
-Export-ModuleMember -Function Convert-JtReplaceUmlaute
+Export-ModuleMember -Function Convert-JtText_German_To_International
 Export-ModuleMember -Function Convert-JtString_To_Betrag
 Export-ModuleMember -Function Convert-JtString_To_ColHeader
 Export-ModuleMember -Function Convert-JtString_To_Decimal
 Export-ModuleMember -Function Convert-JtString_To_DecGb
-Export-ModuleMember -Function Convert-JtTextTemplate
+Export-ModuleMember -Function Convert-JtText_Template
 
 Export-ModuleMember -Function Get-JtDate
 Export-ModuleMember -Function Get-JtDateNormal
 Export-ModuleMember -Function Get-JtDevMode
-Export-ModuleMember -Function Get-JtFldAtPos
 Export-ModuleMember -Function Get-JtFolderPath_Base
 Export-ModuleMember -Function Get-JtMac
 Export-ModuleMember -Function Get-JtRandom6
@@ -1929,7 +1860,6 @@ Export-ModuleMember -Function Write-JtLog_Error
 Export-ModuleMember -Function Write-JtLog_File
 Export-ModuleMember -Function Write-JtLog_Folder
 Export-ModuleMember -Function Write-JtLog_Folder_Error
-Export-ModuleMember -Function Write-JtIoIntern
 Export-ModuleMember -Function Write-JtLog_Message
 
 

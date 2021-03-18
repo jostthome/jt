@@ -7,11 +7,8 @@ Function Test-JtColRen {
 
     New-JtColRenInput_Anzahl 
     New-JtColRenInput_Bxh -Label "Label_ColRenInputArea" -Header "Header_ColRenInputArea"
-    New-JtColRenInput_Currency -Label "Label_ColRenInputCurrency" 
-    New-JtColRenInput_CurrencyBetrag
-    New-JtColRenInput_CurrencyEuro
-    New-JtColRenInput_CurrencyGesamt
-    New-JtColRenInput_CurrencyPreis
+    New-JtColRenInput_Betrag -Label "Label_ColRenInputCurrency" 
+    New-JtColRenInput_Betrag
     New-JtColRenInput_Datum
     New-JtColRenInput_MonthId
     New-JtColRenInput_Stand 
@@ -29,18 +26,14 @@ Test-JtColRen
 
 Function Test-JtPreisliste {
 
-    
     $MyJtPreisliste = New-JtPreisliste_Plotten_2022_01_01
     $MyJtPreisliste = New-JtPreisliste_Plotten_2020_07_01
     
     $MyJtPreisliste.GetDecBasePrice_Paper("90g")
     $MyJtPreisliste.GetDecBasePrice_Ink("90g")
     
-    
     $MyJtPreisliste
 
-
-    
 }
 
 

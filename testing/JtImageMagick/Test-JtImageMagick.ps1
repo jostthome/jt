@@ -93,8 +93,8 @@ Function Test-JtImageMagick1 {
 
 Function Test-JtImageMagick2 {
 
-    [JtIoFolder]$MyJtIoFolderWork = Get-JtIoFolder_Work -Name "JtImageMagick" -Init $True
-    [String]$MyFolderPath_Output = $MyJtIoFolderWork.GetPath()
+    [JtIoFolder]$MyJtIoFolder_Work = Get-JtIoFolder_Work -Name "JtImageMagick" -Init $True
+    [String]$MyFolderPath_Output = $MyJtIoFolder_Work.GetPath()
     [String]$MyFilename_Output = "Test-JtImageMagick2.jpg"
 
     [JtImageMagick_Image]$MyJtImageMagick_Image = New-JtImageMagick_Image -FolderPath_Output $MyFolderPath_Output -Filename_Output $MyFilename_Output

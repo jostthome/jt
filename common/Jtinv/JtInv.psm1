@@ -7,67 +7,6 @@ using module JtRep
 using module JtSnapshot
 using module JtTbl
 
-class Gen_Csvs_To_CsvsAll : JtClass {
-
-    [JtIoFolder]$JtIoFolder_Input
-
-    static hidden [Boolean]DoJoinCsvs([System.Collections.ArrayList]$TheAlCsvFiles, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabel) {
-
-        [JtIoFolder]$MyJtIoFolder_Output = $TheJtIoFolder_Output
-        [String]$MyLabel = $TheLabel
-        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
-        foreach ($File in $TheAlCsvFiles) {
-            [JtIoFile]$MyJtIoFile = $File
-            [String]$MyFilename = $MyJtIoFile.GetName() 
-            if (! ($MyFilename.StartsWith("all"))) {
-                $MyFilePath_Csv = $MyJtIoFile.GetPath()
-                $MyContent = Import-Csv -Path $MyFilePath_Csv -Delimiter ([JtClass]::Delimiter)
-                $MyContent
-                
-                [JtTblRow]$MyJtTblRow = New-JtTblRow
-                foreach ($Field in $MyContent) {
-                    foreach ($Element in $Field | Get-Member) {
-                        if ($element.MemberType -eq "NoteProperty") {
-                            $Name = $element.Name   
-                            [String]$MyFieldLabel = $Element.Name
-                            [String]$MyFieldValue = $Field.$Name
-    
-                            [JtFld]$MyJtFld = New-JtFld -Label $MyFieldLabel
-                            $MyJtFld.SetValue($MyFieldValue)
-    
-                            $MyJtTblRow.Add($MyJtFld)
-                        }
-                    }
-                }
-                $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
-            }
-        }
-        [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
-        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
-        return $True
-    }  
-
-
-    Gen_Csvs_To_CsvsAll([JtIoFolder]$TheJtIoFolder_Input) {
-        $This.ClassName = "Gen_Csvs_To_CsvsAll"
-        $This.JtIoFolder_Input = $TheJtIoFolder_Input
-    }
-
-    [Boolean]DoIt() {
-        $This.DoLogRepoStart()
-
-        [JtIoFolder]$MyJtIoFolder_Csv = $This.JtIoFolder_Input.GetJtIoFolder_Sub("csv")
-        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Csv
-
-        [String]$MyLabel = "all"
-
-        [JtIoFolder]$MyJtIoFolder_Output = $This.JtIoFolder_Input
-        [Gen_Csvs_To_CsvsAll]::DoJoinCsvs($MyAlJtIoFiles, $MyJtIoFolder_Output, $MyLabel)
-
-        return $True
-    }
-}
-
 
 class JtCsvTool : JtClass {
 
@@ -312,462 +251,6 @@ class JtInvClientChoco : JtInv {
 }
 
 
-Function Get-JtInstalledSoftware {
-    Param(
-        [Alias('Computer', 'ComputerName', 'HostName')]
-        [Parameter(ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, Mandatory = $True, Position = 1)]
-        [String[]]$Name
-    )
-    Begin {
-        if (!($Name)) {
-            $Name = $env:COMPUTERNAME
-        }
-        $lmKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall", "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-        $lmReg = [Microsoft.Win32.RegistryHive]::LocalMachine
-        $cuKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall"
-        $cuReg = [Microsoft.Win32.RegistryHive]::CurrentUser
-    }
-    Process {
-        if (!(Test-Connection -ComputerName $Name -count 1 -quiet)) {
-            Write-JtLog_Error -Text "Unable to contact $Name. Please verify its network connectivity and try again." -Category ObjectNotFound -TargetObject $Computer
-            Break
-        }
-        $masterKeys = @()
-        $remoteCURegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($cuReg, $Name)
-        $remoteLMRegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($lmReg, $Name)
-        foreach ($key in $lmKeys) {
-            $regKey = $remoteLMRegKey.OpenSubkey($key)
-            foreach ($subName in $regKey.GetSubkeyNames()) {
-                foreach ($sub in $regKey.OpenSubkey($subName)) {
-                    $masterKeys += (New-Object PSObject -Property @{
-                            "ComputerName"     = $Name
-                            "Name"             = $sub.GetValue("displayname")
-                            "SystemComponent"  = $sub.GetValue("systemcomponent")
-                            "ParentKeyName"    = $sub.GetValue("parentkeyname")
-                            "Version"          = $sub.GetValue("DisplayVersion")
-                            "UninstallCommand" = $sub.GetValue("UninstallString")
-                            "InstallDate"      = $sub.GetValue("InstallDate")
-                            "RegPath"          = $sub.ToString()
-                        })
-                }
-            }
-        }
-        foreach ($key in $cuKeys) {
-            $regKey = $remoteCURegKey.OpenSubkey($key)
-            if ($Null -ne $regKey) {
-                foreach ($subName in $regKey.getsubkeynames()) {
-                    foreach ($sub in $regKey.opensubkey($subName)) {
-                        $masterKeys += (New-Object PSObject -Property @{
-                                "ComputerName"     = $Computer
-                                "Name"             = $sub.GetValue("displayname")
-                                "SystemComponent"  = $sub.GetValue("systemcomponent")
-                                "ParentKeyName"    = $sub.GetValue("parentkeyname")
-                                "Version"          = $sub.GetValue("DisplayVersion")
-                                "UninstallCommand" = $sub.GetValue("UninstallString")
-                                "InstallDate"      = $sub.GetValue("InstallDate")
-                                "RegPath"          = $sub.ToString()
-                            })
-                    }
-                }
-            }
-        }
-        $woFilter = { $null -ne $_.name -AND $_.SystemComponent -ne "1" -AND $null -eq $_.ParentKeyName }
-        $props = 'Name', 'Version', 'ComputerName', 'Installdate', 'UninstallCommand', 'RegPath'
-        $masterKeys = ($masterKeys | Where-Object $woFilter | Select-Object $props | Sort-Object Name)
-        $masterKeys
-    }
-    End { }
-}
-
-
-Function Get-JtXmlReportObject {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name
-    )
-
-    [String]$MyFunctionName = "Get-JtXmlReportObject"
-
-    [String]$MyFolderPath = $FolderPath
-    [String]$MyName = $Name
-    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
-        return $Null
-    }
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
-
-    Write-JtLog -Where $MyFunctionName -Text "MyJtIoFolder: $MyJtIoFolder - MyName: $MyName"
-    
-    [JtIoFolder]$MyJtIoFolder_Xml = $MyJtIoFolder.GetJtIoFolder_Sub("objects")
-    if (!($MyJtIoFolder_Xml.IsExisting())) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Folder is missing in MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
-        return $Null
-    }
-    
-    [String]$MyExtension = [JtIo]::FileExtension_Xml
-    [String]$MyFilename_Xml = -Join ($MyName, $MyExtension)
-    [String]$MyFilePath_Xml = $MyJtIoFolder_Xml.GetFilePath($MyFilename_Xml)
-    
-    Write-JtLog -Where $MyFunctionName -Text "MyName: $MyName - MyFilePath_Xml: $MyFilePath_Xml"
-    if (!(Test-JtIoFilePath -FilePath $MyFilePath_Xml)) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Xml file is missing in MyFilePath_Xml: $MyFilePath_Xml"
-        return $Null
-    }
-    [System.Object]$MyObject = $Null
-    try {
-        $MyObject = Import-Clixml $MyFilePath_Xml
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Problem while reading MyFilePath_Xml: $MyFilePath_Xml"
-        return $Null
-    }
-    return [System.Object]$MyObject
-}
-
-
-
-
-Function New-JtConfigItem {
-
-    Param (
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Computer,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Disk,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Filter,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Pattern,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Source,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$System,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Target,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Template
-    )
-
-    [String]$MyFunctionName = "New-JtConfigItem"
-
-    [HashTable]$MyItem = New-Object HashTable
-    $MyItem.valid = $True
-
-    if ($Source) {
-        [String]$MySource = $Source
-        $MyItem.source = $MySource
-        if (!(Test-JtIoFolderPath -FolderPath $MyItem.source)) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MySource: $MySource"
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    
-    if ($target) {
-        [String]$MyTarget = $target
-        $MyItem.target = $MyTarget
-        [String]$MyFolderPath_Target = $MyTarget
-        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
-        if (!($MyJtIoFolder_Output.IsExisting())) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MyTarget: $MyTarget"
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($computer) {
-        $MyItem.computer = $computer
-        if ($computer.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! COMPUTER is empty."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($disk) {
-        $MyItem.disk = $disk
-        if ($disk.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! DISK is empty."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($filter) {
-        $MyItem.filter = $filter
-        if ($filter.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! FILTER is EMPTY."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($label) {
-        $MyItem.label = $label
-        if ($label.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! LABEL is EMPTY."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($partition) {
-        $MyItem.partition = $partition
-        if ($partition.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PARTITION is empty."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($pattern) {
-        $MyItem.pattern = $pattern
-        if ($pattern.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PATTERN is empty."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    if ($template) {
-        $MyItem.template = $template
-        if ($template.length -lt 1) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! TEMPLATE is empty."
-            $MyItem.valid = $False
-            return $MyItem
-        }
-    }
-
-    return $MyItem
-}
-
-
-
-
-Function New-JtInvClient {
-
-    New-JtInvClientClean
-    New-JtInvClientReport
-    New-JtInvClientObjects
-    New-JtInvClientSoftware
-    New-JtInvClientCsvs
-    New-JtInvClientExport
-    
-    New-JtInvClientTimestamp  -Label "report"
-}
-
-
-Function New-JtInvClientChoco {
-
-    [JtInvClientChoco]::new()
-}
-
-
-Function New-JtInvClientClean {
-
-    [JtInvClientClean]::new()
-
-    New-JtInvClientTimestamp  -Label "clean"
-}
-
-
-Function New-JtInvClientConfig {
-
-    [JtInvClientConfig]::new()
-
-    New-JtInvClientTimestamp  -Label "config"
-}
-
-
-Function New-JtInvClientCsvs {
-
-    [JtInvClientCsvs]::new()
-
-    New-JtInvClientTimestamp  -Label "csv"
-}
-
-
-Function New-JtInvClientErrors {
-
-
-    [JtInvClientErrors]::new()
-
-    New-JtInvClientTimestamp  -Label "errors"
-}
-
-
-Function New-JtInvClientExport {
-
-
-    [JtInvClientExport]::new()
-    
-    New-JtInvClientTimestamp  -Label "export"
-}
-
-
-Function New-JtInvClientObjects {
-
-
-    [JtInvClientObjects]::new()
-
-    New-JtInvClientTimestamp  -Label "objects"
-}
-
-
-
-Function New-JtInvClientReport {
-
-    [JtInvClientReport]::new()
-
-    New-JtInvClientTimestamp  -Label "report"
-}
-
-
-Function New-JtInvClientSoftware {
-
-
-    [JtInvClientSoftware]::new()
-    
-    New-JtInvClientTimestamp  -Label "software"
-}
-
-
-Function New-JtInvClientTimestamp {
-
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
-    )
-
-    [String]$MyLabel = $Label
-
-
-    [JtInvClientTimestamp]::new($MyLabel)
-}
-
-
-
-Function New-JtInvData {
-
-
-    [JtInvData]::new()
-    
-    New-JtInvClientTimestamp -Label "data"
-}
-
-
-
-
-Function New-JtInvFiles {
-
-
-    [JtInvFiles]::new()
-
-    New-JtInvClientTimestamp  -Label "files"
-}
-
-
-
-
-Function New-JtInvFolder {
-
-    [JtInvFolder]::new()
-
-    New-JtInvClientTimestamp  -Label "folder"
-
-}
-
-
-Function New-JtInvLengths {
-
-
-    [JtInvLengths]::new()
-    
-    New-JtInvClientTimestamp -Label "lengths"
-}
-
-
-Function New-JtInvLines {
-
-
-    [JtInvLines]::new()
-    
-    New-JtInvClientTimestamp  -Label "lines"
-
-}
-
-
-Function New-JtInvMd {
-
-
-    [JtInvMd]::new()
-    
-    New-JtInvClientTimestamp  -Label "JtMd"
-}
-
-
-Function New-JtInvMirror {
-
-
-    [JtInvMirror]::new()
-    
-    New-JtInvClientTimestamp  -Label "mirror"
-}
-
-
-Function New-JtInvPoster {
-
-
-    [JtInvPoster]::new()
-
-    New-JtInvClientTimestamp  -Label "poster"
-}
-
-
-Function New-JtInvRecover {
-
-
-    [JtInvRecover]::new()
-
-    New-JtInvClientTimestamp  -Label "recover"
-}
-
-
-
-Function New-JtInvReportsCombine {
-
-    [JtInvReportsCombine]::new()
-}
-
-
-Function New-JtInvReportsUpdate {
-
-    [JtInvReportsUpdate]::new()
-
-}
-
-
-
-Function New-JtInvSnapshot {
-    [JtInvSnapshot]::new()
-    
-    New-JtInvClientTimestamp  -Label "Snapshot"
-}
-
-
-
-Function New-JtInvWol {
-
-    [JtInvWol]::new()
-
-    New-JtInvClientTimestamp  -Label "wol"
-}
-
-
-
-Function New-JtInvVersion {
-    New-JtRobocopy -FolderPath_Input "%OneDrive%\0.INVENTORY\common" -FolderPath_Output "D:\Seafile\al-apps\apps\inventory\common"
-
-    Write-JtIoFile_Meta_Version -FolderPath_Output "%OneDrive%\0.INVENTORY\common"
-}
-
-
-
-
-
 
 class JtInvClientClean : JtInv {
 
@@ -956,16 +439,16 @@ class JtInvClientExport  : JtInv {
         Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
 
         foreach ($MyItem in $MyArrayList) {
-            [JtIoFolder]$MyJtIoFolderExport = $Null
+            [JtIoFolder]$MyJtIoFolder_Export = $Null
             [String]$MyFolderPath_Target = $MyItem.target
 
             if ($MyFolderPath_Target.Length -gt 0) {
-                [JtIoFolder]$MyJtIoFolderExport = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
-                Write-JtLog -Where $This.ClassName -Text "... Exporting results to: $MyJtIoFolderExport"
+                [JtIoFolder]$MyJtIoFolder_Export = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
+                Write-JtLog -Where $This.ClassName -Text "... Exporting results to: $MyJtIoFolder_Export"
             }
 
             [String]$MySystemId = [JtIo]::GetSystemId()
-            [JtIoFolder]$MyJtIoFolder_OutputSys = $MyJtIoFolderExport.GetJtIoFolder_Sub($MySystemId, $True)
+            [JtIoFolder]$MyJtIoFolder_OutputSys = $MyJtIoFolder_Export.GetJtIoFolder_Sub($MySystemId, $True)
 
             [String]$MyFolderPath_Output = $MyJtIoFolder_OutputSys.GetPath()
             
@@ -1253,12 +736,6 @@ class JtInvClientReport : JtInv {
             Add-Content -Path $MyFilePath_Output
         }
 
-        # [String]$MyFolderPath_Public_Desktop = "c:\users\public\desktop"
-        # [String]$MyVersionMeta = -join ($MyFolderPath_Public_Desktop, "\*", [JtIo]::FileExtension_Meta_Cmd)
-        # if (Test-JtIoFolderPath -FolderPath $MyVersionMeta) {
-        #     $MyCommand = -join ('cmd.exe /C ', '"', 'copy ', $MyFolderPath_Public_Desktop, '\*', [JtIo]::FileExtension_Meta, ' ', $MyFolderPath_C_inventory_Report, '\.', '"')   
-        #     Invoke-Expression -Command:$MyCommand    
-        # }
         return $True
     }
 
@@ -2588,6 +2065,463 @@ class FileElementXml : JtClass {
 #>
 
 
+Function Get-JtInstalledSoftware {
+    Param(
+        [Alias('Computer', 'ComputerName', 'HostName')]
+        [Parameter(ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, Mandatory = $True, Position = 1)]
+        [String[]]$Name
+    )
+    Begin {
+        if (!($Name)) {
+            $Name = $env:COMPUTERNAME
+        }
+        $lmKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall", "SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+        $lmReg = [Microsoft.Win32.RegistryHive]::LocalMachine
+        $cuKeys = "Software\Microsoft\Windows\CurrentVersion\Uninstall"
+        $cuReg = [Microsoft.Win32.RegistryHive]::CurrentUser
+    }
+    Process {
+        if (!(Test-Connection -ComputerName $Name -count 1 -quiet)) {
+            Write-JtLog_Error -Text "Unable to contact $Name. Please verify its network connectivity and try again." -Category ObjectNotFound -TargetObject $Computer
+            Break
+        }
+        $masterKeys = @()
+        $remoteCURegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($cuReg, $Name)
+        $remoteLMRegKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($lmReg, $Name)
+        foreach ($key in $lmKeys) {
+            $regKey = $remoteLMRegKey.OpenSubkey($key)
+            foreach ($subName in $regKey.GetSubkeyNames()) {
+                foreach ($sub in $regKey.OpenSubkey($subName)) {
+                    $masterKeys += (New-Object PSObject -Property @{
+                            "ComputerName"     = $Name
+                            "Name"             = $sub.GetValue("displayname")
+                            "SystemComponent"  = $sub.GetValue("systemcomponent")
+                            "ParentKeyName"    = $sub.GetValue("parentkeyname")
+                            "Version"          = $sub.GetValue("DisplayVersion")
+                            "UninstallCommand" = $sub.GetValue("UninstallString")
+                            "InstallDate"      = $sub.GetValue("InstallDate")
+                            "RegPath"          = $sub.ToString()
+                        })
+                }
+            }
+        }
+        foreach ($key in $cuKeys) {
+            $regKey = $remoteCURegKey.OpenSubkey($key)
+            if ($Null -ne $regKey) {
+                foreach ($subName in $regKey.getsubkeynames()) {
+                    foreach ($sub in $regKey.opensubkey($subName)) {
+                        $masterKeys += (New-Object PSObject -Property @{
+                                "ComputerName"     = $Computer
+                                "Name"             = $sub.GetValue("displayname")
+                                "SystemComponent"  = $sub.GetValue("systemcomponent")
+                                "ParentKeyName"    = $sub.GetValue("parentkeyname")
+                                "Version"          = $sub.GetValue("DisplayVersion")
+                                "UninstallCommand" = $sub.GetValue("UninstallString")
+                                "InstallDate"      = $sub.GetValue("InstallDate")
+                                "RegPath"          = $sub.ToString()
+                            })
+                    }
+                }
+            }
+        }
+        $woFilter = { $null -ne $_.name -AND $_.SystemComponent -ne "1" -AND $null -eq $_.ParentKeyName }
+        $props = 'Name', 'Version', 'ComputerName', 'Installdate', 'UninstallCommand', 'RegPath'
+        $masterKeys = ($masterKeys | Where-Object $woFilter | Select-Object $props | Sort-Object Name)
+        $masterKeys
+    }
+    End { }
+}
+
+
+Function Get-JtXmlReportObject {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name
+    )
+
+    [String]$MyFunctionName = "Get-JtXmlReportObject"
+
+    [String]$MyFolderPath = $FolderPath
+    [String]$MyName = $Name
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        return $Null
+    }
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
+
+    Write-JtLog -Where $MyFunctionName -Text "MyJtIoFolder: $MyJtIoFolder - MyName: $MyName"
+    
+    [JtIoFolder]$MyJtIoFolder_Xml = $MyJtIoFolder.GetJtIoFolder_Sub("objects")
+    if (!($MyJtIoFolder_Xml.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Folder is missing in MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
+        return $Null
+    }
+    
+    [String]$MyExtension = [JtIo]::FileExtension_Xml
+    [String]$MyFilename_Xml = -Join ($MyName, $MyExtension)
+    [String]$MyFilePath_Xml = $MyJtIoFolder_Xml.GetFilePath($MyFilename_Xml)
+    
+    Write-JtLog -Where $MyFunctionName -Text "MyName: $MyName - MyFilePath_Xml: $MyFilePath_Xml"
+    if (!(Test-JtIoFilePath -FilePath $MyFilePath_Xml)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Xml file is missing in MyFilePath_Xml: $MyFilePath_Xml"
+        return $Null
+    }
+    [System.Object]$MyObject = $Null
+    try {
+        $MyObject = Import-Clixml $MyFilePath_Xml
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Problem while reading MyFilePath_Xml: $MyFilePath_Xml"
+        return $Null
+    }
+    return [System.Object]$MyObject
+}
+
+
+
+
+Function New-JtConfigItem {
+
+    Param (
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Computer,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Disk,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Filter,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Pattern,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Source,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$System,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Target,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Template
+    )
+
+    [String]$MyFunctionName = "New-JtConfigItem"
+
+    [HashTable]$MyItem = New-Object HashTable
+    $MyItem.valid = $True
+
+    if ($Source) {
+        [String]$MySource = $Source
+        $MyItem.source = $MySource
+        if (!(Test-JtIoFolderPath -FolderPath $MyItem.source)) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MySource: $MySource"
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    
+    if ($target) {
+        [String]$MyTarget = $target
+        $MyItem.target = $MyTarget
+        [String]$MyFolderPath_Target = $MyTarget
+        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
+        if (!($MyJtIoFolder_Output.IsExisting())) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MyTarget: $MyTarget"
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($computer) {
+        $MyItem.computer = $computer
+        if ($computer.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! COMPUTER is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($disk) {
+        $MyItem.disk = $disk
+        if ($disk.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! DISK is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($filter) {
+        $MyItem.filter = $filter
+        if ($filter.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! FILTER is EMPTY."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($label) {
+        $MyItem.label = $label
+        if ($label.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! LABEL is EMPTY."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($partition) {
+        $MyItem.partition = $partition
+        if ($partition.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PARTITION is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($pattern) {
+        $MyItem.pattern = $pattern
+        if ($pattern.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PATTERN is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    if ($template) {
+        $MyItem.template = $template
+        if ($template.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! TEMPLATE is empty."
+            $MyItem.valid = $False
+            return $MyItem
+        }
+    }
+
+    return $MyItem
+}
+
+
+
+
+Function New-JtInvClient {
+
+    New-JtInvClientClean
+    New-JtInvClientReport
+    New-JtInvClientObjects
+    New-JtInvClientSoftware
+    New-JtInvClientCsvs
+    New-JtInvClientExport
+    
+    New-JtInvClientTimestamp  -Label "client"
+}
+
+
+Function New-JtInvClientChoco {
+
+    [JtInvClientChoco]::new()
+}
+
+
+Function New-JtInvClientClean {
+
+    [JtInvClientClean]::new()
+
+    New-JtInvClientTimestamp  -Label "clean"
+}
+
+
+Function New-JtInvClientConfig {
+
+    [JtInvClientConfig]::new()
+
+    New-JtInvClientTimestamp  -Label "config"
+}
+
+
+Function New-JtInvClientCsvs {
+
+    [JtInvClientCsvs]::new()
+
+    New-JtInvClientTimestamp  -Label "csv"
+}
+
+
+Function New-JtInvClientErrors {
+
+
+    [JtInvClientErrors]::new()
+
+    New-JtInvClientTimestamp  -Label "errors"
+}
+
+
+Function New-JtInvClientExport {
+
+
+    [JtInvClientExport]::new()
+    
+    New-JtInvClientTimestamp  -Label "export"
+}
+
+
+Function New-JtInvClientObjects {
+
+
+    [JtInvClientObjects]::new()
+
+    New-JtInvClientTimestamp  -Label "objects"
+}
+
+
+
+Function New-JtInvClientReport {
+
+    [JtInvClientReport]::new()
+
+    New-JtInvClientTimestamp  -Label "report"
+}
+
+
+Function New-JtInvClientSoftware {
+
+
+    [JtInvClientSoftware]::new()
+    
+    New-JtInvClientTimestamp  -Label "software"
+}
+
+
+Function New-JtInvClientTimestamp {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
+    )
+
+    [String]$MyLabel = $Label
+
+
+    [JtInvClientTimestamp]::new($MyLabel)
+}
+
+
+
+Function New-JtInvData {
+
+
+    [JtInvData]::new()
+    
+    # New-JtInvClientTimestamp -Label "data"
+}
+
+
+
+
+Function New-JtInvFiles {
+
+
+    [JtInvFiles]::new()
+
+    # New-JtInvClientTimestamp  -Label "files"
+}
+
+
+
+
+Function New-JtInvFolder {
+
+    [JtInvFolder]::new()
+
+    # New-JtInvClientTimestamp  -Label "folder"
+
+}
+
+
+Function New-JtInvLengths {
+
+
+    [JtInvLengths]::new()
+    
+    # New-JtInvClientTimestamp -Label "lengths"
+}
+
+
+Function New-JtInvLines {
+
+
+    [JtInvLines]::new()
+    
+    # New-JtInvClientTimestamp  -Label "lines"
+
+}
+
+
+Function New-JtInvMd {
+
+
+    [JtInvMd]::new()
+    
+    # New-JtInvClientTimestamp  -Label "JtMd"
+}
+
+
+Function New-JtInvMirror {
+
+
+    [JtInvMirror]::new()
+    
+    # New-JtInvClientTimestamp  -Label "mirror"
+}
+
+
+Function New-JtInvPoster {
+
+
+    [JtInvPoster]::new()
+
+    # New-JtInvClientTimestamp  -Label "poster"
+}
+
+
+Function New-JtInvRecover {
+
+
+    [JtInvRecover]::new()
+
+    # New-JtInvClientTimestamp  -Label "recover"
+}
+
+
+
+Function New-JtInvReportsCombine {
+
+    [JtInvReportsCombine]::new()
+}
+
+
+Function New-JtInvReportsUpdate {
+
+    [JtInvReportsUpdate]::new()
+
+}
+
+
+
+Function New-JtInvSnapshot {
+    [JtInvSnapshot]::new()
+    
+    # New-JtInvClientTimestamp  -Label "Snapshot"
+}
+
+
+
+Function New-JtInvWol {
+
+    [JtInvWol]::new()
+
+    # New-JtInvClientTimestamp  -Label "wol"
+}
+
+
+
+Function New-JtCommonVersion {
+    New-JtRobocopy -FolderPath_Input "%OneDrive%\0.INVENTORY\common" -FolderPath_Output "D:\Seafile\al-apps\apps\inventory\common"
+
+    Write-JtIoFile_Meta_Version -FolderPath_Output "%OneDrive%\0.INVENTORY\common"
+}
+
+
+
+
+
+
 
 
 
@@ -2620,4 +2554,4 @@ Export-ModuleMember -Function New-JtInvPoster
 Export-ModuleMember -Function New-JtInvRecover
 Export-ModuleMember -Function New-JtInvSnapshot
 Export-ModuleMember -Function New-JtInvWol
-Export-ModuleMember -Function New-JtInvVersion
+Export-ModuleMember -Function New-JtCommonVersion

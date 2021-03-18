@@ -1,0 +1,21 @@
+ Datenträger in Laufwerk C: ist c-win10p
+ Volumeseriennummer: 4C4E-ABF1
+
+ Verzeichnis von c:\
+
+16.01.2021  20:47    <DIR>          apps
+12.11.2019  22:24    <DIR>          ESD
+07.12.2019  10:14    <DIR>          PerfLogs
+11.03.2021  08:10    <DIR>          Program Files
+12.03.2021  19:43    <DIR>          Program Files (x86)
+14.11.2020  22:10    <DIR>          Python38
+21.02.2021  09:07    <DIR>          Python39
+06.03.2021  07:54    <DIR>          TEMP
+19.11.2020  18:18    <DIR>          Users
+09.03.2021  19:34    <DIR>          Windows
+05.12.2020  14:41    <DIR>          _archland
+04.03.2021  05:49    <DIR>          _backup
+12.02.2021  00:04    <DIR>          _inventory
+15.04.2020  21:20    <DIR>          _wartung
+               0 Datei(en),              0 Bytes
+              14 Verzeichnis(se), 164.139.339.776 Bytes frei

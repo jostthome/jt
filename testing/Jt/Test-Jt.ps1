@@ -109,7 +109,7 @@ Function Test-JtValid {
         [String]$MyTest = $MyTestValues[$i]
         [String]$MyShould = $MyTestOutputs[$i]
 
-        [JtColRen]$MyJtColRen = New-JtColRenInput_CurrencyBetrag
+        [JtColRen]$MyJtColRen = New-JtColRenInput_Betrag
         [String]$MyIs = $MyJtColRen.GetOutput($MyTest)
         [Boolean]$MyBlnValid = Test-JtIsValid_Betrag -Text $MyTest
 

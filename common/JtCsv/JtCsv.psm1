@@ -670,7 +670,7 @@ Function Convert-JtFolderPath_To_Csv_Filelist {
         return
     }
     $MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Files -FolderPath_Input $MyFolderPath_Input 
-    $MyDatatable = Convert-JtFolderPath_To_DataTable -JtTblTable $MyJtTblTable 
+    $MyDatatable = Convert-JtTblTable_To_DataTable -JtTblTable $MyJtTblTable 
     $MyDataTable
             
     [String]$MyFoldername = $MyJtIoFolder_Input.GetName()
@@ -682,6 +682,7 @@ Function Convert-JtFolderPath_To_Csv_Filelist {
     $MyParams = @{
         DataTable         = $MyDataTable 
         FolderPath_Output = $MyFolderPath_Output 
+        Prefix            = [JtIo]::FilePrefix_Folder
         Label             = $MyLabel
         Extension2        = [JtIo]::FileExtension_Csv_Filelist
     }
@@ -742,7 +743,6 @@ Function Convert-JtTblTable_To_Datatable {
     [JtTblTable]$MyJtTblTable = $JtTblTable
     [String]$MyLabel = $MyJtTblTable.GetLabel() 
     Write-JtLog -Where $MyFunctionName -Text "Start... MyLabel: $MyLabel"
-
     
     [System.Data.DataTable]$MyDataTable = New-Object System.Data.DataTable
     [System.Collections.ArrayList]$MyAlObjects = $MyJtTblTable.GetObjects()
@@ -751,7 +751,6 @@ Function Convert-JtTblTable_To_Datatable {
     foreach ($MyKey in $MyOrdDic.keys) {
         $MyDataTable.Columns.Add($MyKey, "String") | Out-Null
     }
-    [System.Collections.ArrayList]$MyAlObjects = $MyJtTblTable.GetObjects()
 
     [Int16]$MyIntObjects = $MyAlObjects.count
     Write-JtLog -Where $MyFunctionName -Text "Number of objects. MyIntObjects: $MyIntObjects"

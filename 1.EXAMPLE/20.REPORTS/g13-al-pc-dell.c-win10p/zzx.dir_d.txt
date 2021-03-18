@@ -1,0 +1,15 @@
+ Datentr„ger in Laufwerk D: ist d-data-1259gb
+ Volumeseriennummer: 0EC5-7D19
+
+ Verzeichnis von d:\
+
+14.03.2021  11:37    <DIR>          backup
+20.02.2021  12:20    <DIR>          daten
+13.05.2020  15:48    <DIR>          hyper-v
+24.09.2020  13:29    <DIR>          MyApps
+06.01.2021  12:55    <DIR>          Seafile
+01.12.2020  10:35    <DIR>          Seafile.readonly
+12.03.2021  18:14    <DIR>          temp
+29.11.2020  21:13    <DIR>          test
+               0 Datei(en),              0 Bytes
+               8 Verzeichnis(se), 470.041.501.696 Bytes frei

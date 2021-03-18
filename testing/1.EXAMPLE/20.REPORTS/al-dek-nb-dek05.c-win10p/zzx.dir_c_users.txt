@@ -1,4 +1,4 @@
- DatentrÃ¤ger in Laufwerk C: ist c-win10p
+ Datentr„ger in Laufwerk C: ist c-win10p
  Volumeseriennummer: 4C4E-ABF1
 
  Verzeichnis von c:\users
@@ -10,4 +10,4 @@
 28.05.2020  00:25    <DIR>          Public
 11.03.2021  22:30    <DIR>          thome.ARCHLAND
                0 Datei(en),              0 Bytes
-               6 Verzeichnis(se), 164.139.339.776 Bytes frei
+               6 Verzeichnis(se), 159.132.372.992 Bytes frei

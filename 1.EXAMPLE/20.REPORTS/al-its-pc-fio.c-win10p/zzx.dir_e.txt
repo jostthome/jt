@@ -1,0 +1,22 @@
+ Datentr„ger in Laufwerk E: ist ESD-USB
+ Volumeseriennummer: D24B-2930
+
+ Verzeichnis von e:\
+
+08.08.2020  11:24               128 autorun.inf
+18.09.2020  09:49    <DIR>          boot
+08.08.2020  11:24           413.738 bootmgr
+08.08.2020  11:24         1.541.648 bootmgr.efi
+18.09.2020  09:49    <DIR>          efi
+08.08.2020  11:24            74.184 setup.exe
+18.09.2020  09:49    <DIR>          sources
+18.09.2020  09:50    <DIR>          support
+27.10.2020  13:44         1.142.968 Revit_2021_G1_Win_64bit_wi_de-DE_Setup_webinstall.exe
+27.10.2020  13:52    <DIR>          Autodesk
+18.01.2021  16:47        13.375.088 Intel-Chipset-Device-Software_5J88W_WIN_10.1.18267.8194_A11_02.EXE
+18.01.2021  16:47       138.619.616 Intel-Management-Engine-Components-Installer_FC5J4_WIN_2036.15.0.1835_A08_03.EXE
+18.01.2021  16:47        17.663.984 SK-Hynix-BC711-PCIe-NVMe-Solid-State-Drive-Firmware_2RYRY_WIN64_4100.2131_A00.EXE
+18.01.2021  16:49     1.288.579.348 5550-win10-A02-KKX71.CAB
+18.01.2021  16:51    <DIR>          5550-win10-A02-KKX71
+               9 Datei(en),  1.461.410.702 Bytes
+               6 Verzeichnis(se), 25.816.006.656 Bytes frei

@@ -208,8 +208,6 @@ class JtInf : JtClass {
 }
 
 
-
-
 class JtInf_AFolder : JtInf {
 
     [Boolean]$IsValid = $True
@@ -239,33 +237,18 @@ class JtInf_AFolder : JtInf {
     [JtFld]$Win4
     [JtFld]$WinVer
 
-
     static [String]GetIp([String]$TheFolderPath) {
-        return Get-JtReport_Value -FolderPath $TheFolderPath -Label "ip"
+        [String]$MyReportValue = Get-JtReport_Value -FolderPath $TheFolderPath -Label "ip"
+        [String]$MyResult = $MyReportValue.Replace("-", ".")
+        return $MyResult
     }
-    
     
     static [String]GetMasterUser([String]$TheFolderPath) {
         return Get-JtReport_Value -FolderPath $TheFolderPath -Label "user"
     }
     
     
-    static [String]GetKlonVersion([String]$TheFolderPath) {
-        [String]$MyFolderPath = $TheFolderPath
-        [String]$MyResult = "---"
-        
-        [String]$MyMatch = -join ('_*.klon', [JtIo]::FileExtension_Meta)
-        
-        $MyAlFiles_Meta = Get-ChildItem -Path $MyFolderPath | Where-Object { $_.Name -match $MyMatch }
-        
-        if ($Null -ne $MyAlFiles_Meta) {
-            if ($MyAlFiles_Meta.Length -gt 0) {
-                $MyFile1 = $MyAlFiles_Meta[0]
-                $MyResult = [JtIo]::GetDateForKlon($MyFile1)
-            }
-        }
-        return $MyResult
-    }
+
     
     
     static [String]GetTheTimestamp([String]$TheFolderPath) {
@@ -426,8 +409,7 @@ Function Get-JtInf_AFolder {
         [String]$MyWin4 = Convert-JtDotter -Text $MyWinVer -PatternOut "4"
         $MyJtInf.Get_Win4().SetValue($MyWin4)
 
-
-        [String]$MyKlonVersion = [JtInf_AFolder]::GetKlonVersion($MyFolderPath)
+        [String]$MyKlonVersion = Get-JtKlonVersion
         $MyJtInf.Get_KlonVersion().SetValue($MyKlonVersion)
 
         [String]$MyIp = [JtInf_AFolder]::GetIp($MyFolderPath)
@@ -1215,8 +1197,8 @@ Function Get-JtInf_Win32LogicalDisk {
 
 
                 $MyValue4 = 0
-                if($MyDecCapacity -ne 0) {
-                     [Decimal]$MyDecFree = $MyDecFreeSpaceGB / $MyDecCapacity * 100
+                if ($MyDecCapacity -ne 0) {
+                    [Decimal]$MyDecFree = $MyDecFreeSpaceGB / $MyDecCapacity * 100
                     $MyValue4 = $MyDecFree -as [int32]
                 }
                 $MyJtInf.$MyField4.SetValue($MyValue4)
@@ -1604,7 +1586,23 @@ Function New-JtInf_Win32VideoController {
     [JtInf_Win32VideoController]::new()
 }
 
+Function Get-JtKlonVersion {
+    # GetKlonVersion
 
+    [String]$MyFolderPath = "c:/Users/Public/Desktop"
+    [String]$MyResult = "---"
+        
+    [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Meta_Klon)
+        
+    $MyAlFiles_Meta = Get-JtChildItem -FolderPath $MyFolderPath -Filter $MyFilter
+
+    if ($MyAlFiles_Meta.Count -eq 1) {
+        [JtIoFile]$MyJtIoFile_Meta_Klon = $MyAlFiles_Meta[0]
+        [String]$MyFilename = $MyJtIoFile_Meta_Klon.GetName()
+        $MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "3"
+    }
+    return $MyResult
+}
 
 Export-ModuleMember -Function Get-JtInf_AFolder
 Export-ModuleMember -Function Get-JtInf_Bitlocker
@@ -1618,6 +1616,7 @@ Export-ModuleMember -Function Get-JtInf_Win32OperatingSystem
 Export-ModuleMember -Function Get-JtInf_Win32Processor
 Export-ModuleMember -Function Get-JtInf_Win32VideoController
 
+Export-ModuleMember -Function Get-JtKlonVersion
 Export-ModuleMember -Function Get-JtXmlReportSoftware
 
 Export-ModuleMember -Function New-JtFldSoft

@@ -1,0 +1,12 @@
+ Datentr„ger in Laufwerk C: ist c-win10p
+ Volumeseriennummer: 7ED8-285E
+
+ Verzeichnis von c:\users
+
+01.10.2020  12:17    <DIR>          .
+01.10.2020  12:17    <DIR>          ..
+01.10.2020  13:14    <DIR>          Public
+01.10.2020  12:19    <DIR>          root
+16.03.2021  15:59    <DIR>          thome
+               0 Datei(en),              0 Bytes
+               5 Verzeichnis(se), 12.550.000.640 Bytes frei

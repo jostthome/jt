@@ -16,25 +16,25 @@ Function New-JtPosterPlaceholders {
 
     [String]$MyFunctionName = "New-JtPosterPlaceholders"
 
-    [JtIoFolder]$MyJtIoFolderWork = Get-JtIoFolder_Work -Name $MyFunctionName
+    [JtIoFolder]$MyJtIoFolder_Work = Get-JtIoFolder_Work -Name $MyFunctionName
 
 
     [String]$MyLabel = -join($X, "x", $Y, ".", $From, "to", $To)
 
     [String]$MyLabelJpg = "jpg.$MyLabel"
     [String]$MyLabelPdf = "pdf.$MyLabel"
-    [JtIoFolder]$MyJtIoFolderWorkJpg = $MyJtIoFolderWork.GetJtIoFolder_Sub($MyLabelJpg)
-    [JtIoFolder]$MyJtIoFolderWorkPdf = $MyJtIoFolderWork.GetJtIoFolder_Sub($MyLabelPdf)
+    [JtIoFolder]$MyJtIoFolder_WorkJpg = $MyJtIoFolder_Work.GetJtIoFolder_Sub($MyLabelJpg)
+    [JtIoFolder]$MyJtIoFolder_WorkPdf = $MyJtIoFolder_Work.GetJtIoFolder_Sub($MyLabelPdf)
     for ($i = $From; $i -le $To; $i++) {
         # for ($i = 1; $i -le 150; $i++) {
-            [String]$MyFolderPath_Output = $MyJtIoFolderWorkJpg.GetPath()
+            [String]$MyFolderPath_Output = $MyJtIoFolder_WorkJpg.GetPath()
             [String]$MyFilename_Output = [JtImageMagick]::GetFilenameForNumber($i)
             $Label = Convert-JtInt_To_000 -Int $i
             New-JtImageMagick_Item_Icon -FolderPath_Output $MyFolderPath_Output -Filename_Output $MyFilename_Output -Label $Label -Background $Background -Pointsize $Pointsize -X $X -Y $Y
             
             [String]$MyFolderPath_Input = $MyFolderPath_Output
             [String]$MyFilename_Input = $MyFilename_Output
-            [String]$MyFolderPath_Output = $MyJtIoFolderWorkPdf
+            [String]$MyFolderPath_Output = $MyJtIoFolder_WorkPdf
             New-JtImageMagick_Convert_JpgToPdf -FolderPath_Input $MyFolderPath_Input -Filename_Input $MyFilename_Input -FolderPath_Output $MyFolderPath_Output
     }
 

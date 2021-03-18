@@ -1,0 +1,13 @@
+ Datenträger in Laufwerk C: ist c-win10p
+ Volumeseriennummer: 4C4E-ABF1
+
+ Verzeichnis von c:\users
+
+19.11.2020  18:18    <DIR>          .
+19.11.2020  18:18    <DIR>          ..
+28.05.2020  00:25    <DIR>          archit
+28.05.2020  00:25    <DIR>          archit.ARCHLAND
+28.05.2020  00:25    <DIR>          Public
+11.03.2021  22:30    <DIR>          thome.ARCHLAND
+               0 Datei(en),              0 Bytes
+               6 Verzeichnis(se), 164.139.339.776 Bytes frei

@@ -1,0 +1,13 @@
+ Datenträger in Laufwerk D: ist d-data-145gb
+ Volumeseriennummer: CA41-3CE6
+
+ Verzeichnis von d:\
+
+06.03.2021  20:09    <DIR>          backup
+25.11.2020  08:29    <DIR>          MyApps
+08.11.2020  10:10    <DIR>          obs
+28.01.2021  21:17    <DIR>          Seafile
+10.03.2021  22:28    <DIR>          temp
+06.12.2020  11:34    <DIR>          test
+               0 Datei(en),              0 Bytes
+               6 Verzeichnis(se), 13.863.628.800 Bytes frei

@@ -143,7 +143,7 @@ Function Get-JtRep_Folder {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Org2) | Out-Null
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Type) | Out-Null
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Computername) | Out-Null
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Alias) | Out-Null
+    # $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Alias) | Out-Null
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Name) | Out-Null
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().LabelC) | Out-Null
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().DaysAgo) | Out-Null
@@ -588,23 +588,36 @@ Function Get-JtRep_Timestamps {
     $MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Timestamp -Filter $MyFilter
 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().SystemId) | Out-Null
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().JtVersion) | Out-Null
 
     ForEach ($i in 0..5) {
-        [String]$MyLabel = -join ("Fld", $i)
-        [String]$MyValue = ""
+        [Int16]$MyIntNr = $i + 1
+        [String]$MyLabel1 = -join ("FldDate", $MyIntNr)
+        [String]$MyLabel2 = -join ("FldTime", $MyIntNr)
+        [String]$MyLabel_Step = -join ("Step", $MyIntNr)
+        [String]$MyValue1 = ""
+        [String]$MyValue2 = ""
+        [String]$MyValue_Step = ""
         if ($i -lt $MyAlJtIoFiles.Count) {
             [JtIoFile]$MyJtIoFile = $MyAlJtIoFiles[$i]
             [String]$MyFilename = $MyJtIoFile.GetName()
             [String]$MyValue = Convert-JtDotter -Text $MyFilename -PatternOut "2"
+            [String]$MyValue_Helper = $MyValue.Replace("_", ".")
+            [String]$MyValue1 = Convert-JtDotter -Text $MyValue_Helper -PatternOut "1"
+            [String]$MyValue2 = Convert-JtDotter -Text $MyValue_Helper -PatternOut "2"
+
+
+            [String]$MyValue_Step = Convert-JtDotter -Text $MyFilename -PatternOut "3"
         }
-        $MyJtTblRow.Add($MyLabel, $MyValue) | Out-Null
+        $MyJtTblRow.Add($MyLabel_Step, $MyValue_Step) | Out-Null
+        $MyJtTblRow.Add($MyLabel1, $MyValue1) | Out-Null
+        $MyJtTblRow.Add($MyLabel2, $MyValue2) | Out-Null
     }
         
     [String]$MyLabel = "Errors"
-    [String]$MyFolderPath = $MyJtInfi.GetJtInf_AFolder().Get_FolderPath()
-    [String]$MyErrors = [JtIo]::GetErrors($MyFolderPath)
+    [String]$MyErrors = $MyJtInfi.GetJtInf_AFolder().Errors
     [String]$MyValue = $MyErrors
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Errors) | Out-Null
+    $MyJtTblRow.Add($MyLabel, $MyValue) | Out-Null
     return , $MyJtTblRow
 }
 

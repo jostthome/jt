@@ -11,7 +11,6 @@ Function Test-JtInvClient {
 }
 Test-JtInvClient
 
-
 Function Test-JtInvClient2 {
 
     #    New-JtInvClientClean

@@ -79,6 +79,7 @@ class JtIo : JtClass {
     static [String]$FileExtension_Meta_Computer = ".computer.meta"
     static [String]$FileExtension_Meta_Ip = ".ip.meta"
     static [String]$FileExtension_Meta_Errors = ".errors.meta"
+    static [String]$FileExtension_Meta_Klon = ".klon.meta"
     static [String]$FileExtension_Meta_Obj = ".obj.meta"
     static [String]$FileExtension_Meta_Report = ".report.meta"
     static [String]$FileExtension_Meta_Systemid = ".systemid.meta"
@@ -104,24 +105,6 @@ class JtIo : JtClass {
         return $MyOut
     }
 
-
-    static [String]GetDateForKlon([String]$TheFilename) {
-        [String]$MyFilename = $TheFilename
-
-
-        [String]$MyResult = ""
-
-        if ($Null -eq $MyFilename) {
-
-        }
-        else {
-            [String]$MyExtension = [JtIo]::FileExtension_Meta
-            [String]$MySuffix = -join (".", "klon", $MyExtension)
-            $MyResult = $MyFilename.Replace($MySuffix, "")
-            $MyResult = $MyResult.Replace("_", "")
-        }
-        return $MyResult
-    }
 
     static [String]GetOrg1ForComputername([String]$TheComputername) {
         [String]$MyResult = ""
@@ -357,16 +340,13 @@ class JtIoFileCsv : JtIoFile {
     }
 }
 
-
 class JtIoFolder : JtIo {
-
-    [System.IO.FileSystemInfo]$File = $Null
 
     static hidden [DateTime]GetReportFolderDateTime([String]$FolderPath) {
         [String]$MyFolderPath = Convert-JtFolderPathExpanded -FolderPath $FolderPath
         [System.DateTime]$MyFileDate = Get-Date
 
-        [Boolean]$MyBlnFileOk = Test-JtIoPath -Path $MyFolderPath
+        [Boolean]$MyBlnFileOk = Test-JtIoFolderPath -FolderPath $MyFolderPath
 
         [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Md)
  
@@ -384,18 +364,10 @@ class JtIoFolder : JtIo {
     JtIoFolder([String]$TheFolderPath) {
         $This.ClassName = "JtIoFolder"
         [String]$MyFolderPath = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath
+
         [Boolean]$MyBlnExists = Test-JtIoPath -Path $MyFolderPath
-        if ($False -eq $MyBlnExists) {
+        if (! ($MyBlnExists)) {
             Write-JtLog_Error -Where $This.ClassName -Text "Folder does NOT exist. MyFolderPath: $MyFolderPath"
-        }
-        else {
-            [System.Object[]]$MyAlJtObjects = Get-ChildItem -Path $MyFolderPath
-            if ($Null -eq $MyAlJtObjects) {
-                # Write-JtLog_Error -Where $This.ClassName -Text "Array of dirs is null: $This.Path"
-            }
-            else {
-                $This.File = $MyAlJtObjects[0]
-            }
         }
         $This.Path = $MyFolderPath
         $This.BlnExists = $MyBlnExists
@@ -419,15 +391,7 @@ class JtIoFolder : JtIo {
             }
         }
 
-        $MyBlnExists = Test-JtIoPath -Path $MyFolderPath
-        if ($MyBlnExists) {
-            [System.Object[]]$MyAlJtObjects = Get-Item -Path $MyFolderPath
-            $This.File = $MyAlJtObjects[0]
-        }
-        else {
-            # Write-JtLog_Error -Where $This.ClassName -Text "Path does not exist: $MyFolderPath"
-            $This.File = $Null
-        }
+        [Boolean]$MyBlnExists = Test-JtIoPath -Path $MyFolderPath
         $This.Path = $MyFolderPath
         $This.BlnExists = $MyBlnExists
     }
@@ -436,7 +400,6 @@ class JtIoFolder : JtIo {
         [JtIoFile]$MyJtIoFile = $TheJtIoFile
         $This.ClassName = "JtIoFolder"
         if (!($MyJtIoFile.IsExisting())) {
-            $This.File = $Null
             $This.Path = $Null
             $This.BlnExists = $True
         }
@@ -445,14 +408,11 @@ class JtIoFolder : JtIo {
             [String]$MyFilename = $MyJtIoFile.GetName()
             [String]$MyReplace = -join ("\", $MyFilename)
             [String]$MyFolderPath = $MyFilePath.Replace($MyReplace, "")
-            [String]$MyFolderPathParent = $MyFolderPath
-            $This.File = Get-Item -Path $MyFolderPathParent
-            $This.Path = $MyFolderPathParent
+            [String]$MyFolderPath_Parent = $MyFolderPath
+            $This.Path = $MyFolderPath_Parent
             $This.BlnExists = $True
         }
     }
-
-    
 
     [Boolean]DoRemoveFiles_All() {
         [String]$MyFolderPath = $This.GetPath()
@@ -486,10 +446,8 @@ class JtIoFolder : JtIo {
             Write-JtLog_Error -Where $This.ClassName -Text "Error while deleting files in $MyFolderPath"
             return $False
         }
-        
         return $True
     }
-
 
     [Boolean]DoRemoveFiles_Some([String]$ThePrefix, [String]$TheExtension) { 
         [String]$MyFilePrefix = $ThePrefix
@@ -520,8 +478,8 @@ class JtIoFolder : JtIo {
 
     [JtIoFile]GetJtIoFile([String]$TheFilename) {
         [String]$MyFilename = $TheFilename
-        [String]$MyPathFileNew = -join ($This.GetPath(), "\", $MyFilename)
-        [JtIoFile]$MyJtIoFile = [JtIoFile]::new($MyPathFileNew)
+        [String]$MyFilePath = -join ($This.GetPath(), "\", $MyFilename)
+        [JtIoFile]$MyJtIoFile = [JtIoFile]::new($MyFilePath)
         return $MyJtIoFile
     }
     
@@ -621,7 +579,8 @@ class JtIoFolder : JtIo {
         [Boolean]$MyBlnFileOk = $This.IsExisting()
         
         if ($MyBlnFileOk) {
-            $MyTimestamp = $This.File.LastWriteTime.ToString([JtIo]::TimestampFormat)
+            $MyFile = Get-Item -Path $This.GetPath()
+            $MyTimestamp = $MyFile.LastWriteTime.ToString([JtIo]::TimestampFormat)
         }
         return $MyTimestamp
     }
@@ -661,9 +620,6 @@ class JtIoFolder : JtIo {
         [System.Collections.ArrayList]$MyAlTypes = $MyJtList.GetValues()
         return $MyAlTypes
     }
-
-
-
     
     [DateTime]GetLastModified() {
         return [JtIoFolder]::GetReportFolderDateTime($This.GetPath())
@@ -693,7 +649,7 @@ class JtIoFolder : JtIo {
                 return $MyJtIoFolder
             }
         }
-        if (!(Test-JtIoPath -Path $MyFolderPathNew)) {
+        if (!(Test-JtIoFolderPath -FolderPath $MyFolderPathNew)) {
             # Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFolder_Sub. Subfolder does not exist! PATH: $MyFolderPathNew"
         }
         return $MyJtIoFolder
@@ -744,6 +700,37 @@ class JtIoFolder : JtIo {
     }
 }
 
+Function Convert-JtFilePath_To_Filename {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+        
+    [String]$MyFilePath = $FilePath
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath
+    [String]$MyFilename = $MyJtIoFile.GetName()
+    return $MyFilename
+}
+Function Convert-JtFolderPath_To_Label {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+        
+    [String]$MyFolderPath = $FolderPath
+        
+    [String]$MyResult = $MyFolderPath
+    [String]$MyComputername = $env:COMPUTERNAME
+    $MyResult = $MyResult.Replace("%COMPUTERNAME%", $MyComputername)
+    $MyResult = $MyResult.Replace(":", "")
+    $MyResult = $MyResult.Replace("*", "")
+    $MyResult = $MyResult.Replace("\.", "")
+    $MyResult = $MyResult.Replace("\", "_")
+    $MyResult = $MyResult.Replace(".", "_")
+    $MyResult = $MyResult.Replace("__", "_")
+    return $MyResult
+}
+
 Function Convert-JtIoFilenamesAtFolderPath {
 
     Param (
@@ -771,8 +758,6 @@ Function Convert-JtIoFilenamesAtFolderPath {
     }
 }
 
-
-
 Function Get-JtChildItem {
 
     Param (
@@ -782,7 +767,6 @@ Function Get-JtChildItem {
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Recurse,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Normal
     )
-
 
     [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
     [String]$MyFilter = $Filter
@@ -806,7 +790,6 @@ Function Get-JtChildItem {
     return , $MyAlJtIoFiles
 }
 
-
 Function Get-JtFolderPath_Info_FilesCount {
     Param (
         [Cmdletbinding()]
@@ -827,9 +810,6 @@ Function Get-JtFolderPath_Info_FilesCount {
     [Int32]$MyFilesCount = $MyResult.Count
     return $MyFilesCount
 }
-
-
-
 
 Function Get-JtFolderPath_Info_Level {
     Param (
@@ -871,9 +851,6 @@ Function Get-JtFolderPath_Info_SizeGb {
     return $MyDecSizeGb
 }
 
-
-
-
 Function Get-JtFolderPath_inv {
     Return "c:\_inventory"
 }
@@ -886,9 +863,6 @@ Function Get-JtFolderPath_inv_out {
     Return "c:\_inventory\out"
 }
 
-
-
-
 Function Get-JtIoFolder_Work {
 
     param (
@@ -899,21 +873,19 @@ Function Get-JtIoFolder_Work {
     # [String]$FolderPathWork = -join ("%temp%", "\", "Jt", "\", $Name)
     [String]$MyFolderPath_Inv = Get-JtFolderPath_Inv
     [String]$MyFolderPath_Work = -join ($MyFolderPath_Inv, "\", "out", "\", $Name)
-    [JtIoFolder]$MyJtIoFolderWork = New-JtIoFolder -FolderPath $MyFolderPath_Work -Force
+    [JtIoFolder]$MyJtIoFolder_Work = New-JtIoFolder -FolderPath $MyFolderPath_Work -Force
 
-    if (!($MyJtIoFolderWork.IsExisting())) {
-        Throw "WorkFolder does not exist. MyJtIoFolderWork: $MyJtIoFolderWork"
+    if (!($MyJtIoFolder_Work.IsExisting())) {
+        Throw "WorkFolder does not exist. MyJtIoFolder_Work: $MyJtIoFolder_Work"
     }
 
     if ($Init) {
         if ($True -eq $Init) {
-            $MyJtIoFolderWork.DeDeleteEveryThing()
+            $MyJtIoFolder_Work.DeDeleteEveryThing()
         }
     }
-    Return $MyJtIoFolderWork
+    Return $MyJtIoFolder_Work
 }
-
-
 
 
 Function Get-JtReportLogDate {
@@ -1378,7 +1350,6 @@ Function Test-JtIoFolderPath {
     return Test-Path -Path $MyFolderPath
 }
 
-
 Function Test-JtIoSpecial {
 
     Param (
@@ -1401,7 +1372,6 @@ Function Test-JtIoSpecial {
     }  
         
     [String]$MyExtension = [System.IO.Path]::GetExtension($MyFilename)
-        
     $MyList = New-Object System.Collections.Generic.List[System.Object]
     $MyList.Add([JtIo]::FileExtension_Csv)
     $MyList.Add([JtIo]::FileExtension_Folder)
@@ -1414,68 +1384,340 @@ Function Test-JtIoSpecial {
             return $MyBlnIsSpecial
         }
     }
-        
     return $MyBlnIsSpecial
 }
 
-Function Convert-JtIoFile_Md_To_Pdf {
+
+Function Write-JtIoFile {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Content,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Overwrite
+    )
+
+    [String]$MyFunctionName = "Write-JtIoFile"
+        
+    [String]$MyFilePath_Output = $FilePath_Output
+    [String]$MyContent = $Content
+    if (Test-JtIoFilePath $MyFilePath_Output) {
+        if ($Overwrite) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "File exists. Replacing old file!! FilePath_Output: $FilePath_Output"
+            Write-JtLog_File -Where $MyFunctionName -Text "Writing file." -FilePath $MyFilePath_Output
+            $MyContent | Out-File -FilePath $MyFilePath_Output -Encoding utf8
+        }
+        else {
+            Write-JtLog_Error -Where $MyFunctionName -Text "File exists. Not overwriting!!! FilePath_Output: $FilePath_Output"
+        }
+    }
+    else {
+        Write-JtLog_File -Where $MyFunctionName -Text "Writing file." -FilePath $MyFilePath_Output
+        $MyContent | Out-File -FilePath $MyFilePath_Output -Encoding utf8
+    }
+}
+
+
+Function Write-JtIoFile_Md {
+        
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Content,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Extension2,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$OnlyOne,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Overwrite
+    )
+
+    # [String]$MyFunctionName = "Write-JtIoFile_Md"
+
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+    [String]$MyFoldername_Output = $MyJtIoFolder_Output.GetName()
+
+    [String]$MyExtension2 = $Extension2
+    [String]$MyContent = $Content
+    [String]$MyOverwrite = $Overwrite
+    [String]$MyName = $Name
+    [String]$MyPrefix = [JtIo]::FilePrefix_Folder
+    
+    [String]$MyExtension_Md = [JtIo]::FileExtension_Md
+    if (! ($MyExtension2.EndsWith($MyExtension_Md))) {
+        Throw "Illegal extension"
+        return
+    }
+    
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+    if ($OnlyOne) {
+        [String]$MyFilter = -join ($MyPrefix, "*", $MyExtension2)
+        $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter)
+    }
+    
+    $MyFilename_Output = -Join ($MyPrefix, ".", $MyFoldername_Output, ".", $MyName, $MyExtension2)
+    $MyFilename_Output = Convert-JtLabel_To_Filename -Label $MyFilename_Output
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+    if ($MyOverwrite -eq $True) {
+        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent -Overwrite
+    }
+    else {
+        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent
+        
+    }
+    Convert-JtIoFile_Md_To_Pdf -FolderPath_Input $MyFolderPath_Output -Filename_Input $MyFilename_Output
+}
+
+Function Write-JtIoFile_Meta {
+    Param (
+        [Cmdletbinding()]
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Prefix,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Extension2,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$OnlyOne,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Overwrite
+    )
+
+    # [String]$MyFunctionName = "Write-JtIoFile_Meta"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [String]$MyExtension2 = $Extension2
+    [String]$MyOverwrite = $Overwrite
+    [String]$MyLabel = $Label
+
+    [String]$MyExtension_Meta = [JtIo]::FileExtension_Meta
+    if (! ($MyExtension2.EndsWith($MyExtension_Meta))) {
+        Throw "Illegal extension"
+        return
+    }
+
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+    if ($OnlyOne) {
+        [String]$MyFilter = -join ("*", $MyExtension2)
+        $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter)
+    }
+
+    $MyLabel = $Label
+    if ($Prefix) {
+        $MyPrefix = $Prefix
+        $MyLabel = -join ($MyPrefix, ".", $MyLabel)
+    }
+
+
+    $MyFilename_Output = -Join ($MyLabel, $MyExtension2)
+
+    $MyContent = $MyFolderPath_Input
+
+    $MyFilename_Output = Convert-JtLabel_To_Filename -Label $MyFilename_Output
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+
+    if ($MyOverwrite) {
+        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent -Overwrite
+    }
+    else {
+        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent
+
+    }
+}
+
+
+
+
+Function Write-JtIoFile_Meta_Anzahl {
 
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Input
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Anzahl
     )
-
+    
+    [String]$MyFunctionName = "Write-JtIoFile_Meta_Anzahl"
+    Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
+    
     [String]$MyFolderPath_Input = $FolderPath_Input
-    [String]$MyFolderPath_Output = $MyFolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
     
-    [String]$MyFilename_Input = $Filename_Input
+    [String]$MyAnzahl = $Anzahl
+        
+    [String]$MyPrefix = [JtIo]::FilePrefix_Folder
+    [String]$MyLabel = $MyAnzahl
+    [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Anzahl
     
-    [String]$MyExtension_Md = [JtIo]::FileExtension_Md
-    [String]$MyExtension_Pdf = [JtIo]::FileExtension_Pdf
-    
-    
-    [String]$MyFilename_Output = $MyFilename_Input.Replace($MyExtension_Md, $MyExtension_Pdf)
-    
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
-    [String]$MyFilePath_Input = $MyJtIoFolder_Input.GetFilePath($MyFilename_Input)
-
-    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
-    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
-    
-
-    # miktex has do be installed.
-    # choco install miktex -y
-        [String]$MyCommand = -join ('pandoc.exe -s -V geometry:margin=0.2in -o "', $MyFilePath_Output, '" "', $MyFilePath_Input, '"')
-        $MyCommand
-        Invoke-Expression -Command:$MyCommand
-
-        return $True
+    $MyParams = @{
+        FolderPath_Input  = $MyFolderPath_Input
+        FolderPath_Output = $MyFolderPath_Output
+        Prefix            = $MyPrefix
+        Label             = $MyLabel
+        Extension2        = $MyExtension2
+        #        Overwrite         = $True
     }
-
-
-Function Convert-JtFolderPath_To_Label {
-
+    Write-JtIoFile_Meta @MyParams
+}
+    
+Function Write-JtIoFile_Meta_Betrag {
+    
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
-        )
-        
-        [String]$MyFolderPath = $FolderPath
-        
-        [String]$MyResult = $MyFolderPath
-        [String]$MyComputername = $env:COMPUTERNAME
-        $MyResult = $MyResult.Replace("%COMPUTERNAME%", $MyComputername)
-        $MyResult = $MyResult.Replace(":", "")
-        $MyResult = $MyResult.Replace("*", "")
-        $MyResult = $MyResult.Replace("\.", "")
-        $MyResult = $MyResult.Replace("\", "_")
-        $MyResult = $MyResult.Replace(".", "_")
-        $MyResult = $MyResult.Replace("__", "_")
-        return $MyResult
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Year,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Decimal]$Betrag
+    )
+    
+    [String]$MyFunctionName = "Write-JtIoFile_Meta_Betrag"
+    Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
+    
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    
+    [String]$MyName = $Name
+    [String]$MyYear = $Year
+    [Decimal]$MyDecBetrag = $Betrag
+    
+    
+    if ($Year) {
+        $MyYear = $Year
+    }
+    else {
+        $MyYear = "20xx"
     }
     
+    [String]$MyLabel = Get-JtLabel_Betrag -FolderPath_Input $MyFolderPath_Input -Name $MyName -Year $MyYear -Betrag $MyDecBetrag 
+        
+    [String]$MyPrefix = [JtIo]::FilePrefix_Folder
+    [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Betrag
+    
+    $MyParams = @{
+        FolderPath_Input  = $MyFolderPath_Input
+        FolderPath_Output = $MyFolderPath_Output
+        Prefix            = $MyPrefix
+        Label             = $MyLabel
+        Extension2        = $MyExtension2
+        Overwrite         = $True
+    }
+    Write-JtIoFile_Meta @MyParams
+}
     
     
-    Export-ModuleMember -Function Convert-JtIoFile_Md_To_Pdf
+Function Write-JtIoFile_Meta_Betrag_Year {
+            
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Year,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Decimal]$Betrag
+    )
+        
+    [Decimal]$MyDecBetrag = $Betrag
+    [String]$MyName = $Name
+    [String]$MyYear = $Year
+        
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+        
+    $MyParams = @{
+        FolderPath_Input  = $MyFolderPath_Input
+        FolderPath_Output = $MyFolderPath_Output
+        Name              = $MyName
+        Year              = $MyYear
+        Betrag            = $MyDecBetrag
+        # OnlyOne           = $True
+    }
+    Write-JtIoFile_Meta_Betrag @MyParams
+}
+    
+    
+Function Write-JtIoFile_Meta_Report {
+    
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Value
+    )
+    
+    [String]$MyFunctionName = "Write-JtIoFile_Meta_Report"
+    Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
+    
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    
+    [String]$MyName = $Name
+    [String]$MyValue = $Value
+        
+    [String]$MyPrefix = [JtIo]::FilePrefix_Report
+    [String]$MyLabel = -join ($MyName, ".", $MyValue)
+    [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Report
+    
+    $MyParams = @{
+        FolderPath_Input  = $MyFolderPath_Input
+        FolderPath_Output = $MyFolderPath_Output
+        Prefix            = $MyPrefix
+        Label             = $MyLabel
+        Extension2        = $MyExtension2
+        Overwrite         = $True
+    }
+    Write-JtIoFile_Meta @MyParams
+}
+    
+Function Write-JtIoFile_Meta_Time {
+            
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name
+    )
+    
+    [String]$MyFunctionName = "Write-JtIoFile_Meta_Time"
+    Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
+    
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyName = $Name
+    [String]$MyPrefix = "_timestamp"
+    [String]$MyTimestamp = Get-JtTimestamp
+        
+    [String]$MyLabel = -join ($MyTimestamp, ".", $MyName)
+        
+    $MyParams = @{
+        FolderPath_Input  = $MyFolderPath_Input
+        FolderPath_Output = $MyFolderPath_Output
+        Prefix            = $MyPrefix
+        Label             = $MyLabel
+        Extension2        = [JtIo]::FileExtension_Meta_Time
+        Overwrite         = $True
+        # OnlyOne           = $True
+    }
+    Write-JtIoFile_Meta @MyParams
+}
+    
+Function Write-JtIoFile_Meta_Version {
+        
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+            
+    [String]$MyFunctionName = "Write-JtIoFile_Meta_Version"
+    Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
+            
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [String]$MyFolderPath_Input = $MyFolderPath_Output
+    [String]$MyTimestamp = Get-JtTimestamp
+    [String]$MyPrefix = "_v"
+            
+    $MyParams = @{
+        FolderPath_Input  = $MyFolderPath_Input
+        FolderPath_Output = $MyFolderPath_Output
+        Prefix            = $MyPrefix
+        Label             = $MyTimestamp
+        Extension2        = [JtIo]::FileExtension_Meta_Version
+        OnlyOne           = $True
+        Overwrite         = $True
+    }
+    Write-JtIoFile_Meta @MyParams
+}
+
+Export-ModuleMember -Function Convert-JtFilePath_To_Filename
 Export-ModuleMember -Function Convert-JtIoFilenamesAtFolderPath
 Export-ModuleMember -Function Convert-JtFolderPath_To_Label
 
@@ -1517,5 +1759,14 @@ Export-ModuleMember -Function Test-JtIoFilePath
 Export-ModuleMember -Function Test-JtIoFolderPath
 Export-ModuleMember -Function Test-JtIoSpecial
 
+Export-ModuleMember -Function Write-JtIoFile
+Export-ModuleMember -Function Write-JtIoFile_Md
+Export-ModuleMember -Function Write-JtIoFile_Meta
+Export-ModuleMember -Function Write-JtIoFile_Meta_Anzahl
+Export-ModuleMember -Function Write-JtIoFile_Meta_Betrag
+Export-ModuleMember -Function Write-JtIoFile_Meta_Betrag_Year
+Export-ModuleMember -Function Write-JtIoFile_Meta_Report
+Export-ModuleMember -Function Write-JtIoFile_Meta_Time
+Export-ModuleMember -Function Write-JtIoFile_Meta_Version
 
 

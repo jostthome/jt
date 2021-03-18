@@ -1,4 +1,4 @@
- DatentrÃ¤ger in Laufwerk C: ist c-win10p
+ Datentr„ger in Laufwerk C: ist c-win10p
  Volumeseriennummer: 4C4E-ABF1
 
  Verzeichnis von c:\
@@ -18,4 +18,4 @@
 12.02.2021  00:04    <DIR>          _inventory
 15.04.2020  21:20    <DIR>          _wartung
                0 Datei(en),              0 Bytes
-              14 Verzeichnis(se), 164.139.339.776 Bytes frei
+              14 Verzeichnis(se), 159.132.372.992 Bytes frei

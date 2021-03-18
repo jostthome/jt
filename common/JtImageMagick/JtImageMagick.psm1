@@ -980,8 +980,8 @@ Function New-JtImageTwin {
     [String]$MyFolderPath_Output = $FolderPath_Output
     [String]$MyFilename_Output = $Filename_Output
     
-    [JtIoFolder]$MyJtIoFolderWork = Get-JtIoFolder_Work -Name $MyFunctionName
-    [String]$MyFolderPath_Output_Work = $MyJtIoFolderWork.GetPath()
+    [JtIoFolder]$MyJtIoFolder_Work = Get-JtIoFolder_Work -Name $MyFunctionName
+    [String]$MyFolderPath_Output_Work = $MyJtIoFolder_Work.GetPath()
 
     [String]$MyFolderPath_Output = $FolderPath_Output
     [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
@@ -1004,7 +1004,7 @@ Function New-JtImageTwin {
     $MyParameters = @{
         FolderPath_Input1 = $MyFolderPath_Input1
         FolderPath_Input2 = $MyFilePathImageWorkBlank
-        FolderPath_Output = $MyJtIoFolderWork.GetPath()
+        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
         Filename_Output = $MyFilename_OutputLeft
     }
     
@@ -1018,7 +1018,7 @@ Function New-JtImageTwin {
         Filename_Input1 = $MyFilename_OutputLeft
         FolderPath_Input2 = $MyFolderPath_Output_Work
         Filename_Input2 = $MyFilename_Input
-        FolderPath_Output   = $MyJtIoFolderWork.GetPath()
+        FolderPath_Output   = $MyJtIoFolder_Work.GetPath()
         Filename_Output = $MyFilename_OutputRight
     }
 
@@ -1049,7 +1049,7 @@ Function New-JtImageAttachRight {
     )
         
     [String]$MyFunctionName = "New-JtImageAttachRight"
-    # [JtIoFolder]$MyJtIoFolderWork = Get-JtIoFolder_Work -Name $MyFunctionName
+    # [JtIoFolder]$MyJtIoFolder_Work = Get-JtIoFolder_Work -Name $MyFunctionName
     [String]$MyFilename_Output = $Filename_Output
     [String]$MyFolderPath_Input1 = $FolderPath_Input1
     [String]$MyFolderPath_Input2 = $FolderPath_Input2
@@ -1074,7 +1074,7 @@ Function New-JtImageAttachRight {
     $MyParameters = @{
         FolderPath_Input1 = $MyFolderPath_Input1
         FolderPath_Input2 = $MyFilePathWorkImageBlank
-        FolderPath_Output = $MyJtIoFolderWork.GetPath()
+        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
         Filename_Output   = $MyFilename_OutputLeft
     }
     
@@ -1086,7 +1086,7 @@ Function New-JtImageAttachRight {
     $MyParameters = @{
         FolderPath_Input1 = $MyFolderPath_Input2
         FolderPath_Input2 = $MyFilePathWorkImageLeft
-        FolderPath_Output = $MyJtIoFolderWork.GetPath()
+        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
         Filename_Output = $MyFilename_OutputRight
     }
 
@@ -1094,7 +1094,7 @@ Function New-JtImageAttachRight {
     $MyJtImageMagick_Composite.SetGravity("NorthEast")
     [String]$MyFilePathWorkImageRight = $MyJtImageMagick_Composite.DoWrite()
 
-    [String]$MyFolderPath_Output = $MyJtIoFolderWork.GetPath()
+    [String]$MyFolderPath_Output = $MyJtIoFolder_Work.GetPath()
     [String]$MyFilename_Output = $MyFilename_Output
     [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
     [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
