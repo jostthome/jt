@@ -389,7 +389,7 @@ class JtImageMagick_Image : JtImageMagick {
         [String]$MyFilePath_Input = ""
 
 
-        if($This.Filename_Input) {
+        if ($This.Filename_Input) {
             [String]$MyFolderPath_Input = $This.FolderPath_Input
             [String]$MyFilename_Input = $This.Filename_Input
             [String]$MyFilePath_Input = -join ($MyFolderPath_Input, "\", $MyFilename_Input)
@@ -516,7 +516,7 @@ class JtImageMagick_Item_Background : JtImageMagickItem {
         [String]$MyFolderPath_Input1 = $This.FolderPath_Output
         [String]$MyFilename_Input1 = $TheFilename_Input2
         [String]$MyFolderPath_Input2 = $This.FolderPath_Template
-        [String]$MyFilename_Input2 = $This.GetFilenameTemplate()
+        [String]$MyFilename_Input2 = $This.GetFilename_Template()
 
         [String]$MyFolderPath_Output = $This.FolderPath_Output
         [String]$MyFilename_Output = -join ("_", $This.Generation, ".", $This.System, ".", $This.User, ".jpg")
@@ -560,7 +560,7 @@ class JtImageMagick_Item_Background : JtImageMagickItem {
         return $MyFilename_Output
     }
 
-    [String]GetFilenameTemplate() {
+    [String]GetFilename_Template() {
         [String]$MyFilename_Template = -join ($This.Generation, ".", $This.System, ".", $This.User, ".jpg")
         return $MyFilename_Template
     }

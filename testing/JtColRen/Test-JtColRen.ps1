@@ -17,7 +17,7 @@ Function Test-JtColRen {
     New-JtColRenInput_TextNr
     
     Write-Host "---"
-    $t = Get-JtColRen -Name "LABEL"
+    $t = Get-JtColRen -Part "LABEL"
     $t
     
 }

@@ -1,13 +1,17 @@
- Datentr„ger in Laufwerk D: ist d-data-145gb
- Volumeseriennummer: CA41-3CE6
+ Datentr„ger in Laufwerk D: ist d-data
+ Volumeseriennummer: BEFD-9FEA
 
  Verzeichnis von d:\
 
-13.03.2021  10:39    <DIR>          backup
-25.11.2020  08:29    <DIR>          MyApps
-08.11.2020  10:10    <DIR>          obs
-28.01.2021  21:17    <DIR>          Seafile
-13.03.2021  10:39    <DIR>          temp
-06.12.2020  11:34    <DIR>          test
+08.04.2021  07:27    <DIR>          backup
+27.03.2021  11:55    <DIR>          MyApps
+12.04.2021  14:27    <DIR>          Seafile
+03.04.2021  11:12    <DIR>          stb
+17.04.2021  10:17    <DIR>          stb.buchung
+03.04.2021  13:00    <DIR>          stb.test
+30.03.2021  22:51    <DIR>          stb.work
+13.04.2021  16:43    <DIR>          temp
+07.04.2021  23:22    <DIR>          _backup
+07.04.2021  23:21    <DIR>          _georg
                0 Datei(en),              0 Bytes
-               6 Verzeichnis(se), 13.621.764.096 Bytes frei
+              10 Verzeichnis(se), 113.207.934.976 Bytes frei

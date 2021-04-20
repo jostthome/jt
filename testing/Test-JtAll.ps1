@@ -8,11 +8,11 @@ Get-JtVersion
 .\Jt\Test-Jt.ps1
 .\JtColRen\Test-JtColRen.ps1
 .\JtCsv\Test-JtCsv.ps1
-.\JtFilename\Test-JtFilename.ps1
 .\JtFolder\Test-JtFolder.ps1
 .\JtImageMagick\Test-JtImageMagick.ps1
 .\JtIndex\Test-JtIndex.ps1
 .\JtInf\Test-JtInf.ps1
+.\JtInf_Soft\Test-JtInf_Soft.ps1
 .\JtInfi\Test-JtInfi.ps1
 .\JtInvClient\Test-JtInvClient.ps1
 .\JtInvData\Test-JtInvData.ps1

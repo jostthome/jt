@@ -4,13 +4,146 @@ using module JtIo
 using module JtMd
 using module JtTbl
 
+Function Convert-JtFolderPath_To_Csv_Buchung {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    # [String]$MyFunctionName = "Convert-JtFolderPath_To_Csv_Buchung"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+
+    [System.Collections.ArrayList]$MyAlJtIoFiles = $MyJtDataRepository.GetAlJtIoFiles_Buchung()
+
+    Convert-JtAlJtIoFiles_to_FileCsv -ArrayList $MyAlJtIoFiles -FolderPath_Output $MyFolderPath_Output -Label "table.buchung_jpg"
+}
+
+Function New-JtRepo_Report_Meta {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_Meta"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+    [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Report
+    [String]$MyLabel_Report = -join ($MyLabel, $MyExtension2)
+
+    [System.Collections.ArrayList]$MyAlJtIoFiles = $MyJtDataRepository.GetAlJtIoFiles_Meta()
+
+    Write-JtLog -Where $MyFunctionName -Text "MyLabel_Report: $MyLabel_Report - MyJtIoFolder_Output: $MyJtIoFolder_Output"
+
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Report
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile = $File
+
+        [JtTblRow]$MyJtTblRow = Convert-JtFilePath_To_JtTblRow_Betrag -FilePath $MyJtIoFile
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
+}
+
+Function Convert-JtFolderPath_To_AlJtIoFiles_Buchung {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+    )
+
+    [String]$MyFunctionName = "Convert-JtFolderPath_To_AlJtIoFiles_Buchung"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+
+    [System.Collections.ArrayList]$MyAlJtIoFiles_Result = New-Object System.Collections.ArrayList
+    [System.Collections.ArrayList]$MyAlJtDataFolders = Convert-JtFolderPath_To_AlJtDataFolders -FolderPath_Input $MyFolderPath_Input
+
+    ForEach ($Folder in $MyAlJtDataFolders) {
+        [JtDataFolder]$MyJtDataFolder = $Folder
+
+        $MyAlJtIoFiles = $MyJtDataFolder.GetAlJtIoFiles_Buchung()
+        ForEach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
+        }
+    }
+    [Int16]$MyIntNumber = $MyAlJtIoFiles_Result.Count
+    Write-JtLog -Where $MyFunctionName -Text "Found $MyIntNumber buchung files(s) in $MyFolderPath_Input"
+    return , $MyAlJtIoFiles_Result
+}
+
+
+
+Function Convert-JtFolderPath_To_AlJtIoFiles_Meta {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+    )
+
+    [String]$MyFunctionName = "Convert-JtFolderPath_To_AlJtIoFiles_Meta"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+
+    
+    [System.Collections.ArrayList]$MyAlJtIoFiles_Result = New-Object System.Collections.ArrayList
+    [System.Collections.ArrayList]$MyAlJtDataFolders = Convert-JtFolderPath_To_AlJtDataFolders -FolderPath_Input $MyFolderPath_Input
+
+    ForEach ($Folder in $MyAlJtDataFolders) {
+        [JtDataFolder]$MyJtDataFolder = $Folder
+
+        [System.Collections.ArrayList]$MyAlJtIoFiles = $MyJtDataFolder.GetAlJtIoFiles_Meta()
+        ForEach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
+        }
+    }
+    [Int16]$MyIntNumber = $MyAlJtIoFiles_Result.Count
+    Write-JtLog -Where $MyFunctionName -Text "Found $MyIntNumber meta files(s) in $MyFolderPath_Input"
+    return , $MyAlJtIoFiles_Result
+}
+
+
+
+Function Convert-JtFolderPath_To_AlJtDataFolders {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+    )
+
+    [String]$MyFunctionName = "Convert-JtFolderPath_To_AlJtDataFolders"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+
+    [String]$MyExtension = [JtIo]::FileExtension_Folder
+    [String]$MyFilter = -join ("*", $MyExtension)
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Filter $MyFilter -Recurse
+
+    [System.Collections.ArrayList]$MyAlJtDataFolders = New-Object System.Collections.ArrayList
+
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile = $File
+        [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
+        [JtDataFolder]$MyJtDataFolder = New-JtDataFolder -FolderPath $MyJtIoFolder_Parent
+        $MyAlJtDataFolders.Add($MyJtDataFolder) | Out-Null
+    }
+    [Int16]$MyIntNumber = $MyJtDataFolders.Count
+    Write-JtLog -Where $MyFunctionName -Text "Found $MyIntNumber datafolder(s) in $MyFolderPath_Input"
+    return , $MyJtDataFolders
+}
+
 Function Convert-JtFolderPath_To_AlFoldertypes {
 
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
     )
 
-    [String]$MyFilter = "*.folder"
+    [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Folder)
     [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
     [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter -Recurse
 
@@ -48,6 +181,58 @@ Function Convert-JtFolderPath_To_AlYears {
     return $MyAlYears
 }
 
+   
+Function Convert-JtFolderPath_To_Md_Betrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+            
+    [String]$MyFunctionName = "Convert-JtFolderPath_To_Md_Betrag"
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
+    
+    Write-JtLog -Where $MyFunctionName -Text "Start..."
+    
+    [String]$MyFoldername_Input = $MyJtIoFolder_Input.GetName()
+    [String]$MyTitle = Convert-JtDotter -Text $MyFoldername_Input -PatternOut "3.4.5.6.7" -SeparatorOut " - "
+    [String]$MyJahr = Convert-JtDotter -Text $MyFoldername_Input -PatternOut "7"
+    [String]$MyBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part "BETRAG"
+    [JtMdDocument]$MyMdDoc = Get-JtTemplate_Md_Betrag -Title $MyTitle
+
+    [String]$MyFolderPath_Parent = $MyJtIoFolder_Input.GetJtIoFolder_Parent().GetPath()
+    [String]$MyPath = $MyFolderPath_Parent
+
+    [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Betrag -FolderPath_Input $MyFolderPath_Input
+    [System.Data.Datatable]$MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    [JtMdTable]$MyJtMdTable = New-JtMdTable -DataTable $MyDataTable
+    [String]$MyTable_Output = $MyJtMdTable.GetOutput()
+
+    $MyHashTable = @{
+        Jahr   = $MyJahr
+        Betrag = $MyBetrag
+        Path   = $MyPath
+        Table  = $MyTable_Output
+    }
+
+    $MyParams = @{
+        Text    = $MyMdDoc.GetOutput()
+        Replace = $MyHashTable
+    }
+    [String]$MyOutput = Convert-JtText_Template @MyParams
+    
+    $MyParams = @{
+        FolderPath_Output = $MyFolderPath_Output
+        Content           = $MyOutput
+        Name              = "ABRECHNUNG"
+        Extension2        = [JtIo]::FileExtension_Md_Abrechnung
+        OnlyOne           = $True
+    }
+    Write-JtIoFile_Md @MyParams
+}
+
 
 Function Convert-JtFolderPath_To_Md_BxH {
     Param (
@@ -74,11 +259,16 @@ Function Convert-JtFolderPath_To_Md_BxH {
     [JtMdTable]$MyJtMdTable = New-JtMdTable -DataTable $MyDataTable
     [String]$MyTable_Output = $MyJtMdTable.GetOutput()
 
-    $MyParams = @{
-        Text  = $MyMdDoc.GetOutput()
+
+    $MyHashTable = @{
         Url   = $MyUrl
         Path  = $MyPath
         Table = $MyTable_Output
+    }
+
+    $MyParams = @{
+        Text    = $MyMdDoc.GetOutput()
+        Replace = $MyHashTable
     }
     [String]$MyOutput = Convert-JtText_Template @MyParams
 
@@ -118,10 +308,14 @@ Function Convert-JtFolderPath_To_Md_Stunden {
     [JtMdTable]$MyJtMdTable = New-JtMdTable -DataTable $MyDataTable
     [String]$MyTable_Output = $MyJtMdTable.GetOutput()
 
-    $MyParams = @{
-        Text  = $MyMdDoc.GetOutput()
+    $MyHashTable = @{
         Path  = $MyPath
         Table = $MyTable_Output
+    }
+
+    $MyParams = @{
+        Text    = $MyMdDoc.GetOutput()
+        Replace = $MyHashTable
     }
     [String]$MyOutput = Convert-JtText_Template @MyParams
     
@@ -152,6 +346,8 @@ Function Convert-JtFolderPath_To_Md_Zahlung {
     
     [String]$MyFoldername_Input = $MyJtIoFolder_Input.GetName()
     [String]$MyTitle = Convert-JtDotter -Text $MyFoldername_Input -PatternOut "3.4.5.6.7" -SeparatorOut " - "
+    [String]$MyJahr = Convert-JtDotter -Text $MyFoldername_Input -PatternOut "7"
+    [String]$MyMiete = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part "MIETE"
     [JtMdDocument]$MyMdDoc = Get-JtTemplate_Md_Zahlung -Title $MyTitle
 
     [String]$MyFolderPath_Parent = $MyJtIoFolder_Input.GetJtIoFolder_Parent().GetPath()
@@ -162,10 +358,16 @@ Function Convert-JtFolderPath_To_Md_Zahlung {
     [JtMdTable]$MyJtMdTable = New-JtMdTable -DataTable $MyDataTable
     [String]$MyTable_Output = $MyJtMdTable.GetOutput()
 
-    $MyParams = @{
-        Text  = $MyMdDoc.GetOutput()
+    $MyHashTable = @{
+        Jahr  = $MyJahr
+        Miete = $MyMiete
         Path  = $MyPath
         Table = $MyTable_Output
+    }
+
+    $MyParams = @{
+        Text    = $MyMdDoc.GetOutput()
+        Replace = $MyHashTable
     }
     [String]$MyOutput = Convert-JtText_Template @MyParams
     
@@ -173,7 +375,7 @@ Function Convert-JtFolderPath_To_Md_Zahlung {
         FolderPath_Output = $MyFolderPath_Output
         Content           = $MyOutput
         Name              = "ABRECHNUNG"
-        Extension2        = [JtIo]::FileExtension_Md_Zahlung
+        Extension2        = [JtIo]::FileExtension_Md
         OnlyOne           = $True
     }
     Write-JtIoFile_Md @MyParams
@@ -234,7 +436,7 @@ Function Convert-JtFolderPath_To_Meta_Betrag {
     ForEach ($Year in $MyAlYears) {
         [String]$MyYear = $Year
         [String]$MyName = "BETRAG"
-        [String]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part_For_Year -FolderPath_Input $MyFolderPath_Input -Year $MyYear
+        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part_For_Year -FolderPath_Input $MyFolderPath_Input -Year $MyYear
 
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
@@ -244,13 +446,11 @@ Function Convert-JtFolderPath_To_Meta_Betrag {
             Betrag            = $MyDecBetrag
             # OnlyOne           = $True
         }
-     
         Write-JtIoFile_Meta_Betrag_Year @MyParams
     }
 }
 
 Function Convert-JtFolderPath_To_Meta_BxH {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
@@ -270,13 +470,13 @@ Function Convert-JtFolderPath_To_Meta_BxH {
 
     Write-JtLog -Where $MyFunctionName -Text "DoIt. ... for MyFolderPath_Input: $MyFolderPath_Input"
 
-    [String]$MyBetrag = Convert-JtFolderPath_To_Decimal_Betrag_BxH -FolderPath_Input $MyFolderPath_Input
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_BxH -FolderPath_Input $MyFolderPath_Input
     
     $MyParams = @{
         FolderPath_Input  = $MyFolderPath_Input
         FolderPath_Output = $MyFolderPath_Output
         Name              = "BETRAG"
-        Betrag            = $MyBetrag
+        Betrag            = $MyDecBetrag
         Year              = "y"
     }
     Write-JtIoFile_Meta_Betrag @MyParams
@@ -284,7 +484,6 @@ Function Convert-JtFolderPath_To_Meta_BxH {
 
 
 Function Convert-JtFolderPath_To_Meta_Stunden {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
@@ -309,7 +508,7 @@ Function Convert-JtFolderPath_To_Meta_Stunden {
     ForEach ($MyYear in $MyAlYears) {
 
         [String]$MyPart = "SOLL"
-        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
             FolderPath_Output = $MyFolderPath_Output
@@ -320,7 +519,7 @@ Function Convert-JtFolderPath_To_Meta_Stunden {
         Write-JtIoFile_Meta_Betrag @MyParams
         
         [String]$MyPart = "STUNDEN"
-        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
             FolderPath_Output = $MyFolderPath_Output
@@ -329,13 +528,10 @@ Function Convert-JtFolderPath_To_Meta_Stunden {
             Betrag            = $MyDecBetrag
         }
         Write-JtIoFile_Meta_Betrag @MyParams
-        
     }
 }
 
-
 Function Convert-JtFolderPath_To_Meta_Zahlung {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
@@ -360,7 +556,7 @@ Function Convert-JtFolderPath_To_Meta_Zahlung {
     ForEach ($MyYear in $MyAlYears) {
 
         [String]$MyPart = "MIETE"
-        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
             FolderPath_Output = $MyFolderPath_Output
@@ -371,7 +567,7 @@ Function Convert-JtFolderPath_To_Meta_Zahlung {
         Write-JtIoFile_Meta_Betrag @MyParams
         
         [String]$MyPart = "VORAUS"
-        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
             FolderPath_Output = $MyFolderPath_Output
@@ -382,7 +578,7 @@ Function Convert-JtFolderPath_To_Meta_Zahlung {
         Write-JtIoFile_Meta_Betrag @MyParams
         
         [String]$MyPart = "ZAHLUNG"
-        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+        [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
             FolderPath_Output = $MyFolderPath_Output
@@ -394,10 +590,7 @@ Function Convert-JtFolderPath_To_Meta_Zahlung {
     }
 }
 
-
-
 Function Convert-JtFolderPath_To_Decimal_Betrag_BxH {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
     )
@@ -429,31 +622,29 @@ Function Convert-JtFolderPath_To_Decimal_Betrag_BxH {
 }
 
 Function Convert-JtFolderPath_To_Decimal_Betrag_Part {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$PartName
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
 
     [String]$MyFunctionName = "Convert-JtFolderPath_To_Decimal_Betrag_Part"
 
     [String]$MyFolderPath_Input = $FolderPath_input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
 
-    [String]$MyColumn = $Partname
+    [String]$MyColumn = $Part
     [Decimal]$MySum = 0
-    if (!($MyJtIoFolder_Input.IsExisting())) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Please edit XML for MyJtIoFolder: $MyJtIoFolder_Input"
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath_Input)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Please edit XML for MyFolderPath_Input: $MyJtIoFolder_Input"
         return 0
     }
-    [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyJtIoFolder_Input
+    [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyFolderPath_Input
     [String]$MyFilename_Template = $MyJtTemplateFile.GetName()
-    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Normal
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
     ForEach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
         
         [String]$MyFilename = $MyJtIoFile.GetName()
-        [String]$MyValue = Convert-JtFilename_To_Info_With_Template -Filename $MyFilename -FilenameTemplate $MyFilename_Template -Field $MyColumn
+        [String]$MyValue = Convert-JtFilename_To_Info_With_Template -Filename $MyFilename -Filename_Template $MyFilename_Template -Field $MyColumn
         if ($MyValue.Length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "MyValue is empty. MyColumn: $MyColumn - MyFilename: $MyFilename - MyFilename_Template: $MyFilename_Template"
             return -9999
@@ -470,53 +661,14 @@ Function Convert-JtFolderPath_To_Decimal_Betrag_Part {
 Function Convert-JtFolderPath_To_Decimal_Betrag_Part_For_Year {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Int16]$Year
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Int16]$Year
     )
 
-    [String]$MyFunctionName = "Convert-JtFolderPath_To_Decimal_Betrag_Part_For_Year"
+    # [String]$MyFunctionName = "Convert-JtFolderPath_To_Decimal_Betrag_Part_For_Year"
     
-    [String]$MyFolderPath_Input = $FolderPath_Input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
-    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Normal
-
-    if (!($MyJtIoFolder_Input.IsExisting())) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Folder is not existing! MyJtIoFolder_Input: $MyJtIoFolder_Input"
-        return 0
-    }
-    
-    [Decimal]$MyDecResult = 0
-    [String]$MyFilterPrefix = "20" 
-    if ($Year) {
-        [String]$MyFilterPrefix = $Year 
-    } 
-
-    Foreach ($File in $MyAlJtIoFiles) {
-        [JtIoFile]$MyJtIoFile = $File
-        [String]$MyFilePath = $MyJtIoFile.GetPath()
-        [Decimal]$MyDecBetrag = 0
-
-        [String]$MyFilename = $MyJtIoFile.GetName()
-        if ($MyFilename.StartsWith($MyFilterPrefix)) {
-            if (Test-JtFilename_Betrag_IsValid -Filename $MyFilename) {
-                [String]$MyFilename = $MyJtIoFile.GetName()
-                [Decimal]$MyDecBetrag = Convert-JtFilename_To_DecBetrag -Filename $MyFilename
-            }
-            else {
-                [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
-                [String]$MyFolderPath = $MyJtIoFolder_Parent.GetPath()
-                [String]$MyFilePath = $MyJtIoFile.GetPath()
-                Write-JtLog_Folder_Error -Where $MyFunctionName -Text "Problem with file; EURO (in GetInfo) MyFolderPath: $MyFolderPath" -FilePath $MyFilePath
-
-                Return 9991
-            }
-            $MyDecResult = $MyDecResult + $MyDecBetrag
-        }
-        else {
-            # Write-JtLog -Where $MyFunctionName -Text "Ignoring file. FilePath: $MyFilePath"
-        }
-    }
-    [String]$MyBetrag = Convert-JtDecimal_To_String2 -Decimal $MyDecResult
-    return $MyBetrag
+    [JtDataFolder]$MyJtDataFolder = New-JtDataFolder -FolderPath $MyFolderPath_Input
+    [Decimal]$MyDecResult = $MyJtDataFolder.GetBetragForYear($MyIntYear)
+    Return $MyDecResult
 }
 
 
@@ -541,7 +693,7 @@ Function Convert-JtFolderPath_To_Integer_Anzahl {
     ForEach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
         [String]$MyFilename = $MyJtIoFile.GetName()
-        if (Test-JtFilename_Anzahl_IsValid -Filename $MyFilename) {
+        if (Test-JtFilename_IsContainingValid_Anzahl -Filename $MyFilename) {
             [Int16]$MyIntAnz = Convert-JtFilename_To_IntAnzahl -Filename $MyFilename
             $MyIntCount = $MyIntCount + $MyIntAnz
         }
@@ -564,20 +716,19 @@ Function Convert-JtFolderPath_To_JtTblTable_Anzahl {
     Write-JtLog -Where $MyFunctionName -Text "Start..."
 
     [String]$MyFolderPath_Input = $FolderPath_Input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
     [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyFolderPath_Input
 
-    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Normal
-    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetJtColRens()
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
+    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetAlJtColRens()
     
     if ($Null -eq $MyAlJtColRens) {
-        Write-JtLog -Where $MyFunctionName -Text "MyAlJtColRens is NULL. MyJtIoFolder_Input: $MyJtIoFolder_Input"
+        Write-JtLog -Where $MyFunctionName -Text "MyAlJtColRens is NULL. MyFolderPath_Input: $MyFolderPath_Input"
         return $Null
     }
     
     [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyFunctionName
     
-    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Normal
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
         [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile
@@ -618,6 +769,67 @@ Function Convert-JtFolderPath_To_JtTblTable_Anzahl {
     return , $MyJtTblTable
 }
 
+
+Function Convert-JtFolderPath_To_JtTblTable_Betrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+    )
+
+    [String]$MyFunctionName = "Convert-JtFolderPath_To_JtTblTable_Betrag"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
+    
+    [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyFolderPath_Input
+    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetAlJtColRens()
+    
+    [Int32]$MyIntLine = 1
+
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyFunctionName
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile = $File
+        [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile
+        if ($MyBlnFileOk) {
+            [JtTblRow]$MyJtTblRow = New-JtTblRow
+            [String]$MyFilename = $MyJtIoFile.GetName()
+            [String]$MyValue = ""
+        
+            $MyAlFilenameParts = $MyFilename.Split(".")
+            [JtColRen]$MyJtColRen = New-JtColRenInput_TextNr
+            $MyJtTblRow.Add("NR", $MyIntLine)
+        
+            for ([Int32]$j = 0; $j -lt ($MyAlFilenameParts.Count - 1); $j++) {
+                [String]$MyFilename_Part = $MyAlFilenameParts[$j]
+                [JtColRen]$MyJtColRen = $MyAlJtColRens[$j]
+                [String]$MyHeader = $MyJtColRen.GetHeader()
+                [String]$MyLabel = $MyJtColRen.GetLabel()
+                $MyValue = $MyAlJtColRens[$j].GetOutput($MyFilename_Part)
+                $MyJtTblRow.Add($MyLabel, $MyValue) | Out-Null
+            }
+            $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
+            $MyIntLine = $MyIntLine + 1
+        }
+        else {
+            Write-JtLog_Folder_Error -Where $MyFunctionName -Text "Problem with file." -FilePath $MyJtIoFile
+        }
+    }
+
+    [JtTblRow]$MyJtTblRow_Footer = New-JtTblRow
+        
+    [JtColRen]$MyJtColRen = New-JtColRenInput_TextNr
+    [String]$MyLabel = $MyJtColRen.GetLabel()
+    $MyJtTblRow_Footer.Add($MyLabel, "SUM:") | Out-Null
+        
+    [String]$MyPart = "BETRAG"
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
+    [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
+    $MyJtTblRow_Footer.Add($MyPart, $MyValue)
+
+    $MyJtTblTable.AddRow($MyJtTblRow_Footer) | Out-Null
+
+    return , $MyJtTblTable
+}
+
 Function Convert-JtFolderPath_To_JtTblTable_BxH {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
@@ -631,7 +843,7 @@ Function Convert-JtFolderPath_To_JtTblTable_BxH {
 
     [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath $MyFolderPath_Input
     [String]$MyFilename_Template = $MyJtTemplateFile.GetName()
-    $MyAlTemplateParts = $MyFilename_Template.Split(".")
+    $MyAlParts_Template = $MyFilename_Template.Split(".")
    
     [JtTblTable]$MyJtTblTable = New-JtTblTable -Label "JtTblTable_BxH"
     
@@ -658,8 +870,8 @@ Function Convert-JtFolderPath_To_JtTblTable_BxH {
             $MyJtTblRow.Add($MyLabel, $MyValue) | Out-Null
         
             $MyAlFilenameParts = $MyFilename.Split(".")
-            for ($IntI = 0; $IntI -lt ($MyAlTemplateParts.Count - 1); $IntI ++) {
-                [String]$MyLabel = $MyAlTemplateParts[$IntI]
+            for ($IntI = 0; $IntI -lt ($MyAlParts_Template.Count - 1); $IntI ++) {
+                [String]$MyLabel = $MyAlParts_Template[$IntI]
                 $MyLabel = $MyLabel.Replace("_", "")
                 [JtColRen]$MyJtColRen = New-JtColRenInput_Text -Label $MyLabel
                 [String]$MyValue = $MyAlFilenameParts[$IntI]
@@ -699,8 +911,8 @@ Function Convert-JtFolderPath_To_JtTblTable_BxH {
     
     [JtColRen]$MyJtColRen = New-JtColRenFile_JtPreisliste_Price
     [String]$MyLabel = $MyJtColRen.GetLabel()
-    [Decimal]$MyDecValue = Convert-JtFolderPath_To_Decimal_Betrag_BxH -FolderPath_Input $MyFolderPath_Input
-    [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecValue
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_BxH -FolderPath_Input $MyFolderPath_Input
+    [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
     $MyJtTblRow.Add($MyLabel, $MyValue) | Out-Null
     
     [JtColRen]$MyJtColRen = New-JtColRenFile_JtPreisliste_Paper
@@ -714,7 +926,6 @@ Function Convert-JtFolderPath_To_JtTblTable_BxH {
     $MyJtTblRow.Add($MyLabel, $MyValue) | Out-Null
 
     $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
-
     return $MyJtTblTable
 }
 
@@ -729,7 +940,7 @@ Function Convert-JtFolderPath_To_JtTblTable_Files {
     [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
     [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyFolderPath_Input
     
-    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetJtColRens()
+    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetAlJtColRens()
     if (!($MyAlJtColRens)) {
         Write-JtLog -Where $MyFunctionName -Text "MyAlJtColRens is NULL. MyJtIoFolder_Input: $MyJtIoFolder_Input"
         return $Null
@@ -739,9 +950,9 @@ Function Convert-JtFolderPath_To_JtTblTable_Files {
     [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
-        [Boolean]$MyBlnFileValid = Test-JtFolder_File -FilePath_Input $MyJtIoFile
+        [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile
 
-        if ($MyBlnFileValid) {
+        if ($MyBlnFileOk) {
             [JtTblRow]$MyJtTblRow = New-JtTblRow 
 
             [String]$MyFilename = $MyJtIoFile.GetName()
@@ -781,9 +992,72 @@ Function Convert-JtFolderPath_To_JtTblTable_Files {
     return , $MyJtTblTable
 }
 
+Function Convert-JtFolderPath_To_JtTblTable_Filetypes {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Expected
+    )
+
+    [String]$MyFunctionName = "Convert-JtFolderPath_To_JtTblTable_Filetypes"
+
+    [String]$MyLabel = $MyFunctionName
+    [String]$MyFolderPath_Input = $FolderPath_Input
+
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath_Input 
+            
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
+    [String]$MyExpected = $Expected
+    [Array]$MyAlExtensions_Expected = $MyExpected.Split(",")
+
+    [System.Collections.ArrayList]$MyAlJtIoSubfolders = $MyJtIoFolder.GetAlJtIoFolders_Sub()
+    foreach ($SubFolder in $MyAlJtIoSubfolders) {
+        [JtIoFolder]$MyJtIoFolder = $SubFolder
+
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+
+        [String]$MyFoldername = $MyJtIoFolder.GetName()
+        $MyJtTblRow.Add("NAME", $MyFoldername)
+        # $MyJtTblRow.Add("Label", $MyLabel)
+
+        [String]$MyExtension_Meta = [JtIo]::FileExtension_Meta
+        # Generate columes for each expected type (X_pdf,X_jpg)
+        foreach ($Extension in $MyAlExtensions_Expected) {
+            [String]$MyExtension = $Extension
+            [String]$MyLabelExtension = $MyExtension.Replace($MyExtension_Meta, "")
+
+            $MyColumnName = -join ("x", $MyLabelExtension.ToUpper())
+            $MyColumnName = $MyColumnName.Replace(".", "")
+            $MyColumnValue = "-"
+            [JtIoFile]$MyFile = $null
+            [String]$MyFilter = -join ("*", $MyExtension)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
+            if ($MyAlJtIoFiles.Count -gt 0) {
+                [JtIoFile]$MyFile = $MyAlJtIoFiles[0]
+                $MyColumnValue = $MyFile.GetName()
+                $MyColumnValue = $MyColumnValue.Replace("$MyExtension", "")
+            }
+            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+        }
+        
+        foreach ($Extension in $MyAlExtensions_Expected) {
+            [String]$MyExtension = $Extension
+            [String]$MyLabelExtension = $MyExtension.Replace($MyExtension_Meta, "")
+            
+            [String]$MyFilter = -join ("*", $MyExtension)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
+            [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
+            
+            $MyColumnName = -join ("y", $MyLabelExtension.ToUpper())
+            $MyColumnName = $MyColumnName.Replace(".", "")
+            $MyColumnValue = $MyIntCountForType
+            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+        }
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    return , $MyJtTblTable 
+}
 
 Function Convert-JtFolderPath_To_JtTblTable_Stunden {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
     )
@@ -794,15 +1068,14 @@ Function Convert-JtFolderPath_To_JtTblTable_Stunden {
     [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
     
     [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyFolderPath_Input
-    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetJtColRens()
+    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetAlJtColRens()
     
     [Int32]$MyIntLine = 1
 
     [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyFunctionName
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
-        [String]$MyFilePath_Input = $MyJtIoFile.GetPath()
-        [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyFilePath_Input
+        [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile
         if ($MyBlnFileOk) {
             [JtTblRow]$MyJtTblRow = New-JtTblRow
             [String]$MyFilename = $MyJtIoFile.GetName()
@@ -844,16 +1117,15 @@ Function Convert-JtFolderPath_To_JtTblTable_Stunden {
     [String]$MyLabel = $MyJtColRen.GetLabel()
     $MyJtTblRow_Footer.Add($MyLabel, "(Nachname)") | Out-Null
 
-
     [Int32]$j = 2
     [String]$MyPart = "SOLL"
-    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
     [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
     $MyJtTblRow_Footer.Add($MyPart, $MyValue) | Out-Null
         
     [Int32]$j = 3
     [String]$MyPart = "STUNDEN"
-    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
     [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
     $MyJtTblRow_Footer.Add($MyPart, $MyValue) | Out-Null
 
@@ -862,7 +1134,6 @@ Function Convert-JtFolderPath_To_JtTblTable_Stunden {
 }
 
 Function Convert-JtFolderPath_To_JtTblTable_Zahlung {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
     )
@@ -873,15 +1144,14 @@ Function Convert-JtFolderPath_To_JtTblTable_Zahlung {
     [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
     
     [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyFolderPath_Input
-    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetJtColRens()
+    [System.Collections.ArrayList]$MyAlJtColRens = $MyJtTemplateFile.GetAlJtColRens()
     
     [Int32]$MyIntLine = 1
 
     [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyFunctionName
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
-        [String]$MyFilePath_Input = $MyJtIoFile.GetPath()
-        [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyFilePath_Input
+        [Boolean]$MyBlnFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile
         if ($MyBlnFileOk) {
             [JtTblRow]$MyJtTblRow = New-JtTblRow
             [String]$MyFilename = $MyJtIoFile.GetName()
@@ -935,25 +1205,325 @@ Function Convert-JtFolderPath_To_JtTblTable_Zahlung {
 
     [Int32]$j = 4
     [String]$MyPart = "MIETE"
-    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
     [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
     $MyJtTblRow_Footer.Add($MyPart, $MyValue) | Out-Null
         
     [Int32]$j = 5
     [String]$MyPart = "VORAUS"
-    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
     [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
     $MyJtTblRow_Footer.Add($MyPart, $MyValue) | Out-Null
         
     [Int32]$j = 6
     [String]$MyPart = "ZAHLUNG"
-    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -PartName $MyPart
+    [Decimal]$MyDecBetrag = Convert-JtFolderPath_To_Decimal_Betrag_Part -FolderPath_Input $MyFolderPath_Input -Part $MyPart
     [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
     $MyJtTblRow_Footer.Add($MyPart, $MyValue)
 
     $MyJtTblTable.AddRow($MyJtTblRow_Footer) | Out-Null
 
     return , $MyJtTblTable
+}
+
+
+Function New-JtRepo_Report_Betraege {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Years
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_Betraege"
+    
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    [String]$MyYears = $Years
+    
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    [System.Collections.ArrayList]$MyAlJtDataFolders = $MyJtDataRepository.GetAlJtDataFolders()
+
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
+    [String]$MyLabel_Report = -join ($MyLabel, ".", "report", ".", "betraege")
+
+    ForEach ($Folder in $MyAlJtDataFolders) {
+        [JtDataFolder]$MyJtDataFolder = $Folder
+
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+
+        [String]$MyFoldername = $MyJtDataFolder.JtIoFolder.GetName()
+        $MyJtTblRow.Add("FOLDERNAME", $MyFoldername)
+
+        $MyAlYears = $MyYears.Split(".")
+        [Int16]$MyIntScore = 0
+        ForEach ($Year in $MyAlYears) {
+            [Int16]$MyIntYear = [Int16]$Year
+            [Decimal]$MyDecValue_Betrag = $MyJtDataFolder.GetBetragForYear($MyIntYear)
+            [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecValue_Betrag
+            $MyJtTblRow.Add("BETRAG$Year", $MyValue)
+            
+            [Int16]$MyIntYear = [Int16]$Year
+            [Decimal]$MyDecValue_Buchung = $MyJtDataFolder.GetBuchungForYear($MyIntYear)
+            [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecValue_Buchung
+            $MyJtTblRow.Add("BUCHUNG$Year", $MyValue)
+            
+            if ($MyDecValue_Betrag -eq $MyDecValue_Buchung) {
+                $MyJtTblRow.Add("CHECK$Year", "0")
+            }
+            else {
+                $MyJtTblRow.Add("CHECK$Year", "1")
+                $MyIntScore ++
+            }
+        }
+        $MyJtTblRow.Add("PROBLEMS", $MyIntScore)
+        
+        [String]$MyPath = $MyJtDataFolder.JtIoFolder.GetPath()
+        $MyJtTblRow.Add("PATH", $MyPath)
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label $MyLabel_Report -FolderPath_Output $MyFolderPath_Output
+}
+
+
+Function New-JtRepo_Report_YyyJpg {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_YyyJpg"
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    
+    
+    [System.Collections.ArrayList]$MyAlJtIoFiles_Buchung = $MyJtDataRepository.GetAlJtIoFiles_Buchung()
+
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+
+    [String]$MyLabel_Report = -join ($MyLabel, ".", "report", ".", "yyyjpg")
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Report
+    
+    ForEach ($File in $MyAlJtIoFiles_Buchung) {
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+
+        [JtIoFile]$MyJtIoFile = $File
+
+        [String]$MyFilename = $MyJtIoFile.GetName()
+
+        [JtIoFolder]$MyJtIoFolder = $MyJtIoFile.GetJtIoFolder_Parent()
+        [String]$MyFoldername = $MyJtIoFolder.GetName()
+        $MyLabel_Folder = Convert-JtDotter $MyFoldername -PatternOut "1.2.3.4.5.6"
+        $MyLabel_File = Convert-JtDotter $MyFilename -PatternOut "2.3.4.5.6.7"
+#        Write-Host $MyLabel_Folder "-" $MyLabel_File 
+#        Write-JtLog -Where $MyFunctionName -Text "File:  $MyLabel_File - $MyLabel_Folder"
+        if ($MyLabel_Folder -ne $MyLabel_File) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "File: $MyJtIoFile"
+            $MyJtTblRow.Add("FOLDERLABEL", $MyLabel_Folder)
+            $MyJtTblRow.Add("FILELABEL", $MyLabel_File)
+            $MyJtTblRow.Add("FOLDERPATH", $MyJtIoFolder)
+            $MyJtTblTable.AddRow($MyJtTblRow)
+        }
+    }
+    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    [Int16]$MyIntRows = $MyDataTable.Rows.Count
+    if ($MyIntRows -gt 0) {
+        Convert-JtDataTable_To_Csv -DataTable $MyDataTable -FolderPath_Output $MyFolderPath_Output -Label $MyLabel_Report
+    }
+    else {
+        Write-JtLog -Where $MyFunctionName -Text "Nothing to do. No rows."
+    }
+}
+
+Function New-JtRepo_Report_Foldernames {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_Foldernames"
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+    [String]$MyLabel_Report = -join ($MyLabel, ".", "report", ".", "foldernames")
+
+    [System.Collections.ArrayList]$MyAlJtDataFolders = $MyJtDataRepository.GetAlJtDataFolders()
+    
+    [JtTblTable]$MyJtTblTable = New-JtTblTable "foldernames"
+
+    ForEach ($Folder in $MyAlJtDataFolders) {
+        [JtDataFolder]$MyJtDataFolder = $Folder
+
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+
+        [String]$MyFoldername = $MyJtDataFolder.JtIoFolder.GetName()
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "1" -silent
+        $MyJtTblRow.Add("ART", $MyPart)
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "2" -silent
+        $MyJtTblRow.Add("WER", $MyPart)
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "3" -silent
+        $MyJtTblRow.Add("KAT", $MyPart)
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "4" -silent
+        $MyJtTblRow.Add("THEMA", $MyPart)
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "5" -silent
+        $MyJtTblRow.Add("DET1", $MyPart)
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "6" -silent
+        $MyJtTblRow.Add("DET2", $MyPart)
+        
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "7" -silent
+        $MyJtTblRow.Add("JAHR", $MyPart)
+
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "8" -silent
+        $MyJtTblRow.Add("TYPE", $MyPart)
+        
+        $MyPart = Convert-JtDotter $MyFoldername -PatternOut "9" -Silent
+        $MyJtTblRow.Add("INFO", $MyPart)
+        
+        $MyJtTblRow.Add("FOLDERNAME", $MyFoldername)
+        $MyJtTblRow.Add("PARTS", ($MyFoldername.Split(".")).Count)
+        
+        [String]$MyPath = $MyJtDataFolder.JtIoFolder.GetPath()
+        $MyJtTblRow.Add("PATH", $MyPath)
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label $MyLabel_Report -FolderPath_Output $MyFolderPath_Output
+}
+
+Function New-JtRepo_Report_Repo {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_Repo"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    
+
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+
+    [System.Collections.ArrayList]$MyAlJtDataFolders = $MyJtDataRepository.GetAlJtDataFolders()
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+
+    [String]$MyLabel_Report = -join ($MyLabel, ".", "report", ".", "repo")
+    
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Report
+
+    ForEach ($Folder in $MyAlJtDataFolders) {
+        [JtDataFolder]$MyJtDataFolder = $Folder
+
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+
+        [String]$MyFoldername = $MyJtDataFolder.JtIoFolder.GetName()
+        $MyJtTblRow.Add("FOLDERNAME", $MyFoldername)
+
+        [String]$MyPath = $MyJtDataFolder.JtIoFolder.GetPath()
+        $MyJtTblRow.Add("PATH", $MyPath)
+
+        # [System.Collections.ArrayList]$MyJtDataFolder.GetAlJtIoFiles()
+        [Int16]$MyIntFiles = $MyJtDataFolder.GetIntFiles()
+        $MyJtTblRow.Add("FILES", $MyIntFiles)
+        
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label $MyLabel_Report -FolderPath_Output $MyFolderPath_Output
+}
+
+Function New-JtRepo_Report_Foldertypes {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_Foldertypes"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+
+    $MyAlFoldertypes = Convert-JtFolderPath_To_AlFoldertypes -FolderPath $MyFolderPath_Input
+
+    [String]$MyLabel_Report = -join ($MyLabel, ".", "report", ".", "foldertypes")
+    
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Report
+
+    ForEach ($Folder in $MyAlFoldertypes) {
+        [String]$MyFoldertype = $Folder
+
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+
+        $MyJtTblRow.Add("FOLDERTYPE", $MyFoldertype)
+        
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label $MyLabel_Report -FolderPath_Output $MyFolderPath_Output
+}
+
+
+Function New-JtRepo_Report_Problems {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
+    )
+
+    [String]$MyFunctionName = "New-JtRepo_Report_Problems"
+
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
+
+    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    [String]$MyLabel = $MyJtDataRepository.GetLabel()
+    [String]$MyLabel_Report = -join ($MyLabel, ".", "report", ".", "problems")
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Report
+    [Int16]$MyIntProblems = 0
+
+    $MyAlJtDataFolders = $MyJtDataRepository.GetAlJtDataFolders()
+    ForEach ($Folder in $MyAlJtDataFolders) {
+        [JtDataFolder]$MyJtDataFolder = $Folder
+        [JtTemplateFile]$MyJtTemplateFile = $MyJtDataFolder.GetJtTemplateFile()
+        $MyAlJtIoFiles = $MyJtDataFolder.GetAlJtIoFiles_Normal()
+
+        foreach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+
+            [String]$MyMessage = $MyJtTemplateFile.GetMessage_Error($MyJtIoFile)
+            if ($MyMessage) {
+                [JtTblRow]$MyJtTblRow = New-JtTblRow
+                $MyJtTblRow.Add("FILENAME", $MyJtIoFile.GetName())
+                $MyJtTblRow.Add("MESSAGE", $MyMessage)
+                $MyJtTblRow.Add("FILEPATH", $MyJtIoFile.GetPath())
+                $MyJtTblRow.Add("FOLDERPATH", $MyJtDataFolder.JtIoFolder.GetPath())
+
+                $MyJtTblTable.AddRow($MyJtTblRow)
+                $MyIntProblems ++
+            }
+        }
+    }
+    if ($MyIntProblems -gt 0) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Number of problems found. MyIntProblems: $MyIntProblems"
+        $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+        Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label $MyLabel_Report -FolderPath_Output $MyFolderPath_Output
+    } else {
+        Write-JtLog -Where $MyFunctionName -Text "No problems found for repo $MyLabel"
+    }
 }
 
 
@@ -988,19 +1558,13 @@ Function Get-JtLabel_Betrag {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Year,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Year,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Decimal]$Betrag
     )
 
     [Decimal]$MyDecBetrag = $Betrag
     [String]$MyName = $Name
-
-    [String]$MyYear = "JAHRE"
-    if ($Year) {
-        if ($Year.Length -gt 0) {
-            $MyYear = $Year
-        }
-    }
+    [String]$MyYear = $Year
     
     [String]$MyFolderPath_Input = $FolderPath_Input
     [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
@@ -1025,104 +1589,7 @@ Function Get-JtLabel_Betrag {
     return $MyLabel
 }
 
-Function Get-JtLabel_Betrag_Miete {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Year,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Decimal]$Betrag
-    )
-
-    # [String]$MyFunctionName = "Get-JtLabel_Betrag_Miete"
-    [String]$MyName = "MIETE"
-    [Decimal]$MyDecBetrag = $Betrag
-    
-    [String]$MyFolderPath_Input = $FolderPath_Input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
-    [String]$MyFolderName = $MyJtIoFolder_Input.GetName()
-    [String]$MyYear = $Year
-    [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
-    
-    $MyParams = @{
-        Part1 = Convert-JtDotter -Text $MyFolderName -PatternOut "1"
-        Part2 = Convert-JtDotter -Text $MyFolderName -PatternOut "2"
-        Part3 = Convert-JtDotter -Text $MyFolderName -PatternOut "3"
-        Part4 = Convert-JtDotter -Text $MyFolderName -PatternOut "4"
-        Part5 = Convert-JtDotter -Text $MyFolderName -PatternOut "5"
-        Part6 = Convert-JtDotter -Text $MyFolderName -PatternOut "6"
-        Name  = $MyName
-        Year  = $MyYear
-        Value = $MyValue
-    }
-    [String]$MyLabel = Get-JtLabel_Xxx @MyParams
-    return $MyLabel
-}
-
-Function Get-JtLabel_Betrag_Voraus {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][decimal]$Year,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Decimal]$Betrag
-    )
-        
-    # [String]$MyFunctionName = "Get-JtLabel_Betrag_Voraus"
-    [String]$MyName = "VORAUS"
-    [Decimal]$MyDecBetrag = $Betrag
-        
-    [String]$MyFolderPath_Input = $FolderPath_Input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
-    [String]$MyFolderName = $MyJtIoFolder_Input.GetName()
-    [String]$MyYear = $Year
-    [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
-        
-    $MyParams = @{
-        Part1 = Convert-JtDotter -Text $MyFolderName -PatternOut "1"
-        Part2 = Convert-JtDotter -Text $MyFolderName -PatternOut "2"
-        Part3 = Convert-JtDotter -Text $MyFolderName -PatternOut "3"
-        Part4 = Convert-JtDotter -Text $MyFolderName -PatternOut "4"
-        Part5 = Convert-JtDotter -Text $MyFolderName -PatternOut "5"
-        Part6 = Convert-JtDotter -Text $MyFolderName -PatternOut "6"
-        Name  = $MyName
-        Year  = $MyYear
-        Value = $MyValue
-    }
-    [String]$MyLabel = Get-JtLabel_Xxx @MyParams
-    return $MyLabel
-}
-
-Function Get-JtLabel_Betrag_Zahlung {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Year,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Decimal]$Betrag
-    )
-            
-    # [String]$MyFunctionName = "Get-JtLabel_Betrag_Zahlung"
-    [String]$MyName = "ZAHLUNG"
-    [Decimal]$MyDecBetrag = $Betrag
-            
-    [String]$MyFolderPath_Input = $FolderPath_Input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
-    [String]$MyFolderName = $MyJtIoFolder_Input.GetName()
-    [String]$MyYear = $Year
-    [String]$MyValue = Convert-JtDecimal_To_String2 -Decimal $MyDecBetrag
-    
-    $MyParams = @{
-        Part1 = Convert-JtDotter -Text $MyFolderName -PatternOut "1"
-        Part2 = Convert-JtDotter -Text $MyFolderName -PatternOut "2"
-        Part3 = Convert-JtDotter -Text $MyFolderName -PatternOut "3"
-        Part4 = Convert-JtDotter -Text $MyFolderName -PatternOut "4"
-        Part5 = Convert-JtDotter -Text $MyFolderName -PatternOut "5"
-        Part6 = Convert-JtDotter -Text $MyFolderName -PatternOut "6"
-        Name  = $MyName
-        Year  = $MyYear
-        Value = $MyValue
-    }
-    [String]$MyLabel = Get-JtLabel_Xxx @MyParams
-    return $MyLabel
-}
-
-
-Function Get-JtLabel_Xxx {
+ Function Get-JtLabel_Xxx {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part1,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part2,
@@ -1135,9 +1602,37 @@ Function Get-JtLabel_Xxx {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Value
     )
 
-    [String]$MyLabel = -join ($Part1, ".", $Part2, ".", $Part3, ".", $Part4, ".", $Part5, ".", $Part6, ".", $Name, ".", $Year, ".", $Value)
+    # [String]$MyLabel = -join ($Part1, ".", $Part2, ".", $Part3, ".", $Part4, ".", $Part5, ".", $Part6, ".", $Name, ".", $Year, ".", $Value)
+    [String]$MyLabel = -join ($Part1, ".", $Part2, ".", $Part3, ".", $Part4, ".", $Part5, ".", $Part6, ".", $Year, ".", $Value)
     return $MyLabel
 }
+
+
+Function Get-JtTemplate_Md_Betrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Title
+    )
+
+    # [String]$MyFunctionName = "Get-JtTemplate_Md_Zahlung"
+    
+    [JtMdDocument]$MyJtMdDoc = New-JtMdDocument -Title $MyTitle
+    
+    [String]$MyTimestamp = Get-JtTimestamp
+    $MyJtMdDoc.AddLine("* Stand: $MyTimestamp")
+    
+    $MyJtMdDoc.AddLine("* Pfad: <path>")
+    
+    $MyJtMdDoc.AddH2("BETRÄGE")
+    
+    $MyJtMdDoc.AddLine("<table>")
+    $MyJtMdDoc.AddH3("Zusammenfassung")
+    $MyJtMdDoc.AddLine("Summe für das Jahr __<jahr>__. Summe: __<betrag> Euro__")
+    
+    $MyJtMdDoc.AddLine("---")
+
+    return $MyJtMdDoc
+}
+
 
 Function Get-JtTemplate_Md_BxH {
     Param (
@@ -1169,7 +1664,7 @@ Function Get-JtTemplate_Md_Stunden {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Title
     )
 
-    [String]$MyFunctionName = "Get-JtTemplate_Md_Stunden"
+    # [String]$MyFunctionName = "Get-JtTemplate_Md_Stunden"
     
     [JtMdDocument]$MyJtMdDoc = New-JtMdDocument -Title $MyTitle
     
@@ -1186,16 +1681,14 @@ Function Get-JtTemplate_Md_Stunden {
     return $MyJtMdDoc
 }
 
-
 Function Get-JtTemplate_Md_Zahlung {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Title
     )
 
-    [String]$MyFunctionName = "Get-JtTemplate_Md_Zahlung"
+    # [String]$MyFunctionName = "Get-JtTemplate_Md_Zahlung"
     
     [JtMdDocument]$MyJtMdDoc = New-JtMdDocument -Title $MyTitle
-    
     
     [String]$MyTimestamp = Get-JtTimestamp
     $MyJtMdDoc.AddLine("* Stand: $MyTimestamp")
@@ -1203,9 +1696,14 @@ Function Get-JtTemplate_Md_Zahlung {
     $MyJtMdDoc.AddLine("* Pfad: <path>")
     
     $MyJtMdDoc.AddH2("MIETE und VORAUS")
-
+    $MyJtMdDoc.AddH3("Übersicht der Zahlungen")
+    
     $MyJtMdDoc.AddLine("<table>")
+    $MyJtMdDoc.AddH3("Zusammenfassung")
+    $MyJtMdDoc.AddLine("Mieteinnahmen für das Jahr __<jahr>__. Summe: __<miete> Euro__")
+    
     $MyJtMdDoc.AddLine("---")
+
     return $MyJtMdDoc
 }
 
@@ -1247,9 +1745,8 @@ Function New-JtIndex_Betrag {
     # Convert-JtFolderPath_To_Csv_FileList -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 
     Convert-JtFolderPath_To_Meta_Betrag -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
+    Convert-JtFolderPath_To_Md_Betrag -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 }
-
-
 
 Function New-JtIndex_BxH {
     Param (
@@ -1258,14 +1755,15 @@ Function New-JtIndex_BxH {
     )
 
     [String]$MyFunctionName = "New-JtIndex_BxH"
-    Write-JtLog -Where $MyFunctionName -Text "Starting..."
 
-    # $This.FilenameTemplate = -join ("_NACHNAME.VORNAME.LABEL.PAPIER.BxH", [JtIo]::FileExtension_Folder)
-    
-    # [String]$MyLabel = "BxH"
-    
     [String]$MyFolderPath_Input = $FolderPath_Input
     [String]$MyFolderPath_Output = $FolderPath_Output
+
+    Write-JtLog -Where $MyFunctionName -Text "Starting..."
+
+    # $This.Filename_Template = -join ("_NACHNAME.VORNAME.LABEL.PAPIER.BxH", [JtIo]::FileExtension_Folder)
+    
+    # [String]$MyLabel = "BxH"
 
     # Write-JtLog -Where $MyFunctionName -Text "... for MyFolderPath_Input: $MyFolderPath_Input"
     # Convert-JtFolderPath_To_Csv_FileList -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
@@ -1273,7 +1771,24 @@ Function New-JtIndex_BxH {
     Convert-JtFolderPath_To_Meta_BxH -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
     Convert-JtFolderPath_To_Md_BxH -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 }
+
+
+Function Update-JtIndex_BxH {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Template
+    )
+
+    # [String]$MyFunctionName = "Update-JtIndex_BxH"
     
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFilename_Template = $Filename_Template
+
+    [String]$MyFolderPath_Output = $MyFolderPath_Input
+    
+    New-JtTemplateFile -FolderPath_Output $MyFolderPath_Output -Filename_Template $MyFilename_Template
+    Convert-JtIoFilenamesAtFolderPath -FolderPath_Input $MyFolderPath_Input
+}
 
 Function New-JtIndex_Default {
     Param (
@@ -1291,10 +1806,8 @@ Function New-JtIndex_Default {
     # [String]$MyFolderPath_Input = $FolderPath_Input
     # [String]$MyFolderPath_Output = $FolderPath_Output
 
-
     # Convert-JtFolderPath_To_Csv_FileList -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 }
-
 
 Function New-JtIndex_Stunden {
     Param (
@@ -1319,7 +1832,6 @@ Function New-JtIndex_Stunden {
     Convert-JtFolderPath_To_Md_Stunden -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 }
 
-
 Function New-JtIndex_Zahlung {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
@@ -1341,17 +1853,16 @@ Function New-JtIndex_Zahlung {
     Convert-JtFolderPath_To_Md_Zahlung -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 }
 
-
 Function Test-JtFolder {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath_Output
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
     )
 
-    [String]$MyFunctionName = "Test-JtFolder"
+    # [String]$MyFunctionName = "Test-JtFolder"
     
     [String]$MyFolderPath_Input = $FolderPath_Input
-    [String]$MyFilePath_Output = $FilePath_Output
+    [String]$MyFolderPath_Output = $FilePath_Output
 
     [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input 
     # [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output 
@@ -1363,31 +1874,30 @@ Function Test-JtFolder {
         [JtIoFile]$MyJtIoFile_Folder = $File_Folder
         [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile_Folder.GetJtIoFolder_Parent()
 
-        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath $MyJtIoFolder_Parent
+        [JtDataFolder]$MyJtDataFolder = New-JtDataFolder -FolderPath $MyJtIoFolder_Parent
 
-        $MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Parent -Normal
-        ForEach ($File_Content in $MyAlJtIoFiles) {
-            [JtIoFile]$MyJtIoFile_Content = $File_Content
-
-            $MyJtTemplateFile.GetName()
-            Write-JtLog -Where $MyFunctionName -Text "File_Content: $File_Content"
-            [Boolean]$BlnIsFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile_Content -FilePath_Output $MyFilePath_Output
-            if (!($BlnIsFileOk)) {
-                Write-JtLog_Error -Where $MyFunctionName -Text "Found (at least) one problem in folder... MyJtIoFolder_Parent: $MyJtIoFolder_Parent"
-                Break
-            }
+        [Boolean]$MyBlnCheck = $MyJtDataFolder.DoCheck($MyFolderPath_Output)
+        if (!($MyBlnCheck)) {
+            return $False
         }
     }
 }
 
 Function Test-JtFolder_Recurse {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
     )
 
     [String]$MyFunctionName = "Test-JtFolder_Recurse"
 
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $FolderPath_Input
+    [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_input
+    if ($FolderPath_Output) { 
+        $MyFolderPath_Output = $FolderPath_Output
+    }
+
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
 
     [String]$MyExtension = [JtIo]::FileExtension_Folder
     [String]$MyFilter = -join ("*", $MyExtension)
@@ -1398,14 +1908,15 @@ Function Test-JtFolder_Recurse {
         [JtIoFile]$MyJtIoFile = $File
         [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
 
-        [Int16]$MyIntFolderSum = Test-JtFolder -FolderPath_Input $MyJtIoFolder_Parent
+        [Int16]$MyIntFolderSum = Test-JtFolder -FolderPath_Input $MyJtIoFolder_Parent -FolderPath_Output $MyFolderPath_Output
         $MyIntProblems = $MyIntProblems + $MyIntFolderSum
     }
 
     if ($MyIntProblems -gt 0) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Number of problems found: $MyIntProblems"
+        Write-JtLog_Error -Where $MyFunctionName -Text "Number of problems found. MyIntProblems: $MyIntProblems"
     }
 }
+
 
 Function Test-JtFolder_File {
     Param (
@@ -1419,48 +1930,17 @@ Function Test-JtFolder_File {
     [String]$MyFilePath_Output = $FilePath_Output
 
     [JtIoFile]$MyJtIoFile_Input = New-JtIoFile -FilePath $MyFilePath_Input
-    [Boolean]$MyResult = $True
-
+    
     [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile_Input.GetJtIoFolder_Parent()
+    
     [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath $MyJtIoFolder_Parent
+    [String]$MyMessage = $MyJtTemplateFile.GetMessage_Error($MyFilePath_Input)
 
-    [String]$MyFilename = $MyJtIoFile_Input.GetName()
-    $MyAlFileNameParts = $MyFilename.Split(".")
-    [Int16]$MyIntFilenameParts = $MyAlFileNameParts.Count
-
-    [System.Collections.ArrayList]$MyAlColRens = $MyJtTemplateFile.GetJtColRens()
-    [Int16]$MyIntTemplateParts = $MyAlColRens.Count
-
-    if ($MyIntFilenameParts -ne $MyIntTemplateParts) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "DoCheckFile. Not in expected format. MyFilename: $MyFilename - Parts in filename: $MyIntFilenameParts - Parts in template: $MyIntTemplateParts"
-                
-        [String]$MyMessage = "Problem with file (DoCheckFile): MyFilename: $MyFilename"
-        if ($MyFilePath_Output) {
-            Write-JtLog_Folder_Error -Where $MyFunctionName -Text $MyMessage -FilePath $MyFilePath_Input -FilePath_Output $MyFilePath_Output
-        }
-        else {
-            Write-JtLog_Folder_Error -Where $MyFunctionName -Text $MyMessage -FilePath $MyFilePath_Input
-        }
-        $MyResult = $False
+    if ($MyMessage) {
+        Write-JtLog_Folder_Error -Where $MyFunctionName -Text $MyMessage -FilePath $MyFilePath_Input -FilePath_Output $MyFilePath_Output
+        return $False
     }
-    else {
-        for ([Int32]$i = 0; $i -lt $MyIntTemplateParts; $i++) {
-            [String]$MyValue = $MyAlFileNameParts[$i]
-            [JtColRen]$MyJtColRen = $MyAlColRens[$i]
-            [Boolean]$IsValid = $MyJtColRen.CheckValid($MyValue)
-            if (! ($IsValid)) {
-                [String]$MyMessage = "DoCheckFile. File not valid; MyFilename: $MyFilename"
-                if ($MyFilePath_Output) {
-                    Write-JtLog_Folder_Error -Where $MyFunctionName -Text $MyMessage -FilePath $MyFilePath_Input -FilePath_Output $MyFilePath_Output
-                }
-                else {
-                    Write-JtLog_Folder_Error -Where $MyFunctionName -Text $MyMessage -FilePath $MyFilePath_Input
-                }
-                return $False
-            }
-        }
-    }
-    return $MyResult
+    return $True
 }
 
 
@@ -1472,13 +1952,12 @@ Function Update-JtFolderPath_Md_And_Meta {
     [String]$MyFunctionName = "Update-JtFolderPath_Md_And_Meta"
     
     [String]$MyFolderPath_Input = $FolderPath_Input
-    [String]$MyFolderPath_Output = $MyFolderPath_Input
+    # [String]$MyFolderPath_Output = $MyFolderPath_Input
 
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input 
     # [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output 
 
     [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Folder)
-    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Filter $MyFilter -Recurse
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Filter $MyFilter -Recurse
     
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
@@ -1506,6 +1985,7 @@ Function Update-JtFolder_Md_And_Meta {
 
     if (!($MyJtTemplateFile.IsValid())) {
         Write-JtLog_Error -Where $MyFunctionName -Text "Template file is not valid."
+        Return
     } 
 
     [String]$MyFilename_Template = $MyJtTemplateFile.GetName()
@@ -1522,6 +2002,9 @@ Function Update-JtFolder_Md_And_Meta {
     elseif ($MyFilename_Template.EndsWith([JtIo]::FileExtension_Folder_Stand)) {
         New-JtIndex_Default -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
     }
+    elseif ($MyFilename_Template.EndsWith([JtIo]::FileExtension_Folder_Stunden)) {
+        New-JtIndex_Stunden -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
+    }
     elseif ($MyFilename_Template.EndsWith([JtIo]::FileExtension_Folder_Zahlung)) {
         New-JtIndex_Zahlung -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
     }
@@ -1530,31 +2013,15 @@ Function Update-JtFolder_Md_And_Meta {
     }
 }
 
-Function Update-JtIndex_BxH {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Template
-    )
 
-    [String]$MyFunctionName = "Update-JtIndex_BxH"
-    
-    [String]$MyFolderPath_Input = $FolderPath_Input
-    [String]$MyFilename_Template = $Filename_Template
-    
-    [JtTemplateFile]$MyTemplateFile = Get-JtTemplateFile -FolderPath $MyFolderPath_Input
-    if (!($MyTemplateFile.IsValid())) {
-        [String]$MyFolderPath_Output = $MyFolderPath_Input
-        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
-        [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Template)
-        Write-JtLog_File -Where $MyFunctionname -Text "Creating TemplateFile" -FilePath $MyFilePath_Output
-        [String]$MyContent = Get-JtTimestamp
-        $MyContent | Out-File -FilePath $MyFilePath_Output -Encoding utf8
-    }
-    Convert-JtIoFilenamesAtFolderPath -FolderPath_Input $MyFolderPath_Input
-}
+Export-ModuleMember -Function Convert-JtFolderPath_To_Csv_Buchung
+Export-ModuleMember -Function New-JtRepo_Report_Meta
+
+Export-ModuleMember -Function Convert-JtFolderPath_To_AlJtIoFiles_Buchung
+Export-ModuleMember -Function Convert-JtFolderPath_To_AlJtIoFiles_Meta
 
 
-
+Export-ModuleMember -Function Convert-JtFolderPath_To_AlJtDataFolders
 Export-ModuleMember -Function Convert-JtFolderPath_To_AlFoldertypes 
 Export-ModuleMember -Function Convert-JtFolderPath_To_AlYears
 
@@ -1564,10 +2031,13 @@ Export-ModuleMember -Function Convert-JtFolderPath_To_Decimal_Betrag_Part
 Export-ModuleMember -Function Convert-JtFolderPath_To_Decimal_Betrag_Part_For_Year
 
 Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_Anzahl
-Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_Files
+Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_Betrag
 Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_BxH
+Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_Files
+Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_Filetypes
 Export-ModuleMember -Function Convert-JtFolderPath_To_JtTblTable_Zahlung
 
+Export-ModuleMember -Function Convert-JtFolderPath_To_Md_Betrag
 Export-ModuleMember -Function Convert-JtFolderPath_To_Md_BxH
 Export-ModuleMember -Function Convert-JtFolderPath_To_Md_Zahlung
 
@@ -1591,9 +2061,17 @@ Export-ModuleMember -Function New-JtIndex_Default
 Export-ModuleMember -Function New-JtIndex_Stunden
 Export-ModuleMember -Function New-JtIndex_Zahlung
 
+Export-ModuleMember -Function New-JtRepo_Report_Betraege
+Export-ModuleMember -Function New-JtRepo_Report_YyyJpg
+Export-ModuleMember -Function New-JtRepo_Report_Foldernames
+Export-ModuleMember -Function New-JtRepo_Report_Foldertypes
+Export-ModuleMember -Function New-JtRepo_Report_Problems
+Export-ModuleMember -Function New-JtRepo_Report_Repo
+
 Export-ModuleMember -Function Test-JtFolder
 Export-ModuleMember -Function Test-JtFolder_File
 Export-ModuleMember -Function Test-JtFolder_Recurse
+Export-ModuleMember -Function Test-JtFolder_Recurse_Element
 
 Export-ModuleMember -Function Update-JtIndex_BxH
 Export-ModuleMember -Function Update-JtFolder_Md_and_Meta 

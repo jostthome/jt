@@ -198,15 +198,12 @@ class JtInv : JtClass {
         [String]$MyFilePath_Xml = $This.JtIoFolder_Base.GetFilePath($MyFileName_Xml)
         Write-JtLog -Where $This.ClassName -Text "GetConfigXml; FilePathXml: $MyFilePath_Xml"    
         [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath_Xml
-        if ($MyJtIoFile.IsExisting()) {
-            [FileElementXml]$MyFileElementXml = [FileElementXml]::new($MyJtIoFile)
-
-            [Xml]$MyXmlContent = $MyFileElementXml.GetXml()
-            return $MyXmlContent
-        }
-        else {
+        if (!($MyJtIoFile.IsExisting())) {
             return $Null
         }
+        [FileElementXml]$MyFileElementXml = [FileElementXml]::new($MyJtIoFile)
+        [Xml]$MyXmlContent = $MyFileElementXml.GetXml()
+        return $MyXmlContent
     }
 
     [Boolean]DoIt() {
@@ -262,22 +259,23 @@ class JtInvClientClean : JtInv {
         $This.DoLogRepoStart()
 
         [String]$MyFolderPath_C_Inventory_Report = [JtLog]::FolderPath_C_inventory_Report
-        If ($This.JtIoFolder_Report.IsExisting()) {
-            if ($This.JtIoFolder_Report.GetPath() -eq $MyFolderPath_C_Inventory_Report) {
-                $This.JtIoFolder_Report.DoRemoveEverything()
-                Write-JtLog -Where $This.ClassName -Text "# LOG Starting client..."
-            }
-            else {
-                [String]$MyMsg = -join ("This should not happen. Illegal path for local report. Should be: ", $MyFolderPath_C_Inventory_Report)
-                Write-JtLog_Error -Where $This.ClassName -Text $MyMsg
-                Throw $MyMsg
-            }
-            return $True  
-        }
-        else {
+
+        [JtIoFolder]$MyJtIoFolder_Report = $This.JtIoFolder_Report
+        If (!($MyJtIoFolder_Report.IsExisting())) {
             Throw "This should not happen. c:\_inventory\report is missing."
             return $False
         }
+
+        if ($MyJtIoFolder_Report.GetPath() -eq $MyFolderPath_C_Inventory_Report) {
+            $MyJtIoFolder_Report.DoRemoveEverything()
+            Write-JtLog -Where $This.ClassName -Text "# LOG Starting client..."
+        }
+        else {
+            [String]$MyMsg = -join ("This should not happen. Illegal path for local report. Should be: ", $MyFolderPath_C_Inventory_Report)
+            Write-JtLog_Error -Where $This.ClassName -Text $MyMsg
+            Throw $MyMsg
+        }
+        return $True  
     }
     
     [String]GetConfigName() {
@@ -365,7 +363,6 @@ class JtInvClientErrors : JtInv {
         [String]$MyPrefix = [JtIo]::FilePrefix_Report
         [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Errors
 
-
         $MyParams = @{
             FolderPath_Input  = $MyFolderPath_Input
             FolderPath_Output = $MyFolderPath_Output
@@ -412,7 +409,7 @@ class JtInvClientExport  : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -658,6 +655,16 @@ class JtInvClientReport : JtInv {
             FolderPath_Output = $MyFolderPath_Output
             Name              = "user"
             Value             = $env:Username
+        }
+        Write-JtIoFile_Meta_Report @MyParams
+
+        # [String]$MyLabel = -join ("klonversion", ".", $env:Username)
+        [String]$MyKlonVersion = Get-JtKlonversion
+        $MyParams = @{
+            FolderPath_Input  = $MyFolderPath_Input
+            FolderPath_Output = $MyFolderPath_Output
+            Name              = "klonversion"
+            Value             = $MyKlonVersion
         }
         Write-JtIoFile_Meta_Report @MyParams
         
@@ -915,7 +922,7 @@ class JtInvData : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -976,7 +983,7 @@ class JtInvData : JtInv {
         Write-JtLog -Where $This.ClassName -Text "-- GetDataLine, MyFolderPath: $MyFolderPath"
         [JtTblRow]$MyJtTblRow = New-JtTblRow
     
-        [String]$MyComputername = Get-Computername
+        [String]$MyComputername = Get-JtComputername
         $MyJtTblRow.Add("Computer", $MyComputername)
         $MyJtTblRow.Add("Foldername", $MyFoldername)
         $MyJtTblRow.Add("Path", $MyFolderPath)
@@ -1037,11 +1044,11 @@ class JtTblFilelist : JtClass {
         return $MyJtTblRow
     }
 
-    static [JtTblRow] GetRowForFileUsingTemplate([JtIoFile]$TheJtIoFile, [String]$TheFilenameTemplate) {
-        [JtTblRow]$MyJtTblRowAll = Convert-JtIoFile_To_JtTblRow -FilePath $TheJtIoFile
+    static [JtTblRow] GetRowForFileUsingTemplate([JtIoFile]$TheJtIoFile, [String]$TheFilename_Template) {
+        [JtTblRow]$MyJtTblRowAll = Convert-JtFilePath_To_JtTblRow_Betrag -FilePath $TheJtIoFile
 
         [JtTblRow]$MyJtTblRow = New-JtTblRow
-        [String[]]$AlParts = $TheFilenameTemplate.Split(".")
+        [String[]]$AlParts = $TheFilename_Template.Split(".")
 
         foreach ($Element in $AlParts) {
             [String]$MyPart = $Element
@@ -1079,7 +1086,7 @@ class JtInvFiles : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1164,7 +1171,7 @@ class JtInvFolder : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1238,7 +1245,7 @@ class JtInvLengths : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1330,7 +1337,7 @@ class JtInvLines : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
                 return $MyArrayList
             }
@@ -1395,7 +1402,7 @@ class JtInvMd : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
                 return $MyArrayList
             }
@@ -1452,6 +1459,83 @@ class JtInvMd : JtInv {
 }
 
 
+class JtInvDeploy : JtInv {
+
+    JtInvDeploy () : Base() {
+        $This.ClassName = "JtInvDeploy"
+    }
+
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
+        }
+        
+        [String]$MyTagName = "deploy"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source   = $Entity.source
+                computer = $Entity.computer
+                username = $Entity.username
+                share    = $Entity.share
+                passwd   = $Entity.passwd
+                path     = $Entity.path
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+
+            if ($MyItem.BlnValid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
+    }
+
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+
+        [System.Collections.ArrayList]$MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($Item in $MyArrayList) {
+            [String]$MySource = $Item.source
+            [String]$MyComputer = $Item.computer
+            [String]$MyUsername = $Item.username
+            [String]$MyPasswd = $Item.passwd
+            [String]$MyShare = $Item.share
+            [String]$MyPath = $Item.path
+
+            if (New-JtNetConnection -Computer $MyComputer -Username $MyUsername -Passwd $MyPasswd -Share $MyShare) {
+                [String]$MyFolderPath_Output = -join ("\\", $MyComputer, "\", $MyShare, "\", $MyPath)
+                New-JtRobocopy -FolderPath_Input $MySource -FolderPath_Output $MyFolderPath_Output
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Cannot access computer. MyComputer: $MyComputer"
+            }
+        }
+        return $True
+    }
+
+    [String]GetConfigName() {
+        return "JtInvDeploy"
+    }
+
+    [String]GetReportLabel() {
+        return "deploy"
+    }
+}
+
+
 class JtInvMirror : JtInv {
 
     JtInvMirror () : Base() {
@@ -1474,7 +1558,7 @@ class JtInvMirror : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1537,7 +1621,7 @@ class JtInvPoster : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1618,7 +1702,7 @@ class JtInvRecover : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1644,7 +1728,7 @@ class JtInvRecover : JtInv {
         [Int]$MyIntCount = $MyArrayList.count
         Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
         foreach ($Item in $MyArrayList) {
-            [String]$MyFilePath_Source = $Item.Source
+            [String]$MyFilePath_Source = $Item.source
           
             [Int32]$MyDisk = $Item.disk
             [Int32]$MyPartition = $Item.partition
@@ -1703,7 +1787,7 @@ class JtInvReportsCombine : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1794,7 +1878,7 @@ class JtInvReportsUpdate : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -1826,7 +1910,7 @@ class JtInvReportsUpdate : JtInv {
             foreach ($Folder in $MyAlJtIoSubfolders) {
                 [JtIoFolder]$MyJtIoFolder_Report = $Folder
                 Write-JtLog -Where $This.ClassName -Text "DoIt for report. MyJtIoFolder_Report: $MyJtIoFolder_Report"
-                New-JtCsvGenerator -FolderPath_Input $MyJtIoFolder_Report -FolderPath_Output $MyJtIoFolder_Report
+                New-JtCsvGenerator -FolderPath_Input $MyJtIoFolder_Report -FolderPath_Output $MyJtIoFolder_Report -Label $This.ClassName
             }
         }
         return $True
@@ -1866,7 +1950,7 @@ class JtInvSnapshot : JtInv {
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
     
-            if ($MyItem.valid) {
+            if ($MyItem.BlnValid) {
                 $MyArrayList.Add($MyItem)
             }
             else {
@@ -2072,6 +2156,8 @@ Function Get-JtInstalledSoftware {
         [String[]]$Name
     )
     Begin {
+        [String]$MyFunctionName = "Get-JtInstalledSoftware"
+
         if (!($Name)) {
             $Name = $env:COMPUTERNAME
         }
@@ -2082,7 +2168,7 @@ Function Get-JtInstalledSoftware {
     }
     Process {
         if (!(Test-Connection -ComputerName $Name -count 1 -quiet)) {
-            Write-JtLog_Error -Text "Unable to contact $Name. Please verify its network connectivity and try again." -Category ObjectNotFound -TargetObject $Computer
+            Write-JtLog_Error -Where $MyFunctionName -Text "Unable to contact $Name. Please verify its network connectivity and try again." -Category ObjectNotFound -TargetObject $Computer
             Break
         }
         $masterKeys = @()
@@ -2144,6 +2230,7 @@ Function Get-JtXmlReportObject {
     [String]$MyFolderPath = $FolderPath
     [String]$MyName = $Name
     if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Folder is missing."
         return $Null
     }
     [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
@@ -2152,7 +2239,7 @@ Function Get-JtXmlReportObject {
     
     [JtIoFolder]$MyJtIoFolder_Xml = $MyJtIoFolder.GetJtIoFolder_Sub("objects")
     if (!($MyJtIoFolder_Xml.IsExisting())) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Folder is missing in MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Folder is missing. MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
         return $Null
     }
     
@@ -2162,7 +2249,7 @@ Function Get-JtXmlReportObject {
     
     Write-JtLog -Where $MyFunctionName -Text "MyName: $MyName - MyFilePath_Xml: $MyFilePath_Xml"
     if (!(Test-JtIoFilePath -FilePath $MyFilePath_Xml)) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Xml file is missing in MyFilePath_Xml: $MyFilePath_Xml"
+        Write-JtLog_Error -Where $MyFunctionName -Text "MyName: $MyName - Xml file is missing. MyFilePath_Xml: $MyFilePath_Xml"
         return $Null
     }
     [System.Object]$MyObject = $Null
@@ -2187,37 +2274,41 @@ Function New-JtConfigItem {
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Filter,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Passwd,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Path,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Pattern,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Source,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Share,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$System,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Target,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Template
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Template,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Username
     )
 
     [String]$MyFunctionName = "New-JtConfigItem"
 
     [HashTable]$MyItem = New-Object HashTable
-    $MyItem.valid = $True
+    $MyItem.BlnValid = $True
 
     if ($Source) {
         [String]$MySource = $Source
         $MyItem.source = $MySource
         if (!(Test-JtIoFolderPath -FolderPath $MyItem.source)) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MySource: $MySource"
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
 
     
-    if ($target) {
+    if ($Target) {
         [String]$MyTarget = $target
         $MyItem.target = $MyTarget
         [String]$MyFolderPath_Target = $MyTarget
         [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Target -Force
         if (!($MyJtIoFolder_Output.IsExisting())) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! Folder missing. MyTarget: $MyTarget"
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2226,7 +2317,7 @@ Function New-JtConfigItem {
         $MyItem.computer = $computer
         if ($computer.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! COMPUTER is empty."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2235,7 +2326,7 @@ Function New-JtConfigItem {
         $MyItem.disk = $disk
         if ($disk.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! DISK is empty."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2244,7 +2335,7 @@ Function New-JtConfigItem {
         $MyItem.filter = $filter
         if ($filter.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! FILTER is EMPTY."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2253,7 +2344,7 @@ Function New-JtConfigItem {
         $MyItem.label = $label
         if ($label.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! LABEL is EMPTY."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2262,7 +2353,25 @@ Function New-JtConfigItem {
         $MyItem.partition = $partition
         if ($partition.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PARTITION is empty."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
+            return $MyItem
+        }
+    }
+
+    if ($passwd) {
+        $MyItem.passwd = $passwd
+        if ($passwd.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PASSWD is empty."
+            $MyItem.BlnValid = $False
+            return $MyItem
+        }
+    }
+
+    if ($path) {
+        $MyItem.path = $path
+        if ($path.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PATH is empty."
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2271,7 +2380,25 @@ Function New-JtConfigItem {
         $MyItem.pattern = $pattern
         if ($pattern.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! PATTERN is empty."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
+            return $MyItem
+        }
+    }
+
+    if ($share) {
+        $MyItem.share = $share
+        if ($share.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! SHARE is empty."
+            $MyItem.BlnValid = $False
+            return $MyItem
+        }
+    }
+
+    if ($system) {
+        $MyItem.system = $system
+        if ($system.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! SYSTEM is empty."
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2280,7 +2407,16 @@ Function New-JtConfigItem {
         $MyItem.template = $template
         if ($template.length -lt 1) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! TEMPLATE is empty."
-            $MyItem.valid = $False
+            $MyItem.BlnValid = $False
+            return $MyItem
+        }
+    }
+
+    if ($username) {
+        $MyItem.username = $username
+        if ($username.length -lt 1) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! USERNAME is empty."
+            $MyItem.BlnValid = $False
             return $MyItem
         }
     }
@@ -2401,6 +2537,13 @@ Function New-JtInvData {
     # New-JtInvClientTimestamp -Label "data"
 }
 
+Function New-JtInvDeploy {
+
+
+    [JtInvDeploy]::new()
+    
+    # New-JtInvClientTimestamp  -Label "mirror"
+}
 
 
 
@@ -2544,6 +2687,7 @@ Export-ModuleMember -Function New-JtInvClientTimestamp
 Export-ModuleMember -Function New-JtInvReportsCombine
 Export-ModuleMember -Function New-JtInvReportsUpdate
 Export-ModuleMember -Function New-JtInvData
+Export-ModuleMember -Function New-JtInvDeploy
 Export-ModuleMember -Function New-JtInvFiles
 Export-ModuleMember -Function New-JtInvFolder
 Export-ModuleMember -Function New-JtInvLengths

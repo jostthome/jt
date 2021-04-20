@@ -32,7 +32,7 @@ Function Test-JtVal {
 
         $MyResult = Convert-JtPart_To_DecBetrag -Part $MyValue
 
-        if($MyResult -ne $MyExpected) {
+        if ($MyResult -ne $MyExpected) {
             Write-JtLog_Error -Where $MyFunctionName -Text "MyValue: $MyValue - MyExpected: $MyExpected - MyResult: $MyResult"
             Throw "Error"
         }
@@ -111,7 +111,7 @@ Function Test-JtValid {
 
         [JtColRen]$MyJtColRen = New-JtColRenInput_Betrag
         [String]$MyIs = $MyJtColRen.GetOutput($MyTest)
-        [Boolean]$MyBlnValid = Test-JtIsValid_Betrag -Text $MyTest
+        [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Betrag -Text $MyTest
 
         Write-Host "$MyFunctionName"
         Write-Host "Input:      $MyTest"

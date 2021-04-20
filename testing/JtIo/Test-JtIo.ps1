@@ -3,6 +3,10 @@ using module JtIo
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
+
+
+
+
 Function Test-JtConfig {
 
     # [JtIoFolder]$JtIoFolder = New-JtIoFolder -FolderPath "D:\backup\oslo\reports\al-dek-nb-dek09.c-win10p"

@@ -35,10 +35,10 @@ class JtMd : JtClass{
         foreach ($File in $TheAlJtIoFiles) {
             [JtIoFile]$MyJtIoFile = $File
             [String]$MyFilename = $MyJtIoFile.GetName()
-            [String]$MyFileLabel = $MyJtIoFile.GetLabelForFileName()
+            [String]$MyLabel_File = $MyJtIoFile.GetLabelForFileName()
             [String]$MyFilePath = $MyJtIoFile.GetPath()
             [String]$MyPattern = $ThePattern
-            [String]$MyPattern = $MyPattern.Replace("{FILELABEL}", $MyFileLabel)
+            [String]$MyPattern = $MyPattern.Replace("{FILELABEL}", $MyLabel_File)
             [String]$MyFileExtension = [System.IO.Path]::GetExtension($MyFilename)
             
             [String]$MyContent = Get-Content -Path $MyFilePath -Encoding UTF8
@@ -58,7 +58,7 @@ class JtMd : JtClass{
                     $MyObject | Add-Member -MemberType NoteProperty -Name FilePath -Value $MyFilePath
                     $MyObject | Add-Member -MemberType NoteProperty -Name Extension -Value $MyFileExtension
                     # $MyObject | Add-Member -MemberType NoteProperty -Name Find -Value $MyLine
-                    $MyObject | Add-Member -MemberType NoteProperty -Name Label -Value $MyFileLabel
+                    $MyObject | Add-Member -MemberType NoteProperty -Name Label -Value $MyLabel_File
                     
                     $MyLab = [JtMd]::GetLabelForLine($El)
                     $MyObject | Add-Member -MemberType NoteProperty -Name Lab -Value $MyLab
@@ -100,7 +100,7 @@ class JtMd : JtClass{
         $Mat3
 
         [System.Collections.ArrayList]$MyList = [System.Collections.ArrayList]::new()
-        # if($matches.Length -gt 0) {
+        # if ($matches.Length -gt 0) {
         $e = $mat3 | foreach-object { $_ -match $Pattern } | ForEach-Object { $Matches[0] }
         if ($null -eq $e) {
 
@@ -200,7 +200,13 @@ Function Convert-JtIoFile_Md_To_Pdf {
 
     # miktex has do be installed.
     # choco install miktex -y
-    [String]$MyCommand = -join ('pandoc.exe -s -V geometry:margin=0.2in -o "', $MyFilePath_Output, '" "', $MyFilePath_Input, '"')
+    [String]$MyFilePath_Pandoc_Exe = "pandoc.exe"
+    [String]$MyFilePath_Pandoc_Exe_Apps = "c:/apps/tools/pandoc/pandoc.exe"
+    if(Test-JtIoFilePath -FilePath $MyFilePath_Pandoc_Exe_Apps) {
+        $MyFilePath_Pandoc_Exe = $MyFilePath_Pandoc_Exe_Apps
+    }
+
+    [String]$MyCommand = -join ($MyFilePath_Pandoc_Exe, ' -s -V geometry:left=2cm,right=1cm,top=1.5cm,bottom=1cm -o "', $MyFilePath_Output, '" "', $MyFilePath_Input, '"')
     $MyCommand
     Invoke-Expression -Command:$MyCommand
 
@@ -257,7 +263,7 @@ class JtMdTable : JtClass {
     [System.Data.Datatable]$Datatable = $Null
 
     JtMdTable([System.Data.Datatable]$TheDataTable) {
-        if($Null -eq $TheDataTable) {
+        if ($Null -eq $TheDataTable) {
             Throw "JtTblTable is null!"
         }
         $This.Datatable = $TheDataTable

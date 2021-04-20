@@ -1,5 +1,5 @@
 <config>
-	<combine source="D:\backup\oslo\reports" target="D:\Seafile\al-it\0.INVENTORY\01.OUTPUT\combine"></combine>
-	<combine source="D:\backup\oslo\reports" target="%OneDrive%\0.INVENTORY\01.OUTPUT\combine"></combine>
+	<combine source="D:\backup\oslo\reports" target="D:\Seafile\al-admin\log\combine"></combine>
+	<combine source="%OneDrive%\0.INVENTORY\01.OUTPUT\reports" target="%OneDrive%\0.INVENTORY\01.OUTPUT\combine"></combine>
 </config>
 

@@ -225,7 +225,7 @@ Function New-JtTblRow {
     [String]$MyFunctionName = "New-JtTblRow"
     [String]$MyLabel = $MyFunctionName
 
-    if($Label) {
+    if ($Label) {
         $MyLabel = $Label
     }
 

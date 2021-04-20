@@ -19,7 +19,7 @@ class JtSnap : JtClass {
         New-JtRobocopy -FolderPath_Input $MyFolderPath_Input -FolderPath_Output $MyFolderPath_Output
 
         [JtIoFile]$MyJtIoFile_SnaphotExe = [JtIoFile]::new($This.FilePath_Exe_Snapshot)
-        if ($False -eq $MyJtIoFile_SnaphotExe.IsExisting()) {
+        if (!($MyJtIoFile_SnaphotExe.IsExisting())) {
             Write-JtLog_Error -Where $This.ClassName -Text "Snapshot64.exe does not exist at MyJtIoFile_SnaphotExe: $MyJtIoFile_SnaphotExe"
             return $False
         }
@@ -64,7 +64,7 @@ class JtSnap_Partition : JtSnap {
         [String]$MyLabel = -Join ("JtSnap", $This.MyName)
         [JtTimer]$MyJtTimer = [JtTimer]::new($MyLabel)
 
-        if (! ($MyJtIoFolder_Snap.IsExisting())) {
+        if (!($MyJtIoFolder_Snap.IsExisting())) {
             Write-JtLog_Error -Where $This.ClassName -Text "Folder does not exist MyJtIoFolder_Snap: $MyJtIoFolder_Snap"
             return $False
         }
@@ -75,9 +75,9 @@ class JtSnap_Partition : JtSnap {
         $MyJtIoFolder_SnapComputerPart.DoRemoveFiles_All()
         
         [String]$MyFilename_Image = -join ($This.MyName, ".sna")
-        [String]$MyFilePath_Image = $MyJtIoFolder_SnapComputerPart.GetFilePath($MyFilename_Image)
+        [String]$MyFilePath_Sna = $MyJtIoFolder_SnapComputerPart.GetFilePath($MyFilename_Image)
     
-        $MyCommand = -Join ($This.MyPartition, " ", $MyFilePath_Image, " -Go -R")
+        $MyCommand = -Join ($This.MyPartition, " ", $MyFilePath_Sna, " -Go -R")
         if (Get-JtDevMode) {
             Write-JtLog -Where $This.ClassName -Text "MyFilePath_SnapshotExe: $MyFilePath_SnapshotExe, MyCommand: $MyCommand"
         }
@@ -110,37 +110,37 @@ class JtSnap_Partition : JtSnap {
 
 class JtSnap_Recover : JtSnap {
     
-    [JtIofile]$SnaFile = $Null
+    [JtIofile]$FilePath_Sna = $Null
     [String]$Computer = ""
-    [String]$MyName = ""
+    [String]$Name = ""
     [Int32]$Disk = 0
     [Int32]$Part = 0
     # [String]$MyPartition
-    [Boolean]$System = $False
+    [Boolean]$BlnSystem = $False
 
-    JtSnap_Recover([JtIoFile]$MySnaFile, [Int32]$MyDisk, [Int32]$MyPart, [String]$TheComputer) {
+    JtSnap_Recover([String]$TheFilePath_Sna, [Int32]$TheDisk, [Int32]$ThePart, [String]$TheComputer) {
         $This.ClassName = "JtSnap_Recover"
-        $This.Disk = $MyDisk
-        $This.Part = $MyPart
+        $This.Disk = $TheDisk
+        $This.Part = $ThePart
         $This.Computer = $TheComputer
-        $This.MyName = -join ("HD", $This.Disk, "", $This.Part)
+        $This.Name = -join ("HD", $This.Disk, "", $This.Part)
 
-        $This.SnaFile = $MySnaFile
-        $This.System = $False
+        $This.FilePath_Sna = $TheFilePath_Sna
+        $This.BlnSystem = $False
         
         # $MyPartition = "HD2:1"
         # $This.MyPartition = -join ("HD", $Disk, ":", $Part)
     }
     
-    JtSnap_Recover([JtIoFile]$TheSnaFile, [Int32]$TheDisk, [Int32]$ThePart, [String]$TheComputer, [Boolean]$TheBlnIsSystem) {
+    JtSnap_Recover([JtIoFile]$TheFilePath_Sna, [Int32]$TheDisk, [Int32]$ThePart, [String]$TheComputer, [Boolean]$TheBlnIsSystem) {
         $This.ClassName = "JtSnap_Recover"
         $This.Disk = $TheDisk
         $This.Part = $ThePart
         $This.Computer = $TheComputer
-        $This.MyName = -join ("HD", $This.Disk, "", $This.Part)
+        $This.Name = -join ("HD", $This.Disk, "", $This.Part)
 
-        $This.SnaFile = $TheSnaFile
-        $This.System = $TheBlnIsSystem
+        $This.FilePath_Sna = $TheFilePath_Sna
+        $This.BlnSystem = $TheBlnIsSystem
 
         # $MyPartition = "HD2:1"
         # $This.MyPartition = -join ("HD", $Disk, ":", $Part)
@@ -152,13 +152,16 @@ class JtSnap_Recover : JtSnap {
             return $False
         }
 
-        [String]$MyFilePath_Image = $This.SnaFile.GetPath()
+        [String]$MyFilePath_Sna = $This.FilePath_Sna
+        [String]$MyDisk = $This.Disk
+        [String]$MyPart = $This.Part
+        [Boolean]$MyBlnSystem = $This.BlnSystem
 
-        [String]$MyCommandNormal = -Join (" ", $MyFilePath_Image, " ", "hd", $This.Disk, ":", $This.Part, " ", "-y")
-        [String]$MyCommandSystem = -Join (" ", "C:", " ", $MyFilePath_Image, " ", "--schedule", " ", "--autoreboot:success")
+        [String]$MyCommandNormal = -Join (" ", $MyFilePath_Sna, " ", "hd", $MyDisk, ":", $MyPart, " ", "-y")
+        [String]$MyCommandSystem = -Join (" ", "C:", " ", $MyFilePath_Sna, " ", "--schedule", " ", "--autoreboot:success")
 
         [String]$MyCommand = ""
-        if ($True -eq $This.System) {
+        if ($MyBlnSystem) {
             $MyCommand = $MyCommandSystem
         }
         else {
@@ -169,8 +172,9 @@ class JtSnap_Recover : JtSnap {
             Write-JtLog -Where $This.ClassName -Text "Doing nothing. This is a dev system."
         }
         else {
-            Start-Process -FilePath $This.FilePath_Exe_Snapshot -ArgumentList $MyCommand -NoNewWindow -Wait
-            if ($True -eq $This.System) {
+            Write-JtLog -Where $This.ClassName -Text "Restoring... $MyFilePath_SnapshotExe  $MyCommand"
+            Start-Process -FilePath $MyFilePath_SnapshotExe -ArgumentList $MyCommand -NoNewWindow -Wait
+            if ($MyBlnSystem) {
                 $MyCommand = -join ('/c', ' ', '"', 'Computer wird neu gestartet. System wird recovered.', '"', ' ', '/r')
                 #                Start-Process -FilePath $This.ShutdownExe -ArgumentList $MyCommand -NoNewWindow -Wait
             }
@@ -183,7 +187,7 @@ Function New-JtSnap_Partition {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Disk,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Partition
     )
 
     [String]$MyFolderPath_Output = $FolderPath_Output
@@ -199,29 +203,26 @@ Function New-JtSnap_Recover {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Disk,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Partition,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Computer,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Boolean]$BlnSystem
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Partition,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Computer,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Boolean]$BlnSystem
     )
 
-    [String]$MyFilePath = [String]$FilePath,
-    [String]$MyDisk = [String]$Disk,
-    [String]$MyPartition = [String]$Partition,
-    [String]$MyComputer = [String]$Computer,
+    [String]$MyFunctionName = "New-JtSnap_Recover"
+    [String]$MyFilePath_Sna = [String]$FilePath
+    [String]$MyDisk = [String]$Disk
+    [String]$MyPartition = [String]$Partition
+    [String]$MyComputer = [String]$Computer
     [Boolean]$MyBlnSystem = [Boolean]$BlnSystem
 
-    [JtIoFile]$MyJtIoFile_Sna = [JtIoFile]::new($MyItem.source)
-    if (!($MyJtIoFile_Sna.IsExisting())) {
-        Write-JtLog_Error -Where $This.ClassName -Text "Error!!! File missing; please edit XML for MyJtIoFile_Sna: $MyJtIoFile_Sna"
+    if (!(Test-JtIoFilePath -FilePath $MyFilePath_Sna)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Error!!! File missing; please edit XML for MyFilePath_Sna: $MyFilePath_Sna"
         return $False
     }
         
-    [JtSnap_Recover]$MyJtSnap_Recover = [JtSnap_Recover]::new($MyFilePath, $MyDisk, $MyPartition, $MyComputer, $MyBlnSystem)
+    [JtSnap_Recover]$MyJtSnap_Recover = [JtSnap_Recover]::new($MyFilePath_Sna, $MyDisk, $MyPartition, $MyComputer, $MyBlnSystem)
     $MyJtSnap_Recover.DoIt()
 }
-
-
-
 
 Export-ModuleMember -Function New-JtSnap_Partition
 Export-ModuleMember -Function New-JtSnap_Recover

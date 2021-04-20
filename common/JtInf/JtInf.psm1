@@ -6,9 +6,9 @@ class JtInfi : JtClass {
     
     hidden [JtIoFolder]$JtIoFolder
 
-    hidden [Boolean]$Valid = $False
-    hidden [Boolean]$IsValidCsv = $False
-    hidden [Boolean]$IsValidXml = $False
+    hidden [Boolean]$BlnValid = $False
+    hidden [Boolean]$BlnValidCsv = $False
+    hidden [Boolean]$BlnValidXml = $False
 
     hidden [JtInf_AFolder]$Cache_JtInf_AFolder = $Null
     hidden [JtInf_Bitlocker]$Cache_JtInf_Bitlocker = $Null
@@ -70,7 +70,8 @@ class JtInfi : JtClass {
         if ($Null -eq $MyJtInf) {
             # $MyJtInf = Get-JtInf_Soft -FolderPath $This.GetJtIoFolder()
             # [JtInf_Soft]$MyJtInf = $MyJtInf[-1]
-            [JtInf_Soft]$MyJtInf = Get-JtInf_Soft -FolderPath $This.GetJtIoFolder()
+            [JtIoFolder]$MyJtIoFolder = $This.GetJtIoFolder()
+            [JtInf_Soft]$MyJtInf = Get-JtInf_Soft -FolderPath $MyJtIoFolder
             $This.Cache_JtInf_Soft = $MyJtInf
         }
         return $MyJtInf
@@ -158,7 +159,8 @@ class JtInfi : JtClass {
     }
     
     [Boolean]IsValid() {
-        return $This.GetJtInf_AFolder().IsValid()
+        [Boolean]$MyBlnValid = $This.GetJtInf_AFolder().IsValid()
+        return $MyBlnValid
     }
 }
 
@@ -210,7 +212,7 @@ class JtInf : JtClass {
 
 class JtInf_AFolder : JtInf {
 
-    [Boolean]$IsValid = $True
+    [Boolean]$BlnValid = $True
 
     [JtFld]$Name
     [JtFld]$JtVersion
@@ -247,10 +249,6 @@ class JtInf_AFolder : JtInf {
         return Get-JtReport_Value -FolderPath $TheFolderPath -Label "user"
     }
     
-    
-
-    
-    
     static [String]GetTheTimestamp([String]$TheFolderPath) {
         [String]$MyFolderPath = $TheFolderPath
         [String]$MyTypeName = ""
@@ -272,6 +270,11 @@ class JtInf_AFolder : JtInf {
         [String]$MyValue = Get-JtReport_Value -FolderPath $TheFolderPath -Label "winver"
         [String]$MyWinVer = $MyValue.Replace("-", ".")
         return $MyWinVer
+    }
+
+    static [String]GetKlonversion([String]$TheFolderPath) {
+        [String]$MyValue = Get-JtReport_Value -FolderPath $TheFolderPath -Label "klonversion"
+        return $MyValue
     }
 
     JtInf_AFolder() {
@@ -343,7 +346,7 @@ Function Get-JtInf_AFolder {
     
     [String]$MyFolderName = $MyJtIoFolder.GetName()
     $MyJtInf.Get_Name().SetValue($MyFolderName)
-    $MyJtInf.IsValid = $True
+    $MyJtInf.BlnValid = $True
 
     [String]$MyLabelC = "label_c"
     [String]$MyComputername = "computername"
@@ -357,7 +360,7 @@ Function Get-JtInf_AFolder {
         [String[]]$MyAlParts = $MyFolderName.Split(".")
         if ($MyAlParts.length -lt 2) {
             Write-JtLog_Error -Where $MyFunctionName -Text "Ungueltiger Name: $MyFolderName - $MyFolderPath"
-            $MyJtInf.IsValid = $False
+            $MyJtInf.BlnValid = $False
         }
         else {
             $MyComputername = $MyAlParts[0]
@@ -409,7 +412,7 @@ Function Get-JtInf_AFolder {
         [String]$MyWin4 = Convert-JtDotter -Text $MyWinVer -PatternOut "4"
         $MyJtInf.Get_Win4().SetValue($MyWin4)
 
-        [String]$MyKlonVersion = Get-JtKlonVersion
+        [String]$MyKlonVersion = [JtInf_AFolder]::GetKlonversion($MyFolderPath)
         $MyJtInf.Get_KlonVersion().SetValue($MyKlonVersion)
 
         [String]$MyIp = [JtInf_AFolder]::GetIp($MyFolderPath)
@@ -426,7 +429,7 @@ Function Get-JtInf_AFolder {
         $MyJtInf.Get_ReportExists().SetValue($MyReportExists)
     }
     else {
-        $MyJtInf.IsValid = $False
+        $MyJtInf.BlnValid = $False
     }
 
     return $MyJtInf
@@ -490,23 +493,20 @@ class JtInf_Bitlocker : JtInf {
 }
 
 Function Get-JtInf_Bitlocker {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
     ) 
 
     [JtInf_Bitlocker]$MyJtInf = New-JtInf_Bitlocker
     
-    if (!(Test-JtIoFolderPath -FolderPath $FolderPath)) {
+    [String]$MyFolderPath = $FolderPath
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
         return $MyJtInf
     }
-    [String]$MyFolderPath = $FolderPath
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
-
 
     [String]$MyName = "Bitlocker"
 
-    [System.Object]$MyObj = Get-JtXmlReportObject -FolderPath $MyJtIoFolder -Name $MyName
+    [System.Object]$MyObj = Get-JtXmlReportObject -FolderPath $MyFolderPath -Name $MyName
     if ($MyObj) {
         foreach ($Element in $MyObj) {
             $MyElement = $Element
@@ -661,8 +661,8 @@ class JtInf_Soft : JtInf {
     [JtFldSoft]$Premiere_CC
     [JtFldSoft]$Project
     [JtFldSoft]$RawTherapee
-    [JtFldSoft]$Revit_2020
     [JtFldSoft]$Revit_2021
+    [JtFldSoft]$Revit_2022
     [JtFldSoft]$Rhino_6
     [JtFldSoft]$Seadrive
     [JtFldSoft]$Seafile
@@ -721,6 +721,9 @@ class JtInf_Soft : JtInf {
                         elseif ($Part3 -eq "10370") {
                             $MyResult = "Office2019"
                         }
+                        elseif ($Part3 -eq "10372") {
+                            $MyResult = "Office2019"
+                        }
                         elseif ($Part3 -eq "10827") {
                             $MyResult = "Office2019"
                         }
@@ -729,7 +732,7 @@ class JtInf_Soft : JtInf {
                         }
                         else {
                             $MyResult = "OfficeXXX"
-                            Write-JtLog_Error -Text "GetLabelForOffice. Cannot detect Office Version. VERSION: $Version"
+                            Write-JtLog_Error -Where "STATIC" -Text "GetLabelForOffice. Cannot detect Office Version. VERSION: $Version"
                         }
                     } 
                     default {
@@ -830,8 +833,8 @@ class JtInf_Soft : JtInf {
         $This.Project = New-JtFldSoft -Label "Project" -JtSoftSrc Un64 -Search "Microsoft Project MUI*"
         $This.Powertoys = New-JtFldSoft -Label "Powertoys" -JtSoftSrc Un64 -Search "PowerToys*"
         $This.RawTherapee = New-JtFldSoft -Label "RawTherapee" -JtSoftSrc Un64 -Search "RawTherapee Version*"
-        $This.Revit_2020 = New-JtFldSoft -Label "Revit_2020" -JtSoftSrc Un64 -Search "Autodesk Revit 2020*"
         $This.Revit_2021 = New-JtFldSoft -Label "Revit_2021" -JtSoftSrc Un64 -Search "Autodesk Revit 2021*"
+        $This.Revit_2022 = New-JtFldSoft -Label "Revit_2022" -JtSoftSrc Un64 -Search "Autodesk Revit 2022*"
         $This.Rhino_6 = New-JtFldSoft -Label "Rhino_6" -JtSoftSrc Un64 -Search "Rhinoceros 6*"
         $This.Seadrive = New-JtFldSoft -Label "Seadrive" -JtSoftSrc Un64 -Search "SeaDrive*"
         $This.Seafile = New-JtFldSoft -Label "Seafile" -JtSoftSrc Un32 -Search "Seafile*"
@@ -900,13 +903,15 @@ Function Get-JtInf_Soft {
     ) 
 
     [String]$MyFunctionName = "Get-JtInf_Soft"
+
+    Write-JtLog_Verbose -Where $MyFunctionName -Text "Start"
+
     [JtInf_Soft]$MyJtInf = New-JtInf_Soft
 
-    if (!(Test-JtIoFolderPath -FolderPath $FolderPath)) {
+    [String]$MyFolderPath = $FolderPath
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
         return $MyJtInf
     }
-    [String]$MyFolderPath = $FolderPath
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
 
     [String]$MyName = "soft"
 
@@ -916,9 +921,8 @@ Function Get-JtInf_Soft {
     [String]$MyProperty_Filter64 = "DisplayName"
     [String]$MyProperty_Version64 = "DisplayVersion"
 
-    [System.Object]$MyObjXml32 = Get-JtXmlReportSoftware -JtIoFolder $MyJtIoFolder -Name "Uninstall32"
-    [System.Object]$MyObjXml64 = Get-JtXmlReportSoftware -JtIoFolder $MyJtIoFolder -Name "Uninstall64"
-    
+    [System.Object]$MyObjXml32 = Get-JtXmlReportSoftware -FolderPath $MyFolderPath -Name "Uninstall32"
+    [System.Object]$MyObjXml64 = Get-JtXmlReportSoftware -FolderPath $MyFolderPath -Name "Uninstall64"
 
     [System.Collections.ArrayList]$MyArray32 = [JtInf_Soft]::GetFilteredArrayList($MyObjXml32, $MyProperty_Filter32)
     [System.Collections.ArrayList]$MyArray64 = [JtInf_Soft]::GetFilteredArrayList($MyObjXml64, $MyProperty_Filter64)
@@ -928,6 +932,7 @@ Function Get-JtInf_Soft {
         [JtFldSoft]$MyField = $Field
         [String]$MyVersion = ""
         [String]$MyKeyword = $MyField.GetSearch()
+Write-Host $MyKeyword        
         [JtSoftSrc]$MyJtSoftSrc = $MyField.GetJtSoftSrc()
 
         [System.Collections.ArrayList]$MyArray = $Null
@@ -946,20 +951,19 @@ Function Get-JtInf_Soft {
 
         # try {
         $MyResult = $MyArray | Where-Object { $_.($MyProperty_Filter) -like $MyKeyword }
-        if ($Null -ne $MyResult) {
+        if ($MyResult) {
             $MyVersion = "v" + $MyResult[0].($MyProperty_Version)
             [String]$MyLabel = $MyField.GetLabel()
+Write-Host $MyLabel            
             # Write-JtLog -Where $This.ClassName -Text "Label: $MyLabel Version: $Version"
             $MyJtInf.($MyLabel).SetValue($MyVersion) | Out-Null
         }
         #$MyField.SetValue($Version)
     }
 
-        
     [String]$MyValOff = [JtInf_Soft]::GetLabelForOffice($MyJtInf.Office.GetValue())
     $MyJtInf.OfficeTxt.SetValue($MyValOff) | Out-Null
 
-    
     return , $MyJtInf
 }
 
@@ -1029,15 +1033,13 @@ Function Get-JtInf_Win32Bios {
 
     [JtInf_Win32Bios]$MyJtInf = New-JtInf_Win32Bios
 
-    if (!(Test-JtIoFolderPath -FolderPath $FolderPath)) {
+    [String]$MyFolderPath = $FolderPath
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
         return $MyJtInf
     }
-    [String]$MyFolderPath = $FolderPath
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
-
 
     [String]$MyName = "Win32_Bios"
-    [System.Object]$MyObj = Get-JtXmlReportObject -FolderPath $MyJtIoFolder -Name $MyName
+    [System.Object]$MyObj = Get-JtXmlReportObject -FolderPath $MyFolderPath -Name $MyName
     if ($MyObj) {
         $MyJtInf.Hersteller.SetValue($MyObj.Manufacturer)
         $MyJtInf.Sn.SetValue($MyObj.SerialNumber)
@@ -1082,16 +1084,13 @@ Function Get-JtInf_Win32ComputerSystem {
 
     [JtInf_Win32ComputerSystem]$MyJtInf = New-JtInf_Win32ComputerSystem
 
-    if (!(Test-JtIoFolderPath -FolderPath $FolderPath)) {
+    [String]$MyFolderPath = $FolderPath
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
         return $MyJtInf
     }
-    [String]$MyFolderPath = $FolderPath
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
-
-        
     
     [String]$MyName = "Win32_ComputerSystem"
-    [System.Object]$MyObj = Get-JtXmlReportObject -FolderPath $MyJtIoFolder -Name $MyName
+    [System.Object]$MyObj = Get-JtXmlReportObject -FolderPath $MyFolderPath -Name $MyName
 
     if ($MyObj) {
         $MyJtInf.Computername.SetValue($MyObj.Name)
@@ -1243,7 +1242,7 @@ Function Get-JtInf_Win32NetworkAdapter {
     [JtInf_Win32NetworkAdapter]$MyJtInf = New-JtInf_Win32NetworkAdapter
 
     [String]$MyFolderPath = $FolderPath
-    if (!(Test-JtIoFolderPath -FolderPath $FolderPath)) {
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
         Return $MyInf
     }
     [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
@@ -1451,19 +1450,20 @@ Function Get-JtReport_Value {
 Function Get-JtXmlReportSoftware() {
 
     param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][JtIoFolder]$JtIoFolder, 
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath, 
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Name
     )
 
     [String]$MyFunctionName = "Get-JtXmlReportSoftware"
 
-    [JtIoFolder]$MyJtIoFolder = $JtIoFolder
+    [String]$MyFolderPath = $FolderPath
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
     Write-JtLog -Where $MyFunctionName -Text "MyJtIoFolder: $MyJtIoFolder"
 
     [System.Object]$MyObject = $Null
     [System.Object]$MyName = $Name
 
-    Write-JtLog -Where $MyFunctionName -Text "GetXmlReportSoftware. MyName: $MyName"
+    Write-JtLog -Where $MyFunctionName -Text "MyName: $MyName"
     
 
     if ($Null -eq $MyJtIoFolder) {
@@ -1474,12 +1474,12 @@ Function Get-JtXmlReportSoftware() {
     [String]$MyFilename_Xml = -Join ($MyName, [JtIo]::FileExtension_Xml)
     [JtIoFolder]$MyJtIoFolder_Xml = [JtIoFolder]$MyJtIoFolder.GetJtIoFolder_Sub("software")
     if (!($MyJtIoFolder_Xml.IsExisting())) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyJtIoFolder_Xml does not exist. MyName: $MyName  - MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
+        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist. MyName: $MyName  - MyJtIoFolder_Xml: $MyJtIoFolder_Xml"
         return $Null
     }
 
     [String]$MyFilePath_Xml = $MyJtIoFolder_Xml.GetFilePath($MyFilename_Xml)
-    Write-JtLog -Where $MyFunctionName -Text "Get-JtXmlReportSoftware. MyFilePath_Xml: $MyFilePath_Xml"
+    Write-JtLog -Where $MyFunctionName -Text "MyFilePath_Xml: $MyFilePath_Xml"
     if (Test-JtIoFilePath -FilePath $MyFilePath_Xml) {
         try {
             $MyObject = Import-Clixml $MyFilePath_Xml

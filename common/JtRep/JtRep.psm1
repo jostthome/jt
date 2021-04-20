@@ -528,16 +528,18 @@ Function Get-JtRep_SoftwareSupport {
     [JtTblRow]$MyJtTblRow = Get-JtTblRowDefault -JtInfi $MyJtInfi -Label $MyFunctionName
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32ComputerSystem().Herst) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32ComputerSystem().Modell) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Win3) | Out-Null
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Win4) | Out-Null
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Opsi) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().LenovoSysUp) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().DellCommand) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().DellSuppAs) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Opsi) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Seadrive) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Seafile) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().DokanLibrary) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().CiscoAnyConnect) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().DokanLibrary) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32OperatingSystem().OsCaption) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32OperatingSystem().OsVersion) | Out-Null 
+    # $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32OperatingSystem().OsVersion) | Out-Null 
     # $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().WinVersion) | Out-Null 
     return , $MyJtTblRow
 }
@@ -555,7 +557,7 @@ Function Get-JtRep_SoftwareVray {
     [JtTblRow]$MyJtTblRow = Get-JtTblRowDefault -JtInfi $MyJtInfi -Label $MyFunctionName
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Max_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRay3ds) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2021) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRevit) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_6) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRhino) | Out-Null 
@@ -635,7 +637,7 @@ Function Get-JtRep_Z_G13 {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AffinityDesigner) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AffinityPhoto) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AffinityPublisher) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2021) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Office) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Office365) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Seadrive) | Out-Null 
@@ -679,6 +681,7 @@ Function Get-JtRep_Z_Iat {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AutoCAD_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Max_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2021) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().ArchiCAD) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Vectorworks) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Cinema4D) | Out-Null 
@@ -726,6 +729,7 @@ Function Get-JtRep_Z_Lab {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AutoCAD_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Max_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2021) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().ArchiCAD) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Vectorworks) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Cinema4D) | Out-Null 
@@ -776,6 +780,7 @@ Function Get-JtRep_Z_Pools {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AutoCAD_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Max_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2021) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Allplan_2019) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().ArchiCAD) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Vectorworks) | Out-Null 
@@ -808,8 +813,6 @@ Function Get-JtRep_Z_Pools {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().VLC) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().WibuKey) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Zip7) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32OperatingSystem().OsCaption) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32OperatingSystem().OsVersion) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32VideoController().Grafikkarte) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32VideoController().TreiberVersion) | Out-Null 
     return , $MyJtTblRow

@@ -55,11 +55,11 @@ class JtClass {
         }
 
         elseif ($Null -eq $Hash ) {
-            Write-JtLog_Error -Text "STATIC GetDic. Hash is null!"
+            Write-JtLog_Error -Where "STATIC" -Text "STATIC GetDic. Hash is null!"
             return $dictionary
         }
         else {
-            Write-JtLog_Error -Text "STATIC GetDic. Enter a hash table or an array. GetType: $Hash.getType()"
+            Write-JtLog_Error -Where "STATIC" -Text "STATIC GetDic. Enter a hash table or an array. GetType: $Hash.getType()"
             return $dictionary
         }
 
@@ -142,7 +142,7 @@ class JtLog {
 
     static [String]$FilePathError = $Null
     static [String]$FileFolderPath = $Null
-    static [String]$FilePathLog = $Null
+    static [String]$FilePathLog_Log = $Null
     static [String]$FilePathIo = $Null
     
     static [int32]$CounterError = 0
@@ -180,6 +180,12 @@ class JtLog {
     static [String]GetFilename_Log_Log([String]$TheValue) {
         [String]$MyValue = $TheValue
         [String]$MyName = -join ("log", ".", $MyValue, ".", "log", ".md")
+        return $MyName
+    }
+
+    static [String]GetFilename_Log_Job([String]$TheValue) {
+        [String]$MyValue = $TheValue
+        [String]$MyName = -join ("log", ".", $MyValue, ".", "job", ".md")
         return $MyName
     }
 
@@ -221,18 +227,34 @@ class JtLog {
         return [JtLog]::FileFolderPath
     }
     
-    static [String]GetFilePathLog() {
-        if (([JtLog]::FilePathLog).Length -lt 1) {
+    static [String]GetFilePathLog_Log() {
+        [String]$MyFilePath = [JtLog]::FilePathLog_Log
+        if ($MyFilePath.Length -lt 1) {
             [String]$FolderPathLog = [JtLog]::FolderPath_C_inventory_Report
             New-Item -ItemType Directory -Force -Path $FolderPathLog 
         }
-        if (([JtLog]::FilePathLog).Length -lt 1) {
+        if ($MyFilePath.Length -lt 1) {
             [String]$MyTimestamp = Get-JtTimestamp
             [String]$MyFilename = [JtLog]::GetFilename_Log_Log($MyTimestamp)
             [String]$MyFilePath = -join ([JtLog]::FolderPath_C_inventory_Report, "\", $MyFilename)
-            [JtLog]::FilePathLog = $MyFilePath
         }
-        return [JtLog]::FilePathLog
+        [JtLog]::FilePathLog_Log = $MyFilePath
+        return [JtLog]::FilePathLog_Log
+    }
+
+    static [String]GetFilePathLog_Job() {
+        [String]$MyFilePath = [JtLog]::FilePathLog_Job
+        if ($MyFilePath.Length -lt 1) {
+            [String]$MyFolderPath_Log = [JtLog]::FolderPath_C_inventory_Report
+            New-Item -ItemType Directory -Path $MyFolderPath_Log -Force 
+        }
+        if ($MyFilePath.Length -lt 1) {
+            [String]$MyTimestamp = Get-JtTimestamp
+            [String]$MyFilename = [JtLog]::GetFilename_Log_Job($MyTimestamp)
+            $MyFilePath = -join ([JtLog]::FolderPath_C_Inventory_Report, "\", $MyFilename)
+        }
+        [JtLog]::FilePathLog_Job = $MyFilePath
+        return $MyFilePath
     }
  
 
@@ -308,12 +330,38 @@ class JtLog {
     } 
     
     DoPrintLog() {
-        [String]$MyFilePath = [JtLog]::GetFilePathLog()
+        [String]$MyFilePath = [JtLog]::GetFilePathLog_Log()
         
         [JtLog]::CounterLog = [JtLog]::CounterLog + 1
         [Int16]$MyCounter = [JtLog]::CounterLog
         
         [String]$MyType = "LOG"
+        [String]$MyOutput = $This.Text
+        [String]$MyWhere = $This.Where
+
+        Write-JtLog_Message -Text $MyOutput -Where $MyWhere -Type $MyType -Counter $MyCounter -FilePath_Output $MyFilePath
+    } 
+
+    DoPrintLogJob() {
+        [String]$MyFilePath = [JtLog]::GetFilePathLog_Job()
+        
+        [JtLog]::CounterLog = [JtLog]::CounterLog + 1
+        [Int16]$MyCounter = [JtLog]::CounterLog
+        
+        [String]$MyType = "JOB"
+        [String]$MyOutput = $This.Text
+        [String]$MyWhere = $This.Where
+
+        Write-JtLog_Message -Text $MyOutput -Where $MyWhere -Type $MyType -Counter $MyCounter -FilePath_Output $MyFilePath
+    } 
+
+    DoPrintLogVerbose() {
+        [String]$MyFilePath = [JtLog]::GetFilePathLog_Log()
+        
+        [JtLog]::CounterLog = [JtLog]::CounterLog + 1
+        [Int16]$MyCounter = [JtLog]::CounterLog
+        
+        [String]$MyType = "VERBOSE"
         [String]$MyOutput = $This.Text
         [String]$MyWhere = $This.Where
 
@@ -371,8 +419,6 @@ class JtToolWol : JtClass {
         }
     }
 }
-
-
 
 
 Class JtTimer : JtClass {
@@ -455,12 +501,19 @@ Function Convert-JtDotter {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$PatternOut,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$SeparatorIn,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$SeparatorOut,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Reverse,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Default
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Silent,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Default
     )
 
     [String]$MyFunctionName = "Convert-JtDotter"
+
+    [Boolean]$MyBlnSilent = $False
+    if ($Silent) {
+        $MyBlnSilent = $True
+    }
 
     [String]$MyDefault = "xxx"
     if ($Default) {
@@ -468,12 +521,17 @@ Function Convert-JtDotter {
     }
 
     [String]$MyText = $Text
-    [String]$MySeparatorOut = "."
-    if ($SeparatorOut) {
-        $MySeparatorOut = $SeparatorOut
+
+    [String]$MySeparatorIn = $SeparatorIn
+    if (!($SeparatorIn)) {
+        $MySeparatorIn = "."
+    }
+    [String]$MySeparatorOut = $SeparatorOut
+    if (!($SeparatorOut)) {
+        $MySeparatorOut = "."
     }
 
-    $MyAlPartsText = $MyText.Split(".")
+    $MyAlPartsText = $MyText.Split($MySeparatorIn)
     [Int16]$MyIntPartsCount = $MyAlPartsText.Count
     $MyAlPartsIds = $PatternOut.Split(".")
     [JtList]$MyJtList = New-JtList
@@ -488,7 +546,9 @@ Function Convert-JtDotter {
             }
             [String]$MyValue = $MyAlPartsText[$MyIntPos]
             if ($MyValue.Length -lt 1) {
-                Write-JtLog_Error -Where $MyFunctionName -Text "EMPTY ELEMENT. Problem with MyText: $MyText"
+                if (!($MyBlnSilent)) {
+                    Write-JtLog_Error -Where $MyFunctionName -Text "EMPTY ELEMENT. Problem with MyText: $MyText"
+                }
                 $MyValue = $MyDefault
             }
         }
@@ -509,8 +569,7 @@ Function Convert-JtFilename_To_DecBetrag {
     [String]$MyFilename = $Filename
 
     [String]$MyElement = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
-    [String]$MyPreis = $MyElement.Replace("_", ".")
-    [Decimal]$MyDecPreis = [Decimal]$MyPreis
+    [Decimal]$MyDecPreis = Convert-JtPart_To_DecBetrag -Part $MyElement
     return $MyDecPreis
 }
 
@@ -554,8 +613,8 @@ Function Convert-JtInt_To_00 {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Int]$Int
     )
 
-    [Int16]$Thousand = 1000 + $Int
-    [String]$MyResult = -join ("", $Thousand )
+    [Int16]$MyIntThousand = 1000 + $Int
+    [String]$MyResult = -join ("", $MyIntThousand)
     $MyResult = [String]$MyResult.SubString(2, 2)
     return $MyResult
 }
@@ -565,8 +624,8 @@ Function Convert-JtInt_To_000 {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][Int]$Int
     )
 
-    [Int16]$MyThousand = 1000 + $Int
-    [String]$MyResult = -join ("", $MyThousand)
+    [Int16]$MyIntThousand = 1000 + $Int
+    [String]$MyResult = -join ("", $MyIntThousand)
     $MyResult = [String]$MyResult.SubString(1, 3)
     return $MyResult
 }
@@ -626,22 +685,30 @@ Function Convert-JtFilename_To_DecQm {
 
 Function Convert-JtFilename_To_Info_With_Template {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilenameTemplate,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Template,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Field
     )
+
+    [String]$MyFunctionName = "Convert-JtFilename_To_Info_With_Template"
         
-    [String]$MyFilename_Template = $FilenameTemplate
+    [String]$MyFilename_Template = $Filename_Template
     [String]$MyFilename = $Filename
     [String]$MyField = $Field
 
-    [String]$MyResult = ""
-    $MyAlTemplateParts = $MyFilename_Template.Split(".")
+    [String]$MyResult = "ERROR"
+    $MyAlParts_Template = $MyFilename_Template.Split(".")
 
-    for ([Int16]$i = 0; $i -lt $MyAlTemplateParts.Count; $i = $i + 1 ) {
-        $MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
+    for ([Int16]$i = 0; $i -lt $MyAlParts_Template.Count; $i = $i + 1 ) {
+        
+        $MyPart = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
 
+        if ($MyPart -eq $MyField) {
+            $MyValue = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
+            return $MyValue
+        }
     }
+    Write-JtLog_Error -Where $MyFunctionName -Text "Problem. MyFilename: $MyFilename - MyFilename_Template: $MyFilename_Template - MyField: $MyField"
     return $MyResult
 }
 
@@ -756,8 +823,15 @@ Function Convert-JtPart_To_Decimal {
         Write-JtLog -Where $MyFunctionName -Text "MyText is empty. Not expected..."
         return 0
     }
-
-    [Decimal]$MyDec = $MyText
+    [Decimal]$MyDec = 0
+    Try {
+        [Decimal]$MyDec = $MyText
+        
+    }
+    Catch {
+        [Decimal]$MyDec = 999999
+        Write-JtLog_Error -Where $MyFunctionName -Text "Problem while converting MyText: $MyText"
+    }
     return [Decimal]$MyDec
 }
 
@@ -771,13 +845,13 @@ Function Convert-JtPart_To_DecBetrag {
 
     [String]$MyPart = $Part
 
-    [Boolean]$BlnValid = Test-JtPart_Is_Valid_Betrag -Part $MyPart
-    if(! ($BlnValid)) {
+    [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Betrag -Part $MyPart
+    if (! ($MyBlnValid)) {
         return 999999
     }
 
-    [String]$MyText = $MyPart.Replace("_", ".")
-    [Decimal]$MyDecResult = Convert-JtString_To_Betrag -Text $MyText
+    [String]$MyText = $MyPart.Replace("_", ",")
+    [Decimal]$MyDecResult = Convert-JtString_To_DecBetrag -Text $MyText
 
     Return $MyDecResult
 }
@@ -866,6 +940,20 @@ Function Convert-JtString_To_Betrag {
     return $MyResult
 }
 
+Function Convert-JtString_To_DecBetrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
+    )
+
+    # [String]$MyFunctionName = "Convert-JtString_To_DecBetrag"
+
+    [String]$MyText = $Text 
+    $MyText = $MyText.Replace(",", ".")
+
+    [Decimal]$MyDecimal = $MyText
+    return $MyDecimal
+}
+
 
 Function Convert-JtString_To_ColHeader {
 
@@ -887,9 +975,7 @@ Function Convert-JtString_To_ColHeader {
         $MySuffix = $Suffix
     }
 
-     
     $MyText = $MyText.Replace(".", "")
-
 
     [String]$MyResult = -Join ($MyPrefix, $MyText, $MySuffix)
     $MyResult = Convert-JtText_German_To_International -Text $MyResult
@@ -991,50 +1077,65 @@ Function Convert-JtText_Remove_Digits {
 
     [String]$MyText = $Text
     [String]$MyResult = $MyText
-$MyResult = $MyResult.Replace("0", "")
-$MyResult = $MyResult.Replace("1", "")
-$MyResult = $MyResult.Replace("2", "")
-$MyResult = $MyResult.Replace("3", "")
-$MyResult = $MyResult.Replace("4", "")
-$MyResult = $MyResult.Replace("5", "")
-$MyResult = $MyResult.Replace("6", "")
-$MyResult = $MyResult.Replace("7", "")
-$MyResult = $MyResult.Replace("8", "")
-$MyResult = $MyResult.Replace("9", "")
+    $MyResult = $MyResult.Replace("0", "")
+    $MyResult = $MyResult.Replace("1", "")
+    $MyResult = $MyResult.Replace("2", "")
+    $MyResult = $MyResult.Replace("3", "")
+    $MyResult = $MyResult.Replace("4", "")
+    $MyResult = $MyResult.Replace("5", "")
+    $MyResult = $MyResult.Replace("6", "")
+    $MyResult = $MyResult.Replace("7", "")
+    $MyResult = $MyResult.Replace("8", "")
+    $MyResult = $MyResult.Replace("9", "")
     return $MyResult
 }
 
 
+Function Convert-JtText_To_MdOutput {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
+    )
+    
+    [String]$MyText = $Text
+    [String]$MyLabel = $Label
+    $MyLabel = $MyLabel.ToLower()
+
+    [String]$MyOutput = $MyText
+
+    if ($MyLabel.StartsWith("url")) {
+        $MyOutput = -join ("<", $MyUrl, ">")
+    }
+    elseif ($MyLabel.StartsWith("path")) {
+        $MyOutput = $MyOutput.Replace("\", "/")
+    }
+    else {
+        $MyOutput = $MyOutput
+    }
+    return $MyOutput
+}
 
 Function Convert-JtText_Template {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Table,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Path,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Url
-
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][hashtable]$Replace
     )
 
     # [String]$MyFunctionName = "Convert-JtText_Template"
 
     [String]$MyText = $Text 
     [String]$MyResult = $MyText
+    [HashTable]$MyHashTable = $Replace
 
-    [String]$MyPath = $Path
-    if($MyPath) {
-        [String]$MyPath_Output = $MyPath.Replace("\", "/")
-    $MyResult = $MyResult.Replace("<path>", $MyPath_Output)
-    }
+    ForEach ($Key in $MyHashTable.Keys) {
+        [String]$MyLabel = $Key
+        [String]$MyValue = $MyHashTable.$MyLabel
 
-    [String]$MyUrl = $Url
-    if($MyUrl) {
-    [String]$MyUrl_Output = -join("<", $MyUrl, ">")
-    $MyResult = $MyResult.Replace("<url>", $MyUrl_Output)
-    }
+        [String]$MyField = Convert-JtText_To_MdOutput -Text $MyValue -Label $MyLabel
 
-    [String]$MyTable = $Table
-    if($MyTable) {
-    $MyResult = $MyResult.Replace("<table>", $MyTable)
+        [String]$MyPlaceholder = -join ("<", $MyLabel, ">")
+        [String]$MyPlaceholder = $MyPlaceholder.ToLower()
+        $MyResult = $MyResult.Replace($MyPlaceholder, $MyField)
     }
 
     [String]$MyDate = Get-JtDateNormal
@@ -1043,7 +1144,21 @@ Function Convert-JtText_Template {
     return $MyResult
 }
 
+Function Get-JtComputername {
+    [String]$MyComputername = $env:COMPUTERNAME
+    [String]$MyResult = $MyComputername.ToLower()
+    Return $MyResult
+ 
+}
 
+
+Function Get-JtDate {
+    
+    $D = Get-Date
+    [String]$MyDate = $D.toString("yyyy-MM-dd")
+    Return $MyDate
+ 
+}
 
 Function Get-JtDate {
     
@@ -1156,10 +1271,10 @@ Function Get-JtMac {
 
 
 Function Get-JtRandom6 {
-    [int16]$Stellen = 6
+    [int16]$MyIntStellen = 6
     [Int32]$Zufallszahl = Get-Random
     [String]$Zufallswort = "" + $Zufallszahl
-    [String]$MyZufall = $Zufallswort.Substring(0, $Stellen)
+    [String]$MyZufall = $Zufallswort.Substring(0, $MyIntStellen)
     return $MyZufall
 }
 
@@ -1173,7 +1288,7 @@ Function Get-JtTimestamp {
 }
 
 Function Get-JtVersion {
-    return "2021-03-18"
+    return "2021-04-16"
 }
 
 
@@ -1406,59 +1521,43 @@ Function Rename-JtComputerpoolPc {
     return $True
 }
 
-Function Test-JtFilename_Anzahl_IsValid {
+Function Test-JtFilename_IsContainingValid_Anzahl {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    [String]$MyFunctionName = "Test-JtFilename_IsContainingValid_Anzahl"
+
+    [String]$MyFilename = $Filename
     
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
+    [String]$MyAnzahl = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
 
-    [String]$MyFunctionName = "Test-JtFilename_Anzahl_IsValid"
-
-    [Boolean]$MyResult = $True
-    [String]$MyFilename = $Filename
-    $MyAlParts = $MyFilename.Split(".")
-    [String]$MyCount = "0"
-    try {
-        [String]$MyInt = $MyAlParts[$MyAlParts.count - 2]
-        [Decimal]$MyDecInt = [Decimal]$MyInt / 1
-        $MyCount = $MyDecInt
-    }
-    catch {
+    [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Integer -Part $MyAnzahl
+    if (! ($MyBlnValid)) {
         Write-JtLog_Error -Where $MyFunctionName -Text "Problem with COUNT - not valid - in file: $MyFilename"
-        $MyResult = $False
+        return $False
     }
-    return $MyResult
+    return $True
 }
 
 
-Function Test-JtFilename_Betrag_IsValid {
+Function Test-JtFilename_IsContainingValid_Betrag {
 
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
     )
+        
+    # [String]$MyFunctionName = "Test-JtFilename_IsContainingValid_Betrag"
 
-    [String]$MyFunctionName = "Test-JtFilename_Betrag_IsValid"
-
-    [Boolean]$MyResult = $True
     [String]$MyFilename = $Filename
-    $Parts = $MyFilename.Split(".")
-    [String]$MyEuro = ""
-    try {
-        [String]$MyCents = $Parts[$Parts.count - 2]
-        $MyCents = $MyCents.Replace("_", "")
-        [Decimal]$MyEuroDec = [Decimal]$MyCents / 100
-        [String]$MyEuro = $MyEuroDec.ToString("0.00")
-        $MyEuro = $MyEuro.Replace(".", ",")
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with EURO - not valid - in MyFilename: $MyFilename"
-        $MyResult = $False
-    }
-    return $MyResult
+
+    [String]$MyPart_Betrag = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
+    [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Betrag -Part $MyPart_Betrag
+
+    return $MyBlnValid
 }
 
-
-Function Test-JtPart_Is_Valid_Decimal {
+Function Test-JtPart_IsValidAs_Decimal {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
@@ -1466,157 +1565,65 @@ Function Test-JtPart_Is_Valid_Decimal {
     # valid: "0_0", "10_0"
     # not valid: "0_", "a", "1a", "1,0", "2.0"
 
-    $MyFunctionName = "Test-JtPart_Is_Valid_Decimal"
+    $MyFunctionName = "Test-JtPart_IsValidAs_Decimal"
   
     [String]$MyValue = $Part
 
-    if ($MyValue.Length -lt 3) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Too short. Length: $MyValue.Length. MyValue: $MyValue"
-        return $False
-    }
-    
-    [String]$MyTest = Convert-JtText_Remove_Digits -Text $MyValue
-    if("_" -ne $MyTest) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid. MyValue: $MyValue"
-        return $False
-    }
-
-
-    $MyAlParts = $MyValue.Split("_")
-    if (2 -ne $MyAlParts.Count) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Wrong number of parts - MyAlParts.Count: $MyAlParts.Count -  MyValue: $MyValue"
-        return $False
-    }
-    [String]$MyFirstPart = $MyAlParts[0]
-    if (1 -gt $MyFirstPart.length) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MyFirstPart is empty  -  MyValue: $MyValue"
-        return $False
-    }
-
-    [String]$MySecondPart = $MyAlParts[1]
-    if (2 -ne $MySecondPart.length) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MySecondPart: $MySecondPart -  MyValue: $MyValue"
+    # example "12345_67"
+    [Boolean]$MyBlnValid = $MyValue -match '^[-0-9]+[0-9]*[_][0-9]+$'
+    if (! ($MyBlnValid)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid BETRAG. Problem with MyValue: $MyValue"
         return $False
     }
 
     return $True
 }
 
-Function Test-JtPart_Is_Valid_Betrag {
+Function Test-JtPart_IsValidAs_Betrag {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
     # valid: "23_23", "0_00"
     # not valid: "23,23", "12.23", "1.234,56", "1,234.56"
 
-    $MyFunctionName = "Test-JtIsValid_Betrag"
+    $MyFunctionName = "Test-JtPart_IsValidAs_Betrag"
   
     [String]$MyValue = $Part
 
-    if(! (Test-JtPart_Is_Valid_Decimal -Part $MyValue)) {
-        return $False
-    }
-
-    if ($MyValue.Length -lt 4) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Too short. Length: $MyValue.Length. MyValue: $MyValue"
-        return $False
-    }
-
-    [String]$MyUnderscore = $MyValue.Substring($MyValue.Length - 3, 1)
-    if (! ($MyUnderScore = "_")) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Missing underscore. Finding - MyUnderscore: $MyUnderscore -  MyValue: $MyValue"
-        return $False
-    }
-
-    $MyAlParts = $MyValue.Split("_")
-    if (2 -ne $MyAlParts.Count) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Wrong number of parts - MyAlParts.Count: $MyAlParts.Count -  MyValue: $MyValue"
-        return $False
-    }
-
-    [String]$MySecondPart = $MyAlParts[1]
-    if (2 -ne $MySecondPart.length) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "MySecondPart -  MyValue: $MyValue"
-        return $False
-    }
-
-    return $True
-}
-Function Test-JtIsValid_Betrag {
-
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
-    )
-
-    $MyFunctionName = "Test-JtIsValid_Betrag"
-
-    [String]$MyValue = $Text
-    [String]$MyWithoutUnderscore = $MyValue.Replace("_", "")
-    try {
-        [Int32]$MyIntValue = [Int32]$MyWithoutUnderscore
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Value is not valid (int check). Value: $MyValue"
-        return $False
-    }
-    try {
-        $MyValue = $MyValue.Replace("_", ".")
-        [Decimal]$MyDecValue = [Decimal]$MyValue
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Value is not valid (decimal check). Value: $MyValue"
-        return $False
-    }
-    try {
-        $MyValue = $MyValue.Replace("_", ".")
-        [Decimal]$MyDecValue = [Decimal]$MyValue
-        [Int32]$MyIntValue = [Int32]$MyWithoutUnderscore
-        [Decimal]$MyValueThroughInt = $MyIntValue / 100
-        if (0 -ne ($MyValueThroughInt - $MyDecValue)) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Value is not valid (comma check). Value: $MyValue"
-            return $False
-        }
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Value is not valid (decimal check). Value: $MyValue"
+    # example "12345_67"
+    [Boolean]$MyBlnValid = $MyValue -match '^[-0-9]+[0-9]*[_][0-9][0-9]$'
+    if (! ($MyBlnValid)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid BETRAG. Problem with MyValue: $MyValue"
         return $False
     }
     return $True
 }
 
-
-
-Function Test-JtIsValid_Integer {
+Function Test-JtPart_IsValidAs_Integer {
 
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
 
 
-    [String]$MyFunctionName = "Test-JtIsValid_Integer"
+    [String]$MyFunctionName = "Test-JtPart_IsValidAs_Integer"
 
-    [String]$MyText = $Text
-    try {
-        [Int16]$MyInt = [Int16]$MyText
-        $MyInt | Out-Null
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid INTEGER. Problem with MyText: $MyText"
+    [String]$MyValue = $Part
+     
+    [Boolean]$MyBlnValid = $MyValue -match '^[0-9]+$'
+    
+    if (!($MyBlnValid)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid INTEGER. Problem with MyValue: $MyValue"
         return $False
     }
 
     return $True
-
 }
-
-
-
-
 
 Function Write-JtLog_Error {
 
     Param (
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Where,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Where,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
     )
 
@@ -1642,7 +1649,6 @@ Function Write-JtLog_Folder_Error {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$FilePath_Output
-
     )
 
     [String]$MyText = $Text
@@ -1713,7 +1719,29 @@ Function Write-JtLog {
 
     [String]$MyText = $Text
     [String]$MyWhere = $Where
-    if ($Where) {
+    if ($MyWhere) {
+        [JtLog]$MyJtLog = [JtLog]::new($MyText, $MyWhere)
+        $MyJtLog.DoPrintLog()
+    }
+    else {
+        [JtLog]$MyJtLog = [JtLog]::new($MyText)
+        $MyJtLog.DoPrintLog()
+    }
+}
+
+Function Write-JtLog_Verbose {
+    Param (
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Where,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text
+    )
+
+    [Boolean]$MyBlnDevMode = Get-JtDevMode
+    if (! ($MyBlnDevMode)) {
+        Return
+    }
+    [String]$MyText = $Text
+    [String]$MyWhere = $Where
+    if ($MyWhere) {
         [JtLog]$MyJtLog = [JtLog]::new($MyText, $MyWhere)
         $MyJtLog.DoPrintLog()
     }
@@ -1742,7 +1770,7 @@ Function Write-JtLog_Message {
     [String]$MyFilePath_Output = $FilePath_Output
     [String]$MyType = $Type
     [String]$MyPath = ""
-    if($Path) {
+    if ($Path) {
         $MyPath = $Path
         $MyPath = $MyPath.Replace("\", "/")
     }
@@ -1828,12 +1856,14 @@ Export-ModuleMember -Function Convert-JtLabel_To_Filename
 Export-ModuleMember -Function Convert-JtPath_To_Parts
 Export-ModuleMember -Function Convert-JtPart_To_DecBetrag
 Export-ModuleMember -Function Convert-JtText_German_To_International
+Export-ModuleMember -Function Convert-JtText_To_MdOutput
 Export-ModuleMember -Function Convert-JtString_To_Betrag
 Export-ModuleMember -Function Convert-JtString_To_ColHeader
 Export-ModuleMember -Function Convert-JtString_To_Decimal
 Export-ModuleMember -Function Convert-JtString_To_DecGb
 Export-ModuleMember -Function Convert-JtText_Template
 
+Export-ModuleMember -Function Get-JtComputername
 Export-ModuleMember -Function Get-JtDate
 Export-ModuleMember -Function Get-JtDateNormal
 Export-ModuleMember -Function Get-JtDevMode
@@ -1848,11 +1878,10 @@ Export-ModuleMember -Function New-JtTimeStop
 
 Export-ModuleMember -Function Rename-JtComputerpoolPc
 
-Export-ModuleMember -Function Test-JtFilename_Anzahl_IsValid
-Export-ModuleMember -Function Test-JtFilename_Betrag_IsValid
-Export-ModuleMember -Function Test-JtIsValid_Betrag
-Export-ModuleMember -Function Test-JtPart_Is_Valid_Betrag
-Export-ModuleMember -Function Test-JtIsValid_Integer
+Export-ModuleMember -Function Test-JtFilename_IsContainingValid_Anzahl
+Export-ModuleMember -Function Test-JtFilename_IsContainingValid_Betrag
+Export-ModuleMember -Function Test-JtPart_IsValidAs_Betrag
+Export-ModuleMember -Function Test-JtPart_IsValidAs_Integer
 
 
 Export-ModuleMember -Function Write-JtLog
@@ -1861,6 +1890,7 @@ Export-ModuleMember -Function Write-JtLog_File
 Export-ModuleMember -Function Write-JtLog_Folder
 Export-ModuleMember -Function Write-JtLog_Folder_Error
 Export-ModuleMember -Function Write-JtLog_Message
+Export-ModuleMember -Function Write-JtLog_Verbose
 
 
 

@@ -48,8 +48,13 @@ class JtIo : JtClass {
     hidden [String]$Path = ""
     hidden [Boolean]$BlnExists = $True
 
+    static [String]$FilePart_Betrag = "betrag"
+    static [String]$FilePart_Datum = "datum"
+    static [String]$FilePart_Zahlung = "zahlung"
+
     static [String]$FilePrefix_Anzahl = "zzz"
-    static [String]$FilePrefix_Betrag = "zzz"
+    static [String]$FilePrefix_Betrag = "xxx"
+    static [String]$FilePrefix_Buchung = "yyy"
     static [String]$FilePrefix_Count = "zzz"
     static [String]$FilePrefix_Csv = "zzz"
     static [String]$FilePrefix_Folder = "zzz"
@@ -69,10 +74,11 @@ class JtIo : JtClass {
     static [String]$FileExtension_Folder_Betrag = ".BETRAG.folder"
     static [String]$FileExtension_Folder_BxH = ".BxH.folder"
     static [String]$FileExtension_Folder_Stand = ".STAND.folder"
+    static [String]$FileExtension_Folder_Stunden = ".STUNDEN.folder"
     static [String]$FileExtension_Folder_Zahlung = ".ZAHLUNG.folder"
     static [String]$FileExtension_Meta = ".meta"
     static [String]$FileExtension_Meta_Anzahl = ".anzahl.meta"
-    static [String]$FileExtension_Meta_Betrag = ".EU.meta"
+    static [String]$FileExtension_Meta_Betrag = ".meta"
     static [String]$FileExtension_Meta_BxH = ".bxh.meta"
     static [String]$FileExtension_Meta_Choco = ".choco.meta"
     static [String]$FileExtension_Meta_Cmd = ".cmd.meta"
@@ -90,6 +96,7 @@ class JtIo : JtClass {
     static [String]$FileExtension_Meta_Win = ".win.meta"
     static [String]$FileExtension_Meta_Zahlung = ".zahlung.meta"
     static [String]$FileExtension_Md = ".md"
+    static [String]$FileExtension_Md_Abrechnung = ".abrechnung.md"
     static [String]$FileExtension_Md_BxH = ".bxh.md"
     static [String]$FileExtension_Md_Zahlung = ".zahlung.md"
     static [String]$FileExtension_Txt = ".txt"
@@ -273,7 +280,7 @@ class JtIoFile : JtIo {
 
     [String]GetFileTimestamp() {
         [String]$MyTimestamp = ""
-        [Boolean]$MyBlnFileOk = $This.IsExisting
+        [Boolean]$MyBlnFileOk = $This.IsExisting()
         
         if ($MyBlnFileOk) {
             [System.Object[]]$MyAlJtObjects = Get-ChildItem -Path $This.Path
@@ -333,8 +340,8 @@ class JtIoFileCsv : JtIoFile {
         $Elements = $Csv | Select-Object -Property $MyColumn | Sort-Object -Property $MyColumn
 
         foreach ($Element in $Elements) {
-            [String]$MyColumn = $Element.$MyColumn
-            $MyArrayList.Add($MyColumn)
+            [String]$MyEle = $Element.$MyColumn
+            $MyArrayList.Add($MyEle)
         }
         return $MyArrayList
     }
@@ -382,11 +389,11 @@ class JtIoFolder : JtIo {
             if ($BlnCreate) {
                 if ($MyFolderPath.StartsWith("\\")) {
                     Write-JtLog_Error -Where $This.ClassName -Text "Trying to create folder on server: $MyFolderPath"
-                    New-Item -type Directory -Force -Path $MyFolderPath
+                    New-Item -type Directory -Path $MyFolderPath -Force 
                 }
                 else {
                     Write-JtLog_Folder -Where $This.ClassName -Text "Creating new folder." -FolderPath $MyFolderPath
-                    New-Item -type Directory -Force -Path $MyFolderPath
+                    New-Item -type Directory -Path $MyFolderPath -Force 
                 }
             }
         }
@@ -397,8 +404,8 @@ class JtIoFolder : JtIo {
     }
 
     JtIoFolder([JtIoFile]$TheJtIoFile) {
-        [JtIoFile]$MyJtIoFile = $TheJtIoFile
         $This.ClassName = "JtIoFolder"
+        [JtIoFile]$MyJtIoFile = $TheJtIoFile
         if (!($MyJtIoFile.IsExisting())) {
             $This.Path = $Null
             $This.BlnExists = $True
@@ -416,23 +423,22 @@ class JtIoFolder : JtIo {
 
     [Boolean]DoRemoveFiles_All() {
         [String]$MyFolderPath = $This.GetPath()
-        if ($This.IsExisting()) {
-            [String]$MyFolderPath_FilesAll = -join ($MyFolderPath, "\", "*.*")
-            Write-JtLog_Folder -Where $This.ClassName -Text "DoRemoveFiles_All. Deleting content." -FolderPath $MyFolderPath_FilesAll
-            try {
-                Get-ChildItem -Path $MyFolderPath_FilesAll -File | Remove-Item -Force
-            }
-            catch {
-                Write-JtLog_Error -Where $This.ClassName -Text "Error while deleting files in MyFolderPath: $MyFolderPath"
-                return $False
-            }
-            
-            return $True
-        }
-        else {
+        if (!($This.IsExisting())) {
             Write-JtLog_Error -Where $This.ClassName -Text "Trying to remove all files in folder, but folder does not exist: $MyFolderPath"
             return $False
         }
+
+        [String]$MyFolderPath_FilesAll = -join ($MyFolderPath, "\", "*.*")
+        Write-JtLog_Folder -Where $This.ClassName -Text "DoRemoveFiles_All. Deleting content." -FolderPath $MyFolderPath_FilesAll
+        try {
+            Get-ChildItem -Path $MyFolderPath_FilesAll -File | Remove-Item -Force
+        }
+        catch {
+            Write-JtLog_Error -Where $This.ClassName -Text "Error while deleting files in MyFolderPath: $MyFolderPath"
+            return $False
+        }
+            
+        return $True
     }
 
     [Boolean]DoRemoveFiles_All([String]$TheFilter) {
@@ -492,7 +498,8 @@ class JtIoFolder : JtIo {
         [Boolean]$MyBlnRecurse = $TheBlnRecurse
         [String]$MyFolderPath = $This.GetPath()
         if (!($This.IsExisting())) {
-            Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFiles. Folder does not exist FolderPath: $MyFolderPath"
+            Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFiles. Folder does not exist. FolderPath: $MyFolderPath"
+            return $MyAlJtIoFiles
         }
         
         [System.Object[]]$MyAlFiles = $Null
@@ -522,7 +529,7 @@ class JtIoFolder : JtIo {
         [String]$MyFilter = $TheFilter
         [Boolean]$MyBlnRecurse = $TheBlnRecurse
         
-        Write-JtLog -Where $This.ClassName -Text "$MyMethodName. MyFolderPath: $MyFolderPath FILTER: $MyFilter"
+        # Write-JtLog -Where $This.ClassName -Text "$MyMethodName. MyFolderPath: $MyFolderPath FILTER: $MyFilter"
         if (!($This.IsExisting())) {
             [String]$MyMsg = "$MyMethodName. Not existing. MyFolderPath: $MyFolderPath FILTER: $MyFilter"
             Write-JtLog_Error -Where $This.ClassName -Text $MyMsg
@@ -551,7 +558,7 @@ class JtIoFolder : JtIo {
                 $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file -Recurse | Sort-Object -Property Name
             }
             else {
-                Write-JtLog -Where $This.ClassName -Text "GetJtIoFiles_Filter. Filter: empty, Recurse: FALSE, PATH: $MyFolderPath"
+                # Write-JtLog -Where $This.ClassName -Text "GetJtIoFiles_Filter. Filter: empty, Recurse: FALSE, PATH: $MyFolderPath"
                 $MyAlFiles = Get-ChildItem -Path $MyFolderPath -file | Sort-Object -Property Name
             }
             
@@ -637,26 +644,26 @@ class JtIoFolder : JtIo {
     
     [JtIoFolder]GetJtIoFolder_Sub([String]$MyName, [Boolean]$BlnCreate) {
         [String]$MyFolderPath = $This.GetPath()
-        [String]$MyFolderPathNew = -join ($MyFolderPath, "\", $MyName)
-        [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPathNew
+        [String]$MyFolderPath_New = -join ($MyFolderPath, "\", $MyName)
+        [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath_New
         if ($MyJtIoFolder.IsExisting()) {
             return $MyJtIoFolder
         }
         if ($BlnCreate) {
-            # Write-JtLog_Folder -Where $This.ClassName -Text "GetJtIoFolder_Sub. Creating new folder." -FolderPath $MyFolderPathNew
-            [JtIoFolder]$MyJtIoFolder = [JtIoFolder]::new($MyFolderPathNew, $True)
+            # Write-JtLog_Folder -Where $This.ClassName -Text "GetJtIoFolder_Sub. Creating new folder." -FolderPath $MyFolderPath_New
+            [JtIoFolder]$MyJtIoFolder = [JtIoFolder]::new($MyFolderPath_New, $True)
             if ($MyJtIoFolder.IsExisting()) {
                 return $MyJtIoFolder
             }
         }
-        if (!(Test-JtIoFolderPath -FolderPath $MyFolderPathNew)) {
-            # Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFolder_Sub. Subfolder does not exist! PATH: $MyFolderPathNew"
+        if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath_New)) {
+            # Write-JtLog_Error -Where $This.ClassName -Text "GetJtIoFolder_Sub. Subfolder does not exist! PATH: $MyFolderPath_New"
         }
         return $MyJtIoFolder
     }
 
     [JtIoFolder]GetJtIoFolder_Sub([String]$TheFoldername) {
-        [String]$MyFoldername = $TheFolderName
+        [String]$MyFoldername = $TheFoldername
         return $This.GetJtIoFolder_Sub($MyFoldername, $False)
     }
     
@@ -668,27 +675,27 @@ class JtIoFolder : JtIo {
         [System.Collections.ArrayList]$MyAlJtIoFolders_Sub = [System.Collections.ArrayList]::new()
         [Boolean]$MyBlnRecurse = $TheBlnRecurse
 
-        if ($This.IsExisting()) {
-            if ($True -eq $MyBlnRecurse) {
-                $MyAlSubfolders = Get-ChildItem -Path $This.GetPath() -Directory -Recurse
-                foreach ($Subfolder In $MyAlSubfolders) {
-                    $MySubfolder = $Subfolder
-                    [String]$MyFolderPath = $MySubfolder.fullname
-                    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderpath
-                    $MyAlJtIoFolders_Sub.add($MyJtIoFolder)
-                }    
-            }
-            else {
-                $MyAlSubfolders = Get-ChildItem -Path $This.GetPath() -Directory 
-                foreach ($Subfolder In $MyAlSubfolders) {
-                    [String]$MyFolderPath = $Subfolder.fullname
-                    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderpath
-                    $MyAlJtIoFolders_Sub.add($MyJtIoFolder)
-                }    
-            }
+        if (!($This.IsExisting())) {
+            Write-JtLog_Error -Where $This.ClassName -Text "GetAlJtIoFolders_Sub. Folder is not existing! $This.Path"
+            return $MyAlJtIoFolders_Sub
+        }
+
+        if ($True -eq $MyBlnRecurse) {
+            $MyAlSubfolders = Get-ChildItem -Path $This.GetPath() -Directory -Recurse
+            foreach ($Subfolder In $MyAlSubfolders) {
+                $MySubfolder = $Subfolder
+                [String]$MyFolderPath = $MySubfolder.fullname
+                [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderpath
+                $MyAlJtIoFolders_Sub.add($MyJtIoFolder)
+            }    
         }
         else {
-            Write-JtLog_Error -Where $This.ClassName -Text "GetAlJtIoFolders_Sub. Folder is not existing! $This.Path"
+            $MyAlSubfolders = Get-ChildItem -Path $This.GetPath() -Directory 
+            foreach ($Subfolder In $MyAlSubfolders) {
+                [String]$MyFolderPath = $Subfolder.fullname
+                [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderpath
+                $MyAlJtIoFolders_Sub.add($MyJtIoFolder)
+            }    
         }
         return $MyAlJtIoFolders_Sub
     }  
@@ -701,7 +708,6 @@ class JtIoFolder : JtIo {
 }
 
 Function Convert-JtFilePath_To_Filename {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
     )
@@ -711,6 +717,18 @@ Function Convert-JtFilePath_To_Filename {
     [String]$MyFilename = $MyJtIoFile.GetName()
     return $MyFilename
 }
+
+Function Convert-JtFolderPath_To_Foldername {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+        
+    [String]$MyFolderPath = $FolderPath
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath
+    [String]$MyFoldername = $MyJtIoFolder.GetName()
+    return $MyFoldername
+}
+
 Function Convert-JtFolderPath_To_Label {
 
     Param (
@@ -800,14 +818,22 @@ Function Get-JtFolderPath_Info_FilesCount {
 
     [String]$MyFolderPath = $FolderPath
     Write-JtLog -Where $MyFunctionName -Text "-- MyFolderPath: $MyFolderPath"
+
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not existing. MyFolderPath: $MyFolderPath"
+        return -1
+    }
+
+    [Int32]$MyFilesCount = -1
     try {
         $MyResult = Get-ChildItem -Recurse $MyFolderPath | Where-Object { -not $_.PSIsContainer } | Measure-Object -Property Length -Sum
+        [Int32]$MyFilesCount = $MyResult.Count
+        
     }
     catch {
         Write-JtLog_Error -Where $MyFunctionName -Text "GetDataLine. Problem with MyFolderPath: $MyFolderPath"
     }
     # $MyJtTblRow.Add("Size", $MyResult.Sum)
-    [Int32]$MyFilesCount = $MyResult.Count
     return $MyFilesCount
 }
 
@@ -817,9 +843,14 @@ Function Get-JtFolderPath_Info_Level {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
     )
 
-    # [String]$MyFunctionName = "Get-JtFolderPath_Info_Level"
+    [String]$MyFunctionName = "Get-JtFolderPath_Info_Level"
 
     [String]$MyFolderPath = $FolderPath
+
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not existing. MyFolderPath: $MyFolderPath"
+        return -1
+    }
     
     $MyAlLevels = $MyFolderPath.Split("\")
     [Int16]$MyIntLevel = $MyAlLevels.Count
@@ -840,14 +871,21 @@ Function Get-JtFolderPath_Info_SizeGb {
     [String]$MyFolderPath = $FolderPath
     Write-JtLog -Where $MyFunctionName -Text "-- MyFolderPath: $MyFolderPath"
     [Decimal]$MyDecSizeGb = 0
+    [Decimal]$MyValue = 99998
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not existing. MyFolderPath: $MyFolderPath"
+        return -9999
+    }
     try {
         $MyResult = Get-ChildItem -Recurse $MyFolderPath | Where-Object { -not $_.PSIsContainer } | Measure-Object -Property Length -Sum
+        $MyValue = $MyResult.Sum
     }
     catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "GetDataLine. Problem with MyFolderPath: $MyFolderPath"
+        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with MyFolderPath: $MyFolderPath"
     }
     # $MyJtTblRow.Add("Size", $MyResult.Sum)
-    [Decimal]$MyDecSizeGb = Convert-JtString_To_DecGb -Text $MyResult.Sum
+    
+    [Decimal]$MyDecSizeGb = Convert-JtString_To_DecGb -Text $MyValue
     return $MyDecSizeGb
 }
 
@@ -931,10 +969,11 @@ Function Get-JtReportLogDaysAgo {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
     )
 
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath
-    [String]$MyFolderPath = $MyJtIoFolder.GetPath()
-    if (!($MyJtIoFolder.IsExisting())) {
-        Write-JtLog_Error -Text "Get-JtReportLogDaysAgo. Folder does not exist! MyFolderPath: $MyFolderPath"
+    [String]$MyFunctionName = "Get-JtReportLogDaysAgo"
+
+    [String]$MyFolderPath = $FolderPath
+    if (!(Test-JtIoFolderPath -FolderPath $MyFolderPath)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist! MyFolderPath: $MyFolderPath"
         return 999
     }
 
@@ -952,6 +991,7 @@ Function Get-JtReportLogDaysAgo {
     }
     return $MyIntAgo
 }
+
 
 
 class JtRobocopy : JtClass {
@@ -976,12 +1016,12 @@ class JtRobocopy : JtClass {
         $This.DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $False) 
     }
     
-    JtRobocopy([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $ExitOnError) {
+    JtRobocopy([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, [Boolean]$ExitOnError) {
         $This.ClassName = "JtRobocopy"
         $This.DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $ExitOnError) 
     }
         
-    hidden [Boolean]DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, $ExitOnError) {
+    hidden [Boolean]DoInit([String]$TheFolderPath_Input, [String]$TheFolderPath_Output, [Boolean]$ExitOnError) {
         $This.ExitOnError = $ExitOnError
         $This.FolderPath_Input = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath_Input
         $This.FolderPath_Output = Convert-JtFolderPathExpanded -FolderPath $TheFolderPath_Output
@@ -1142,19 +1182,16 @@ Function New-JtRobocopy_Element_Extension_Folder {
 
     [String]$MyFunctionName = "New-JtRobocopy_Element_Extension_Folder"
     
-    
     [String]$MyFolderPath_Input = $FolderPath_Input
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
-    
     [String]$MyFolderPath_Output = $FolderPath_Output
     [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
 
-    if (!($MyJtIoFolder_Input.IsExisting())) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist. MyJtIoFolder_Input: $MyJtIoFolder_Input"
+    if (! (Test-JtIoFolderPath -FolderPath $MyFolderPath_Input)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist. MyFolderPath_Input: $MyFolderPath_Input"
         return
     }
 
-    if (!($MyJtIoFolder_Output.IsExisting())) {
+    if (! (Test-JtIoFolderPath -FolderPath $MyFolderPath_Input)) {
         Write-JtLog_Error -Where $MyFunctionName -Text "Folder does not exist. MyJtIoFolder_Output: $MyJtIoFolder_Output"
         return
     }
@@ -1163,11 +1200,11 @@ Function New-JtRobocopy_Element_Extension_Folder {
 
     [String]$MyExtension = [JtIo]::FileExtension_Folder
     [String]$MyFilter = -join ("*", $MyExtension)
-    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Filter $MyFilter -Recurse
+    [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Filter $MyFilter -Recurse
     
     [Int16]$MyIntCount = $MyAlJtIoFiles.Count
     Write-JtLog -Where $MyFunctionName -Text "Number of files found with MyExtension: $MyExtension - MyIntCount: $MyIntCount"
-    Write-JtLog -Where $MyFunctionName -Text "MyJtIoFolder_Input: $MyJtIoFolder_Input"
+    Write-JtLog -Where $MyFunctionName -Text "MyFolderPath_Input: $MyFolderPath_Input"
 
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
@@ -1192,16 +1229,22 @@ Function New-JtIoCollectFilesWithExtension {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Prefix,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Extension
     )
 
     [String]$MyFunctionName = "New-JtIoCollectFilesWithExtension"
+    [String]$MyPrefix = $Prefix
     [String]$MyExtension = $Extension
     
     [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $FolderPath_Input
     [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $FolderPath_Output -Force
 
     [String]$MyFilter = -join ("*", $MyExtension)
+    if ($MyPrefix) {
+        $MyFilter = -join ($MyPrefix, $MyFilter)
+    }
+
     [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Filter $MyFilter -Recurse
 
     [Int16]$IntCount = $MyAlJtIoFiles.Count
@@ -1362,13 +1405,21 @@ Function Test-JtIoSpecial {
 
     [Boolean]$MyBlnIsSpecial = $False
     if ($MyFilename.Equals("desktop.ini")) {
-        $MyBlnIsSpecial = $True
-        return $MyBlnIsSpecial
+        return $True
     }  
 
     if ($MyFilename.StartsWith("zzz.")) {
-        $MyBlnIsSpecial = $True
-        return $MyBlnIsSpecial
+        return $True
+    }  
+
+    [String]$MyPrefix = [JtIo]::FilePrefix_Betrag
+    if ($MyFilename.StartsWith($MyPrefix)) {
+        return $True
+    }  
+
+    [String]$MyPrefix = [JtIo]::FilePrefix_Buchung
+    if ($MyFilename.StartsWith($MyPrefix)) {
+        return $True
     }  
         
     [String]$MyExtension = [System.IO.Path]::GetExtension($MyFilename)
@@ -1401,7 +1452,7 @@ Function Write-JtIoFile {
     [String]$MyContent = $Content
     if (Test-JtIoFilePath $MyFilePath_Output) {
         if ($Overwrite) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "File exists. Replacing old file!! FilePath_Output: $FilePath_Output"
+            Write-JtLog_Error -Where $MyFunctionName -Text "Overwrite $Overwrite - File exists. Replacing old file!! FilePath_Output: $FilePath_Output"
             Write-JtLog_File -Where $MyFunctionName -Text "Writing file." -FilePath $MyFilePath_Output
             $MyContent | Out-File -FilePath $MyFilePath_Output -Encoding utf8
         }
@@ -1451,7 +1502,8 @@ Function Write-JtIoFile_Md {
         $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter)
     }
     
-    $MyFilename_Output = -Join ($MyPrefix, ".", $MyFoldername_Output, ".", $MyName, $MyExtension2)
+    # $MyFilename_Output = -Join ($MyPrefix, ".", $MyFoldername_Output, ".", $MyName, $MyExtension2)
+    $MyFilename_Output = -Join ($MyPrefix, ".", $MyFoldername_Output, $MyExtension2)
     $MyFilename_Output = Convert-JtLabel_To_Filename -Label $MyFilename_Output
     [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
     if ($MyOverwrite -eq $True) {
@@ -1483,6 +1535,12 @@ Function Write-JtIoFile_Meta {
     [String]$MyExtension2 = $Extension2
     [String]$MyOverwrite = $Overwrite
     [String]$MyLabel = $Label
+    [String]$MyPrefix = ""
+
+
+    if ($Prefix) {
+        $MyPrefix = $Prefix
+    }
 
     [String]$MyExtension_Meta = [JtIo]::FileExtension_Meta
     if (! ($MyExtension2.EndsWith($MyExtension_Meta))) {
@@ -1505,7 +1563,7 @@ Function Write-JtIoFile_Meta {
 
     $MyFilename_Output = -Join ($MyLabel, $MyExtension2)
 
-    $MyContent = $MyFolderPath_Input
+    [String]$MyContent = $MyFolderPath_Input
 
     $MyFilename_Output = Convert-JtLabel_To_Filename -Label $MyFilename_Output
     [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
@@ -1515,7 +1573,6 @@ Function Write-JtIoFile_Meta {
     }
     else {
         Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent
-
     }
 }
 
@@ -1582,9 +1639,18 @@ Function Write-JtIoFile_Meta_Betrag {
     }
     
     [String]$MyLabel = Get-JtLabel_Betrag -FolderPath_Input $MyFolderPath_Input -Name $MyName -Year $MyYear -Betrag $MyDecBetrag 
-        
-    [String]$MyPrefix = [JtIo]::FilePrefix_Folder
+    
+    [String]$MyPrefix = [JtIo]::FilePrefix_Betrag
     [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Betrag
+
+    [String]$MyFilter = -join ($MyPrefix, "*", $MyYear, "*", $MyExtension2) 
+    $MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Filter $MyFilter
+    ForEach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile_Old = $File
+        Remove-Item $MyJtIoFile_Old
+        Write-JtLog_Error -Where $MyFunctionName -Text "Going to delete MyJtIoFile_Old: $MyJtIoFile_Old"
+
+    }
     
     $MyParams = @{
         FolderPath_Input  = $MyFolderPath_Input
@@ -1592,7 +1658,6 @@ Function Write-JtIoFile_Meta_Betrag {
         Prefix            = $MyPrefix
         Label             = $MyLabel
         Extension2        = $MyExtension2
-        Overwrite         = $True
     }
     Write-JtIoFile_Meta @MyParams
 }
@@ -1671,8 +1736,8 @@ Function Write-JtIoFile_Meta_Time {
     [String]$MyFunctionName = "Write-JtIoFile_Meta_Time"
     Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
     
-    [String]$MyFolderPath_Output = $FolderPath_Output
     [String]$MyFolderPath_Input = $FolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
     [String]$MyName = $Name
     [String]$MyPrefix = "_timestamp"
     [String]$MyTimestamp = Get-JtTimestamp
@@ -1700,8 +1765,8 @@ Function Write-JtIoFile_Meta_Version {
     [String]$MyFunctionName = "Write-JtIoFile_Meta_Version"
     Write-JtLog -Where $MyFunctionName -Text "Writing meta file."
             
+    [String]$MyFolderPath_Input = $FolderPath_Output
     [String]$MyFolderPath_Output = $FolderPath_Output
-    [String]$MyFolderPath_Input = $MyFolderPath_Output
     [String]$MyTimestamp = Get-JtTimestamp
     [String]$MyPrefix = "_v"
             
@@ -1717,9 +1782,52 @@ Function Write-JtIoFile_Meta_Version {
     Write-JtIoFile_Meta @MyParams
 }
 
+Function New-JtNetConnection {
+        
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Computer,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Username,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Share,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Passwd
+    )
+
+    [String]$MyFunctionName = "New-JtNetConnection"
+
+    [String]$MyComputer = $Computer
+    [String]$MyShare = $Share
+    [String]$MyUsername = $Username
+    [String]$MyPasswd = $Pass
+            
+
+    # $User = "Domain01\User01"
+    # $PWord = ConvertTo-SecureString -String "P@sSwOrd" -AsPlainText -Force
+    # $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $PWord
+    
+    # $MyPWord = ConvertTo-SecureString -String $MyPassword -AsPlainText -Force
+    # $MyCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $MyUser, $MyPWord
+    
+
+    [String]$MyRoot = -join ("\\", $MyComputer, "\", $MyShare)
+    $MyRoot
+    # New-PSDrive -Name K -PSProvider FileSystem -Root $MyRoot -Persist -Credential $MyCredential -Scope Global
+
+
+    # New-SmbMapping -LocalPath $shareletter -RemotePath $dhcpshare -Username $shareuser -Password $sharepasswd -Persistent $true
+
+
+    New-SmbMapping -RemotePath $MyRoot -Username $MyUsername -Password $MyPasswd -Persistent $True
+
+
+    Write-JtLog -Where $MyFunctionName -Text "Mapping network share. MyRoot: $MyRoot"
+    [Boolean]$MyBlnExists = [System.IO.Directory]::Exists($MyRoot)
+    Write-JtLog -Where $MyFunctionName -Text "Is share available? MyRoot: $MyRoot - MyBlnExists: $MyBlnExists"
+}
+
+
 Export-ModuleMember -Function Convert-JtFilePath_To_Filename
 Export-ModuleMember -Function Convert-JtIoFilenamesAtFolderPath
 Export-ModuleMember -Function Convert-JtFolderPath_To_Label
+Export-ModuleMember -Function Convert-JtFolderPath_To_Foldername
 
 Export-ModuleMember -Function Get-JtChildItem
 
@@ -1745,6 +1853,8 @@ Export-ModuleMember -Function New-JtIoFolder
 Export-ModuleMember -Function New-JtIoFolder_Inv
 Export-ModuleMember -Function New-JtIoFolder_Report
 Export-ModuleMember -Function Get-JtIoFolder_Work
+
+Export-ModuleMember -Function New-JtNetConnection
 
 
 Export-ModuleMember -Function New-JtRobocopy
