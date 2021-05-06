@@ -10,4 +10,4 @@
 28.05.2020  01:25    <DIR>          Public
 30.03.2021  22:31    <DIR>          thome.ARCHLAND
                0 Datei(en),              0 Bytes
-               6 Verzeichnis(se), 24.094.875.648 Bytes frei
+               6 Verzeichnis(se), 34.952.781.824 Bytes frei

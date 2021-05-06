@@ -1,14 +1,14 @@
-* 0001  .  2021-04-14_18-39-15  .  ERROR  .  
+* 0001  .  2021-05-04_22-42-48  .  ERROR  .  
 * Problems with: BitLockerVolume -> Need admin rights...?
  
  
  
-* 0002  .  2021-04-14_18-39-17  .  ERROR  .  
+* 0002  .  2021-05-04_22-42-51  .  ERROR  .  
 * MyName: Bitlocker - Xml file is missing. MyFilePath_Xml: c:\_inventory\report\objects\Bitlocker.xml
  
  
  
-* 0003  .  2021-04-14_18-39-18  .  ERROR  .  
+* 0003  .  2021-05-04_22-42-53  .  ERROR  .  
 * Add. MyField is null!
  
  

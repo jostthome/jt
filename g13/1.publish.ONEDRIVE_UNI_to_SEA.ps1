@@ -23,8 +23,6 @@ Function New-JtPublish_OneDrive_To_Sea {
     
     [String]$FilePath_Input = -join($env:OneDrive, "\1.UNI\12.DOKU\e03.doku.eigene_konfiguration\*.pdf")
     Copy-Item -Path $FilePath_Input -Destination $MyFolderPathTarget_FOLDER
-    
-    
 }
 
 New-JtPublish_OneDrive_To_Sea

@@ -457,19 +457,42 @@ Function Convert-JtAlJtIoFiles_to_JtTblTable {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
     )
 
-    [String]$MyFunctionName = "Convert-JtAlJtIoFiles_to_FileCsv"
+    [String]$MyFunctionName = "Convert-JtAlJtIoFiles_to_JtTblTable"
 
     [System.Collections.ArrayList]$MyAlJtIoFiles = $ArrayList
     [String]$MyLabel = $Label
 
     Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel"
 
-    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label "FileTable"
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
     foreach ($File in $MyAlJtIoFiles) {
         [JtIoFile]$MyJtIoFile = $File
 
         [JtTblRow]$MyJtTblRow = Convert-JtIoFile_To_JtTblRow_Normal -FilePath $MyJtIoFile
         $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    return $MyJtTblTable
+}
+
+Function Convert-JtAlJtIoFiles_to_Documents {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][System.Collections.ArrayList]$ArrayList,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
+    )
+
+    [String]$MyFunctionName = "Convert-JtAlJtIoFiles_to_Documents"
+
+    [System.Collections.ArrayList]$MyAlJtIoFiles = $ArrayList
+    [String]$MyLabel = $Label
+
+    Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel"
+
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
+    foreach ($File in $MyAlJtIoFiles) {
+        [JtIoFile]$MyJtIoFile = $File
+
+        [JtTblRow]$MyJtTblRow = Convert-JtIoFile_To_JtTblRow_Document -FilePath $MyJtIoFile
+        $MyJtTblTable.AddRow($MyJtTblRow)  | Out-Null
     }
     return $MyJtTblTable
 }
@@ -598,24 +621,72 @@ Function Convert-JtIoFile_To_JtTblRow_Normal {
                 
     Foreach ($i in 1..8) {
         [String]$MyPart = Convert-JtDotter -Text $MyFoldername_Parent -PatternOut "$i"
-        $MyJtTblRow.Add("PART$i", $MyPart)
+        $MyJtTblRow.Add("PART$i", $MyPart) | Out-Null
     }
-    $MyJtTblRow.Add("PARENT_NAME", $MyFoldername_Parent)
+    $MyJtTblRow.Add("PARENT_NAME", $MyFoldername_Parent) | Out-Null
                 
     [String]$MyFilename = $MyJtIoFile.GetName()
-    $MyJtTblRow.Add("NAME", $MyFileName)
+    $MyJtTblRow.Add("NAME", $MyFileName) | Out-Null
         
     [String]$MyExtension2 = $MyJtIoFile.GetExtension2()
-    $MyJtTblRow.Add("EXTENSION2", $MyExtension2)
+    $MyJtTblRow.Add("EXTENSION2", $MyExtension2) | Out-Null
 
-    $MyJtTblRow.Add("PATH", $MyFilePath)
+    $MyJtTblRow.Add("PATH", $MyFilePath) | Out-Null
 
     Foreach ($i in 2..9) {
         [String]$MyLev = Convert-JtPath_To_Parts -Path $MyFilePath -PatternOut "$i"
-        $MyJtTblRow.Add("LEV$i", $MyLev)
+        $MyJtTblRow.Add("LEV$i", $MyLev) | Out-Null
     }
     return $MyJtTblRow
 }
+
+Function Convert-JtIoFile_To_JtTblRow_Document {
+        
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+            
+    [String]$MyFunctionName = "Convert-JtIoFile_To_JtTblRow_Document"
+
+    [String]$MyFilePath = $FilePath
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $FilePath
+    [String]$MyFilename = $MyJtIoFile.GetName()
+            
+    Write-JtLog -Where $MyFunctionName -Text "FilePath: $FilePath"
+            
+    [JtTblRow]$MyJtTblRow = New-JtTblRow
+                
+    [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
+    # [String]$MyFoldername_Parent = $MyJtIoFolder_Parent.GetName()
+    [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyJtIoFolder_Parent
+    [String]$MyFilename_Template = $MyjtTemplateFile.GetName()
+
+    [Int16]$MyIntParts = ($MyFilename_Template.Split(".")).count
+
+                
+    For($i = 1; $i -lt $MyIntParts; $i++) {
+        [String]$MyCol = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
+        [String]$MyPart = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
+        [String]$MyOutput = $MyJtTemplateFile.GetOutputFromFilenameForPart($MyFilename, $MyCol)
+        $MyJtTblRow.Add($MyCol, $MyOutput) | Out-Null
+    }
+    # $MyJtTblRow.Add("PARENT_NAME", $MyFoldername_Parent)
+                
+    [String]$MyFilename = $MyJtIoFile.GetName()
+    $MyJtTblRow.Add("NAME", $MyFileName) | Out-Null
+        
+    # [String]$MyExtension2 = $MyJtIoFile.GetExtension2()
+    # $MyJtTblRow.Add("EXTENSION2", $MyExtension2)
+
+    $MyJtTblRow.Add("PATH", $MyFilePath) | Out-Null
+
+    # Foreach ($i in 2..9) {
+    #     [String]$MyLev = Convert-JtPath_To_Parts -Path $MyFilePath -PatternOut "$i"
+    #     $MyJtTblRow.Add("LEV$i", $MyLev)
+    # }
+    return $MyJtTblRow
+}
+
 
 Function Convert-JtFolderPath_To_Csv_Filelist {
 
@@ -766,53 +837,23 @@ Function Convert-JtTblTable_To_Datatable {
     return , $MyDataTable
 }
 
-Function New-JtCsvGenerator {
+
+Function New-JtCsv_ComputerRoomUser {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Expected
     )
-
-    [String]$MyFunctionName = "New-JtCsvGenerator"
 
     [String]$MyFolderPath_Input = $FolderPath_Input
     [String]$MyFolderPath_Output = $FolderPath_Output
-    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_input
-    
-    [String]$MyLabel = "NO LABEL"
-    if ($Label) {
-        $MyLabel = $Label
-    }
+    [String]$MyExpected = $Expected
 
-    Write-JtLog -Where $MyFunctionName -Text "Starting ... MyLabel: $MyLabel - MyJtIoFolder_Input: $MyJtIoFolder_Input"
-        
-    # has to be fixed...
-    # $MyAlJtTblRow contains some integers; not only rows...
-    [System.Collections.ArrayList]$MyAlJtTblRow = Get-JtAl_Rep_JtTblRow -FolderPath_Input $MyFolderPath_Input
-    $MyAl = $MyAlJtTblRow[$MyAlJtTblRow.Count - 1]
-    foreach ($JtTblRow in $MyAl) {
-        $JtTblRow
-        $JtTblRow.GetType()
-
-        [JtTblRow]$MyJtTblRow = $JtTblRow
-        [String]$MyLabel_Row = $MyJtTblRow.GetLabel()
-        [String]$MyLabel_Rep = $MyLabel_Row.Replace("Get-JtRep_", "")
-        # Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel - MyLabel_Rep: $MyLabel_Rep - MyJtIoFolder_Input: $MyJtIoFolder_Input"
-
-        [Boolean]$MyBlnUseLine = $True
-        # test it
-            
-        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Rep
-        if ($MyBlnUseLine) {
-            $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
-        }
-
-        [JtIoFolder]$MyJtIoFolder_Csv = $MyJtIoFolder_Input.GetJtIoFolder_Sub("csv", $True)
-        [String]$MyFolderPath_Output = $MyJtIoFolder_Csv.GetPath()
-        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
-    }
-    return $MyFolderPath_Output
+    [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Filetypes -FolderPath_Input $MyFolderPath_Input -Expected $MyExpected
+    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
+    Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label "ComputerRoomUser" -FolderPath_Output $MyFolderPath_Output
 }
+
 
 Function New-JtCsv_FolderSummary {
     
@@ -861,24 +902,59 @@ Function New-JtCsv_FolderSummaryExpected {
     [JtCsvFolderSummaryExpected]::new($Label, $FolderPath, $Sub, $Expected)
 }
 
-Function New-JtCsv_ComputerRoomUser {
+
+Function New-JtCsvGenerator {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Expected
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Label
     )
+
+    [String]$MyFunctionName = "New-JtCsvGenerator"
 
     [String]$MyFolderPath_Input = $FolderPath_Input
     [String]$MyFolderPath_Output = $FolderPath_Output
-    [String]$MyExpected = $Expected
+    [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_input
+    
+    [String]$MyLabel = "NO LABEL"
+    if ($Label) {
+        $MyLabel = $Label
+    }
 
-    [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Filetypes -FolderPath_Input $MyFolderPath_Input -Expected $MyExpected
-    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
-    Convert-JtDataTable_To_Csv -DataTable $MyDataTable -Label "ComputerRoomUser" -FolderPath_Output $MyFolderPath_Output
+    Write-JtLog -Where $MyFunctionName -Text "Starting ... MyLabel: $MyLabel - MyJtIoFolder_Input: $MyJtIoFolder_Input"
+        
+    # has to be fixed...
+    # $MyAlJtTblRow contains some integers; not only rows...
+    [System.Collections.ArrayList]$MyAlJtTblRow = Get-JtAl_Rep_JtTblRow -FolderPath_Input $MyFolderPath_Input
+    $MyAl = $MyAlJtTblRow[$MyAlJtTblRow.Count - 1]
+    foreach ($JtTblRow in $MyAl) {
+        $JtTblRow
+        $JtTblRow.GetType()
+
+        [JtTblRow]$MyJtTblRow = $JtTblRow
+        [String]$MyLabel_Row = $MyJtTblRow.GetLabel()
+        [String]$MyLabel_Rep = $MyLabel_Row.Replace("Get-JtRep_", "")
+        # Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel - MyLabel_Rep: $MyLabel_Rep - MyJtIoFolder_Input: $MyJtIoFolder_Input"
+
+        [Boolean]$MyBlnUseLine = $True
+        # test it
+            
+        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Rep
+        if ($MyBlnUseLine) {
+            $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
+        }
+
+        [JtIoFolder]$MyJtIoFolder_Csv = $MyJtIoFolder_Input.GetJtIoFolder_Sub("csv", $True)
+        [String]$MyFolderPath_Output = $MyJtIoFolder_Csv.GetPath()
+        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
+    }
+    return $MyFolderPath_Output
 }
 
 
+
 Export-ModuleMember -Function Convert-JtFilePath_To_JtTblRow_Betrag
+Export-ModuleMember -Function Convert-JtIoFile_To_JtTblRow_Document
 Export-ModuleMember -Function Convert-JtIoFile_To_JtTblRow_Normal
 
 Export-ModuleMember -Function Convert-JtFolderPath_To_Csv_FileList
@@ -887,6 +963,7 @@ Export-ModuleMember -Function Convert-JtFolderPath_To_Csv_FileList_Alter
 Export-ModuleMember -Function Convert-JtAl_to_FileCsv
 Export-ModuleMember -Function Convert-JtAlJtIoFiles_to_FileCsv
 Export-ModuleMember -Function Convert-JtAlJtIoFiles_to_JtTblTable
+Export-ModuleMember -Function Convert-JtAlJtIoFiles_to_Documents
 Export-ModuleMember -Function Convert-JtDataTable_To_Csv
 
 Export-ModuleMember -Function Convert-JtTblTable_To_Datatable
@@ -898,3 +975,5 @@ Export-ModuleMember -Function New-JtCsv_FolderSummaryExpected
 Export-ModuleMember -Function New-JtCsv_FolderSummaryMeta 
 Export-ModuleMember -Function New-JtCsv_FolderSummaryAll
 Export-ModuleMember -Function New-JtCsv_ComputerRoomUser
+
+

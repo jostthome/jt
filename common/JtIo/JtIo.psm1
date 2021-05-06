@@ -325,6 +325,7 @@ class JtIoFile : JtIo {
 }
 
 
+
 class JtIoFileCsv : JtIoFile {
     
     JtIoFileCsv([String]$MyPath) : Base($MyPath) {
@@ -707,6 +708,232 @@ class JtIoFolder : JtIo {
     }
 }
 
+
+Function Convert-JtFilename_To_DecQm {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    [String]$MyFunctionName = "Convert-JtFilename_To_DecQm"
+
+    [String]$MyFilename = $Filename
+    try {
+        [String]$MySize = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
+        $MyAlSizeParts = $MySize.Split("x")
+        if ($MyAlSizeParts.Count -lt 2) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Problem with FLAECHE. MyFilename: $MyFilename"
+            return 999
+        }
+        else {
+            [String]$MyBreite = $MyAlSizeParts[0]
+            [String]$MyHoehe = $MyAlSizeParts[1]
+            [Int32]$MyIntBreite = [Int32]$MyBreite
+            [Int32]$MyIntHoehe = [Int32]$MyHoehe
+            [Int32]$MyIntFlaeche = $MyIntBreite * $MyIntHoehe
+            [Decimal]$MyDecFlaeche = [Decimal]$MyIntFlaeche / 1000 / 1000
+            [Decimal]$MyDecFlaeche = [math]::round($MyDecFlaeche, 3, 1)
+            # [Decimal]$DecFlaeche = [Decimal]$IntFlaeche
+            # [String]$MyFlaeche = $MyDecFlaeche.ToString("0.000")
+            # [String]$MyFlaeche = $DecFlaeche.ToString("0")
+            # $MyFlaeche = $MyFlaeche.Replace(",", ".")
+        }
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with FLAECHE in file: $MyFilename"
+    }
+    return $MyDecFlaeche
+}
+
+Function Convert-JtFilename_To_IntJahr {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    [String]$MyFunctionName = "Convert-JtFilename_To_IntJahr"
+
+    [String]$MyFilename = $Filename
+
+    if ($MyFilename.Length -lt 4) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Illegal value MyFilename: $MyFilename"
+        return 9999
+    }
+
+    [Int16]$MyIntJahr = 9999
+
+    [String]$MyJahr = $MyFilename.substring(0, 4)
+    
+    try {
+        # Aus "20-04" soll "2020" werden.
+        $MySep = $MyJahr.substring(2, 1)
+        if ($MySep -eq "-") {
+            $MyJahr = -join ("20", $MyJahr.substring(0, 2))
+        } 
+    }
+    catch {
+        $MyJahr = ""
+        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with MyFilename: $MyFilename"
+        return 9998
+    }
+
+    try {
+        [Int16]$MyIntJahr = [Int16]$MyJahr
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Illegal value. Problem with MyFilename: $MyFilename"
+        return 9997
+    }
+    return $MyIntJahr
+}
+
+Function Convert-JtFilename_To_Jahr {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    [Int16]$MyIntJahr = Convert-JtFilename_To_IntJahr -Filename $Filename
+    [String]$MyJahr = -Join ($MyIntJahr, "")
+    return $MyJahr
+}
+
+Function Convert-JtFilename_To_Papier {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    [String]$MyFunctionName = "Convert-JtFilename_To_Papier"
+
+    # [JtIoFile]$TheJtIoFile
+    # [String]$MyPath = $This.GetPath()
+
+    [String]$MyFilename = $Filename
+    [String]$MyPaper = "xxxx"
+    try {
+        [String]$MyPaper = Convert-JtDotter -Text $MyFilename -PatternOut "3" -Reverse
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with PAPIER in file: $MyFilename"
+    }
+    return $MyPaper
+}
+
+Function Convert-JtFilePathExpanded {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+    [String]$MyResult = $FilePath
+    $MyResult = Convert-JtEnvironmentVariables -Text $MyResult
+    return $MyResult
+} 
+
+Function Convert-JtFolderPathExpanded {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
+    )
+
+    [String]$MyResult = $FolderPath
+    $MyResult = Convert-JtEnvironmentVariables -Text $MyResult
+    return $MyResult
+} 
+
+
+
+Function Convert-JtFilename_To_DecBetrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    # [String]$MyFunctionName = "Convert-JtFilename_To_DecBetrag"
+
+    [String]$MyFilename = $Filename
+
+    [String]$MyElement = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
+    [Decimal]$MyDecBetrag = Convert-JtPart_To_DecBetrag -Part $MyElement
+    return $MyDecBetrag
+}
+
+Function Convert-JtFilename_To_IntAlter {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    [String]$MyFunctionName = "Convert-JtFilename_To_IntAlter"
+    [String]$MyFilename = $Filename
+
+    [Int16]$MyIntYear = Convert-JtFilename_To_IntJahr -Filename $MyFilename
+    if ($MyIntYear -gt 0 ) {
+        $MyDateCurrent = Get-Date
+        $MyYearCurrent = $MyDateCurrent.Year
+        [Int16]$MyIntYearCurrent = [Int16]$MyYearCurrent
+
+        [Int16]$MyIntAlter = $MyIntYearCurrent - $MyIntYear
+    }
+    else {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid!!! MyFilename: $MyFilename"
+    }
+    return $MyIntAlter
+}
+
+Function Convert-JtFilename_To_IntAnzahl {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
+    )
+
+    # [String]$MyFunctionName = "Convert-JtFilename_To_IntAnzahl"
+    
+    # [String]$MyPath = $This.GetPath()
+    [String]$MyFilename = $Filename
+    [String]$MyCount = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
+    return $MyCount
+}
+
+
+Function Convert-JtFilePath_To_Value_Age {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+    # [String]$MyFunctionName = "Convert-JtFilePath_To_Value_Age"
+
+    [String]$MyFilePath = $FilePath
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath
+    [String]$MyFilename = $MyJtIoFile.GetName()
+    [String]$MyResult = Convert-JtFilename_To_IntAlter -Filename $MyFilename
+    return $MyResult
+}
+
+Function Convert-JtFilePath_To_Value_DecQm {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+    # [String]$MyFunctionName = "Convert-JtFilePath_To_Value_Age"
+
+    [String]$MyFilePath = $FilePath
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath
+    [String]$MyFilename = $MyJtIoFile.GetName()
+
+    [Decimal]$MyDecResult = Convert-JtFilename_To_DecQm -Filename $MyFilename
+    [String]$MyResult = Convert-JtDecimal_To_String3 -Decimal $MyDecResult
+    return $MyResult
+}
+
+
+Function Convert-JtFilePath_To_Value_Year {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+    # [String]$MyFunctionName = "Convert-JtFilePath_To_Value_Year"
+
+    [String]$MyFilePath = $FilePath
+    [String]$MyFilename = Convert-JtFilePath_To_Filename -FilePath $MyFilePath
+    [String]$MyResult = Convert-JtFilename_To_Jahr -Filename $MyFilename
+    return $MyResult
+}
+
+
+
 Function Convert-JtFilePath_To_Filename {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
@@ -717,6 +944,7 @@ Function Convert-JtFilePath_To_Filename {
     [String]$MyFilename = $MyJtIoFile.GetName()
     return $MyFilename
 }
+
 
 Function Convert-JtFolderPath_To_Foldername {
     Param (
@@ -1135,6 +1363,49 @@ Function New-JtIoFolder_Report {
 }
 
 
+Function New-JtNetConnection {
+        
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Computer,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Username,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Share,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Passwd
+    )
+
+    [String]$MyFunctionName = "New-JtNetConnection"
+
+    [String]$MyComputer = $Computer
+    [String]$MyShare = $Share
+    [String]$MyUsername = $Username
+    [String]$MyPasswd = $Pass
+            
+
+    # $User = "Domain01\User01"
+    # $PWord = ConvertTo-SecureString -String "P@sSwOrd" -AsPlainText -Force
+    # $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $PWord
+    
+    # $MyPWord = ConvertTo-SecureString -String $MyPassword -AsPlainText -Force
+    # $MyCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $MyUser, $MyPWord
+    
+
+    [String]$MyRoot = -join ("\\", $MyComputer, "\", $MyShare)
+    $MyRoot
+    # New-PSDrive -Name K -PSProvider FileSystem -Root $MyRoot -Persist -Credential $MyCredential -Scope Global
+
+
+    # New-SmbMapping -LocalPath $shareletter -RemotePath $dhcpshare -Username $shareuser -Password $sharepasswd -Persistent $true
+
+
+    New-SmbMapping -RemotePath $MyRoot -Username $MyUsername -Password $MyPasswd -Persistent $True
+
+
+    Write-JtLog -Where $MyFunctionName -Text "Mapping network share. MyRoot: $MyRoot"
+    [Boolean]$MyBlnExists = [System.IO.Directory]::Exists($MyRoot)
+    Write-JtLog -Where $MyFunctionName -Text "Is share available? MyRoot: $MyRoot - MyBlnExists: $MyBlnExists"
+}
+
+
+
 Function New-JtRobocopy {
     
     Param (
@@ -1523,6 +1794,7 @@ Function Write-JtIoFile_Meta {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Prefix,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Value,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Extension2,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$OnlyOne,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Overwrite
@@ -1535,12 +1807,9 @@ Function Write-JtIoFile_Meta {
     [String]$MyExtension2 = $Extension2
     [String]$MyOverwrite = $Overwrite
     [String]$MyLabel = $Label
-    [String]$MyPrefix = ""
+    [String]$MyValue = $Value
+    [String]$MyPrefix = $Prefix
 
-
-    if ($Prefix) {
-        $MyPrefix = $Prefix
-    }
 
     [String]$MyExtension_Meta = [JtIo]::FileExtension_Meta
     if (! ($MyExtension2.EndsWith($MyExtension_Meta))) {
@@ -1549,25 +1818,23 @@ Function Write-JtIoFile_Meta {
     }
 
     [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+
+    [String]$MyMain = $MyLabel
+    if($MyValue) {
+        $MyMain = -join($MyLabel, ".", $MyValue)
+    }
+    $MyMain = Convert-JtLabel_To_Filename -Label $MyMain
+    
+    $MyFilename_Output = -Join ($MyPrefix, ".", $MyMain, $MyExtension2)
+    
+    [String]$MyContent = $MyFolderPath_Input
+    
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+    
     if ($OnlyOne) {
-        [String]$MyFilter = -join ("*", $MyExtension2)
+        [String]$MyFilter = -join ($MyPrefix, ".", $MyLabel, "*", $MyExtension2)
         $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter)
     }
-
-    $MyLabel = $Label
-    if ($Prefix) {
-        $MyPrefix = $Prefix
-        $MyLabel = -join ($MyPrefix, ".", $MyLabel)
-    }
-
-
-    $MyFilename_Output = -Join ($MyLabel, $MyExtension2)
-
-    [String]$MyContent = $MyFolderPath_Input
-
-    $MyFilename_Output = Convert-JtLabel_To_Filename -Label $MyFilename_Output
-    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
-
     if ($MyOverwrite) {
         Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent -Overwrite
     }
@@ -1711,16 +1978,17 @@ Function Write-JtIoFile_Meta_Report {
     [String]$MyValue = $Value
         
     [String]$MyPrefix = [JtIo]::FilePrefix_Report
-    [String]$MyLabel = -join ($MyName, ".", $MyValue)
     [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Report
     
     $MyParams = @{
         FolderPath_Input  = $MyFolderPath_Input
         FolderPath_Output = $MyFolderPath_Output
         Prefix            = $MyPrefix
-        Label             = $MyLabel
+        Label             = $MyName
+        Value             = $MyValue
         Extension2        = $MyExtension2
         Overwrite         = $True
+        OnlyOne           = $True
     }
     Write-JtIoFile_Meta @MyParams
 }
@@ -1769,6 +2037,11 @@ Function Write-JtIoFile_Meta_Version {
     [String]$MyFolderPath_Output = $FolderPath_Output
     [String]$MyTimestamp = Get-JtTimestamp
     [String]$MyPrefix = "_v"
+
+    # Only one
+    [String]$MyFilter = -join ($MyPrefix, ".", "*", $MyExtension2)
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+    $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter)
             
     $MyParams = @{
         FolderPath_Input  = $MyFolderPath_Input
@@ -1782,47 +2055,20 @@ Function Write-JtIoFile_Meta_Version {
     Write-JtIoFile_Meta @MyParams
 }
 
-Function New-JtNetConnection {
-        
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Computer,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Username,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Share,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Passwd
-    )
 
-    [String]$MyFunctionName = "New-JtNetConnection"
+Export-ModuleMember -Function Convert-JtFilename_To_IntAnzahl
+Export-ModuleMember -Function Convert-JtFilename_To_IntAlter
+Export-ModuleMember -Function Convert-JtFilename_To_DecBetrag
+Export-ModuleMember -Function Convert-JtFilename_To_DecQm
+Export-ModuleMember -Function Convert-JtFilename_To_Jahr
+Export-ModuleMember -Function Convert-JtFilename_To_Papier
 
-    [String]$MyComputer = $Computer
-    [String]$MyShare = $Share
-    [String]$MyUsername = $Username
-    [String]$MyPasswd = $Pass
-            
+Export-ModuleMember -Function Convert-JtFilePath_To_Value_Age
+Export-ModuleMember -Function Convert-JtFilePath_To_Value_DecQm
+Export-ModuleMember -Function Convert-JtFilePath_To_Value_Year
 
-    # $User = "Domain01\User01"
-    # $PWord = ConvertTo-SecureString -String "P@sSwOrd" -AsPlainText -Force
-    # $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $PWord
-    
-    # $MyPWord = ConvertTo-SecureString -String $MyPassword -AsPlainText -Force
-    # $MyCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $MyUser, $MyPWord
-    
-
-    [String]$MyRoot = -join ("\\", $MyComputer, "\", $MyShare)
-    $MyRoot
-    # New-PSDrive -Name K -PSProvider FileSystem -Root $MyRoot -Persist -Credential $MyCredential -Scope Global
-
-
-    # New-SmbMapping -LocalPath $shareletter -RemotePath $dhcpshare -Username $shareuser -Password $sharepasswd -Persistent $true
-
-
-    New-SmbMapping -RemotePath $MyRoot -Username $MyUsername -Password $MyPasswd -Persistent $True
-
-
-    Write-JtLog -Where $MyFunctionName -Text "Mapping network share. MyRoot: $MyRoot"
-    [Boolean]$MyBlnExists = [System.IO.Directory]::Exists($MyRoot)
-    Write-JtLog -Where $MyFunctionName -Text "Is share available? MyRoot: $MyRoot - MyBlnExists: $MyBlnExists"
-}
-
+Export-ModuleMember -Function Convert-JtFilePathExpanded
+Export-ModuleMember -Function Convert-JtFolderPathExpanded
 
 Export-ModuleMember -Function Convert-JtFilePath_To_Filename
 Export-ModuleMember -Function Convert-JtIoFilenamesAtFolderPath
@@ -1856,7 +2102,6 @@ Export-ModuleMember -Function Get-JtIoFolder_Work
 
 Export-ModuleMember -Function New-JtNetConnection
 
-
 Export-ModuleMember -Function New-JtRobocopy
 Export-ModuleMember -Function New-JtRobocopy_Date
 Export-ModuleMember -Function New-JtRobocopy_Element_Extension_Folder
@@ -1878,5 +2123,4 @@ Export-ModuleMember -Function Write-JtIoFile_Meta_Betrag_Year
 Export-ModuleMember -Function Write-JtIoFile_Meta_Report
 Export-ModuleMember -Function Write-JtIoFile_Meta_Time
 Export-ModuleMember -Function Write-JtIoFile_Meta_Version
-
 

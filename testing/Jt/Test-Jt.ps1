@@ -5,6 +5,41 @@ using module JtColRen
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
+Function Get-JtInfo {
+
+    [CmdletBinding()]
+
+    Param(
+
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True, ValueFromPipelinebyPropertyName = $True)]
+        
+        [string[]]$computername
+
+        # [string]$logfile = "c:\temp\retries.txt"
+    )
+
+    BEGIN {
+        # Remove-Item $logfile -erroraction silentlycontinue
+    }
+
+    PROCESS {
+        $obj = New-Object -typename PSObject
+
+        $obj | Add-Member -membertype NoteProperty -name ComputerName -value ("hallo1") -passthru |
+        Add-Member -membertype NoteProperty -name OSVersion -value ("hallo2") -passthru |
+        Add-Member -membertype NoteProperty -name OSBuild -value ("hallo3") -passthru |
+        Add-Member -membertype NoteProperty -name BIOSSerial -value ("hallo4") -passthru |
+        Add-Member -membertype NoteProperty -name SPVersion -value ("hallo5")   
+
+        
+        Write-Output $obj
+    }
+}
+
+$Computers = @("1", "2", "3")
+$Os = $Computers | Get-JtInfo 
+
+
 
 
 Function Test-JtVal {
@@ -26,7 +61,7 @@ Function Test-JtVal {
     $MyJtTblTable.AddRow($MyJtTblRow)
 
 
-    ForEach($Obj in $MyJtTblTable.GetObjects()) {
+    ForEach ($Obj in $MyJtTblTable.GetObjects()) {
         $MyValue = $Obj.($MyLabelValue)
         $MyExpected = $Obj.($MyLabelExpected)
 
@@ -102,8 +137,8 @@ Function Test-JtValid {
     [String]$MyFunctionName = "Test-JtValid"
     [Boolean]$MyTestOk = $True
 
-    [String[]]$MyTestValues =  @('Apples', 'Apples10', '00000', '2356323',  '2323_23',  '2323.23')
-    [String[]]$MyTestOutputs = @('0,00',   '0,00',     '0,00',  '23.563,23','2.323,23', '2.323,23')
+    [String[]]$MyTestValues = @('Apples', 'Apples10', '00000', '2356323', '2323_23', '2323.23')
+    [String[]]$MyTestOutputs = @('0,00', '0,00', '0,00', '23.563,23', '2.323,23', '2.323,23')
 
     for ([Int32]$i = 0; $i -lt $MyTestValues.Length; $i = $i + 1) {
         [String]$MyTest = $MyTestValues[$i]

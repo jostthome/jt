@@ -664,6 +664,7 @@ class JtInf_Soft : JtInf {
     [JtFldSoft]$Revit_2021
     [JtFldSoft]$Revit_2022
     [JtFldSoft]$Rhino_6
+    [JtFldSoft]$Rhino_7
     [JtFldSoft]$Seadrive
     [JtFldSoft]$Seafile
     [JtFldSoft]$ServerViewAgents
@@ -836,6 +837,7 @@ class JtInf_Soft : JtInf {
         $This.Revit_2021 = New-JtFldSoft -Label "Revit_2021" -JtSoftSrc Un64 -Search "Autodesk Revit 2021*"
         $This.Revit_2022 = New-JtFldSoft -Label "Revit_2022" -JtSoftSrc Un64 -Search "Autodesk Revit 2022*"
         $This.Rhino_6 = New-JtFldSoft -Label "Rhino_6" -JtSoftSrc Un64 -Search "Rhinoceros 6*"
+        $This.Rhino_7 = New-JtFldSoft -Label "Rhino_7" -JtSoftSrc Un64 -Search "Rhinoceros 7*"
         $This.Seadrive = New-JtFldSoft -Label "Seadrive" -JtSoftSrc Un64 -Search "SeaDrive*"
         $This.Seafile = New-JtFldSoft -Label "Seafile" -JtSoftSrc Un32 -Search "Seafile*"
         $This.ServerViewAgents = New-JtFldSoft -Label "ServerViewAgents" -JtSoftSrc Un64 -Search "FUJITSU Software ServerView Agents x64*"
@@ -932,7 +934,7 @@ Function Get-JtInf_Soft {
         [JtFldSoft]$MyField = $Field
         [String]$MyVersion = ""
         [String]$MyKeyword = $MyField.GetSearch()
-Write-Host $MyKeyword        
+        Write-Host $MyKeyword        
         [JtSoftSrc]$MyJtSoftSrc = $MyField.GetJtSoftSrc()
 
         [System.Collections.ArrayList]$MyArray = $Null
@@ -954,7 +956,7 @@ Write-Host $MyKeyword
         if ($MyResult) {
             $MyVersion = "v" + $MyResult[0].($MyProperty_Version)
             [String]$MyLabel = $MyField.GetLabel()
-Write-Host $MyLabel            
+            Write-Host $MyLabel            
             # Write-JtLog -Where $This.ClassName -Text "Label: $MyLabel Version: $Version"
             $MyJtInf.($MyLabel).SetValue($MyVersion) | Out-Null
         }
@@ -980,11 +982,9 @@ class JtInf_Soft_InstalledSoftware : JtInf_Soft {
 
     static [Object[]]$Cache_Fields_InstalledSoftware = [Object[]]
 
-
     JtInf_Soft_InstalledSoftware() {
         $This.ClassName = "JtInf_Soft_InstalledSoftware"
     }
-
 
     [Object[]]GetFieldsInstalledSoftware() {
         [Object[]]$MyAlFields = [JtInf_Soft_InstalledSoftware]::Cache_Fields_InstalledSoftware
@@ -1005,9 +1005,6 @@ class JtInf_Soft_InstalledSoftware : JtInf_Soft {
         return $MyAlFields
     }
 }
-
-
-
 
 class JtInf_Win32Bios : JtInf {
 
@@ -1418,6 +1415,25 @@ Function Get-JtInf_Win32VideoController {
 }
 
 
+Function Get-JtKlonVersion {
+    # GetKlonVersion
+
+    [String]$MyFolderPath = "c:/Users/Public/Desktop"
+    [String]$MyResult = "---"
+        
+    [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Meta_Klon)
+        
+    $MyAlFiles_Meta = Get-JtChildItem -FolderPath $MyFolderPath -Filter $MyFilter
+
+    if ($MyAlFiles_Meta.Count -eq 1) {
+        [JtIoFile]$MyJtIoFile_Meta_Klon = $MyAlFiles_Meta[0]
+        [String]$MyFilename = $MyJtIoFile_Meta_Klon.GetName()
+        $MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "3"
+    }
+    return $MyResult
+}
+
+
 Function Get-JtReport_Value {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
@@ -1584,24 +1600,6 @@ Function New-JtInf_Win32Processor {
 Function New-JtInf_Win32VideoController {
 
     [JtInf_Win32VideoController]::new()
-}
-
-Function Get-JtKlonVersion {
-    # GetKlonVersion
-
-    [String]$MyFolderPath = "c:/Users/Public/Desktop"
-    [String]$MyResult = "---"
-        
-    [String]$MyFilter = -join ("*", [JtIo]::FileExtension_Meta_Klon)
-        
-    $MyAlFiles_Meta = Get-JtChildItem -FolderPath $MyFolderPath -Filter $MyFilter
-
-    if ($MyAlFiles_Meta.Count -eq 1) {
-        [JtIoFile]$MyJtIoFile_Meta_Klon = $MyAlFiles_Meta[0]
-        [String]$MyFilename = $MyJtIoFile_Meta_Klon.GetName()
-        $MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "3"
-    }
-    return $MyResult
 }
 
 Export-ModuleMember -Function Get-JtInf_AFolder

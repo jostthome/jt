@@ -1,0 +1,3 @@
+<config>
+	<documents label="Testing-JtInvdocuments" source="%OneDrive%\jt\1.EXAMPLE\12.DATA.BETRAG\MU.STE.BEISPIEL2.TEST.Rechnung.2018.betrag" filter="*.pdf"   target="c:\_inventory\out\Test-JtInvdocuments"></documents>
+</config>

@@ -50,16 +50,13 @@ class JtCsvTool : JtClass {
 
         [System.Collections.ArrayList]$MyAlJtIoFolders_Selected = New-Object System.Collections.ArrayList
         foreach ($Folder in $MyAlJtIoFolders) {
+            [Boolean]$MyBlnSelected = $True
+
             [JtIoFolder]$MyJtIoFolder = $Folder
-            if ($Null -eq $MyAlSelection) {
-                $MyAlJtIoFolders_Selected.Add($MyJtIoFolder)
-            }
-            else {
+            if ($MyAlSelection) {
                 [Boolean]$MyBlnSelected = [JtCsvTool]::IsJtIoFolderInSelection($MyJtIoFolder, $MyAlSelection)
-                if ($MyBlnSelected) {
-                    $MyAlJtIoFolders_Selected.Add($MyJtIoFolder)
-                }
             } 
+            $MyAlJtIoFolders_Selected.Add($MyJtIoFolder)
         }
         return $MyAlJtIoFolders_Selected
     }
@@ -711,6 +708,22 @@ class JtInvClientReport : JtInv {
         }
         Write-JtIoFile_Meta_Report @MyParams
 
+
+        $MyLogins = Get-LocalUser | Where-Object {$_.Lastlogon -ge (Get-Date).AddDays(-999)} | Select-Object Name,Enabled,SID,Lastlogon
+        ForEach($Login in $MyLogins) {
+            $MyLabel = $Login.Name
+            [DateTime]$MyLoginDate = $Login.LastLogon
+            $MyValue = $MyLoginDate.ToString("yyyy-MM-dd")
+
+            $MyParams = @{
+                FolderPath_Input  = $MyFolderPath_Input
+                FolderPath_Output = $MyFolderPath_Output
+                Name              = "login_$MyLabel"
+                Value             = $MyValue
+            }
+            Write-JtIoFile_Meta_Report @MyParams
+        }
+
         [String]$MyName = "ipconfig"
         [String]$MyFilePath_Output = $This.GetFilePath_Txt($MyName)
         $MyCommand = -join ('cmd.exe /C ', '"', 'ipconfig /all', '"', '   > ', '"', $MyFilePath_Output, '"')
@@ -1060,6 +1073,92 @@ class JtTblFilelist : JtClass {
     }
 
 
+}
+
+class JtInvDocuments : JtInv {
+
+    JtInvDocuments () : Base() {
+        $This.ClassName = "JtInvDocuments"
+    }
+
+    [System.Collections.ArrayList]GetAlItems() {
+        [System.Collections.ArrayList]$MyArrayList = New-Object System.Collections.ArrayList
+        
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $MyArrayList
+        }
+        
+        [String]$MyTagName = "documents"
+        foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
+            $MyParams = @{
+                source = $Entity.source
+                target = $Entity.target
+                label  = $Entity.label
+                filter = $Entity.filter
+            }
+            [HashTable]$MyItem = New-JtConfigItem @MyParams
+
+            if ($MyItem.BlnValid) {
+                $MyArrayList.Add($MyItem)
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid. Problem with item."
+                $MyItem
+                Write-JtLog_Error -Where $This.ClassName -Text "Config not valid"
+                Throw "Problem with config."
+            }
+        }
+        return $MyArrayList
+    }
+
+    [Boolean]DoIt() {
+        $This.DoLogRepoStart()
+
+        [Xml]$MyConfigXml = $This.GetConfigXml()
+        if ($Null -eq $MyConfigXml) {
+            return $False
+        }
+        
+        $MyArrayList = $This.GetAlItems()
+        [Int]$MyIntCount = $MyArrayList.count
+        Write-JtLog -Where $This.ClassName -Text "DoIt. Number of items. MyIntCount: $MyIntCount"
+        foreach ($MyItem in $MyArrayList) {
+            [String]$MySource = $MyItem.source
+            [String]$MyLabel = $MyItem.label
+            [String]$MyTarget = $MyItem.target
+            [String]$MyFilter = $MyItem.filter
+            
+            [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MySource
+            [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyTarget -Force
+            [String]$MyFolderPath_Output = $MyJtIoFolder_Output.GetPath()
+
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter -Recurse
+
+            [Int16]$MyIntCount = $MyAlJtIoFiles.Count
+            if ($MyIntCount -gt 0) {
+                Write-JtLog -Where $This.ClassName -Text "DoIt... Number of files: $MyIntCount in MyJtIoFolder: $MyJtIoFolder"
+                
+                [JtTblTable]$MyJtTblTable = Convert-JtAlJtIoFiles_to_Documents -ArrayList $MyAlJtIoFiles -Label $MyLabel
+                
+                Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
+            }
+            else {
+                Write-JtLog_Error -Where $This.ClassName -Text "DoIt... Nothing to do. Number of files: $MyIntCount in MyJtIoFolder: $MyJtIoFolder"
+            }
+        }
+        return $True
+    }
+
+
+    [String]GetConfigName() {
+        return "JtInvDocuments"
+    }
+
+
+    [String]GetReportLabel() {
+        return "documents"
+    }
 }
 
 class JtInvFiles : JtInv {
@@ -2546,6 +2645,14 @@ Function New-JtInvDeploy {
 }
 
 
+Function New-JtInvDocuments {
+
+
+    [JtInvDocuments]::new()
+
+    # New-JtInvClientTimestamp  -Label "files"
+}
+
 
 Function New-JtInvFiles {
 
@@ -2688,6 +2795,7 @@ Export-ModuleMember -Function New-JtInvReportsCombine
 Export-ModuleMember -Function New-JtInvReportsUpdate
 Export-ModuleMember -Function New-JtInvData
 Export-ModuleMember -Function New-JtInvDeploy
+Export-ModuleMember -Function New-JtInvDocuments
 Export-ModuleMember -Function New-JtInvFiles
 Export-ModuleMember -Function New-JtInvFolder
 Export-ModuleMember -Function New-JtInvLengths

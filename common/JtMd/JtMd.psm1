@@ -215,19 +215,6 @@ Function Convert-JtIoFile_Md_To_Pdf {
 
 
 
-Function New-JtMdDocument {
-
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Title
-    )
-
-    # [String]$MyFunctionName = "New-JtMdDocument"
-
-    [String]$MyTitle = $Title
-
-    [JtMdDocument]::new($MyTitle)
-
-}
 
 Function Get-JtDataTable_Info_Column_Width {
 
@@ -392,6 +379,21 @@ class JtMdTable : JtClass {
         [String]$MyResult = [system.String]::Join("", $MyLines.ToArray())
         return $MyResult
     }
+}
+
+
+Function New-JtMdDocument {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Title
+    )
+
+    # [String]$MyFunctionName = "New-JtMdDocument"
+
+    [String]$MyTitle = $Title
+
+    [JtMdDocument]::new($MyTitle)
+
 }
 
 Function New-JtMdTable {

@@ -119,6 +119,80 @@ class JtImageMagick_Composite : JtImageMagick {
     }
 }
 
+
+
+Function New-JtImageAttachRight {
+
+    param (
+        [String]$FolderPath_Input1,
+        [Int16]$InputFileX1,
+        [Int16]$InputFileY1,
+        [String]$FolderPath_Input2,
+        [Int16]$InputFileX2,
+        [Int16]$InputFileY2,
+        [String]$FolderPath_Output,
+        [String]$Filename_Output
+    )
+        
+    [String]$MyFunctionName = "New-JtImageAttachRight"
+    # [JtIoFolder]$MyJtIoFolder_Work = Get-JtIoFolder_Work -Name $MyFunctionName
+    [String]$MyFilename_Output = $Filename_Output
+    [String]$MyFolderPath_Input1 = $FolderPath_Input1
+    [String]$MyFolderPath_Input2 = $FolderPath_Input2
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    
+
+    [String]$MyFilename_OutputBlank = $MyFilename_Output.replace(".jpg", "_blank.jpg")
+    [JtImageMagick_Image]$MyJtImageMagick_Image = New-JtImageMagick_Image -FolderPath_Output $MyFolderPath_Output -Filename_Output $MyFilename_OutputBlank
+
+    [Int16]$IntSizeX = [Int16]$InputFileX1 + [Int16]$InputFileX2
+    $MyJtImageMagick_Image.SetSize($IntSizeX, $InputFileY1)
+    $MyJtImageMagick_Image.SetFont("Arial")
+    $MyJtImageMagick_Image.SetGravity("NorthEast")
+    $MyJtImageMagick_Image.SetPointsize(20)
+    $MyJtImageMagick_Image.SetBackground("green")
+    $MyJtImageMagick_Image.SetFill("yellow")
+    $MyJtImageMagick_Image.SetLabel(".")
+    [String]$MyFilePathWorkImageBlank = $MyJtImageMagick_Image.DoWrite()
+    
+
+    [String]$MyFilename_OutputLeft = $Filename_Output.replace(".jpg", "_left.jpg")
+    $MyParameters = @{
+        FolderPath_Input1 = $MyFolderPath_Input1
+        FolderPath_Input2 = $MyFilePathWorkImageBlank
+        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
+        Filename_Output   = $MyFilename_OutputLeft
+    }
+    
+    [JtImageMagick_Composite]$MyJtImageMagick_Composite = New-JtImageMagick_Composite @MyParameters
+    $MyJtImageMagick_Composite.SetGravity("NorthWest")
+    [String]$MyFilePathWorkImageLeft = $MyJtImageMagick_Composite.DoWrite()
+    
+    [String]$MyFilename_OutputRight = $MyFilename_Output.replace(".jpg", "_east.jpg")
+    $MyParameters = @{
+        FolderPath_Input1 = $MyFolderPath_Input2
+        FolderPath_Input2 = $MyFilePathWorkImageLeft
+        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
+        Filename_Output = $MyFilename_OutputRight
+    }
+
+    [JtImageMagick_Composite]$MyJtImageMagick_Composite = New-JtImageMagick_Composite @MyParameters
+    $MyJtImageMagick_Composite.SetGravity("NorthEast")
+    [String]$MyFilePathWorkImageRight = $MyJtImageMagick_Composite.DoWrite()
+
+    [String]$MyFolderPath_Output = $MyJtIoFolder_Work.GetPath()
+    [String]$MyFilename_Output = $MyFilename_Output
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+
+    Write-JtLog -Where $This.ClassName -Text "MyFilePathWorkImageRight: $MyFilePathWorkImageRight"
+    Write-JtLog -Where $This.ClassName -Text "MyFilePath_Output: $MyFilePath_Output"
+    Copy-Item $MyFilePathWorkImageRight $MyFilePath_Output
+
+    return $MyFilePath_Output
+}
+
+
 Function New-JtImageMagick_Composite {
 
     param (
@@ -1033,78 +1107,6 @@ Function New-JtImageTwin {
     return $MyFilePath_Output
 }
 
-
-
-Function New-JtImageAttachRight {
-
-    param (
-        [String]$FolderPath_Input1,
-        [Int16]$InputFileX1,
-        [Int16]$InputFileY1,
-        [String]$FolderPath_Input2,
-        [Int16]$InputFileX2,
-        [Int16]$InputFileY2,
-        [String]$FolderPath_Output,
-        [String]$Filename_Output
-    )
-        
-    [String]$MyFunctionName = "New-JtImageAttachRight"
-    # [JtIoFolder]$MyJtIoFolder_Work = Get-JtIoFolder_Work -Name $MyFunctionName
-    [String]$MyFilename_Output = $Filename_Output
-    [String]$MyFolderPath_Input1 = $FolderPath_Input1
-    [String]$MyFolderPath_Input2 = $FolderPath_Input2
-    [String]$MyFolderPath_Output = $FolderPath_Output
-    
-
-    [String]$MyFilename_OutputBlank = $MyFilename_Output.replace(".jpg", "_blank.jpg")
-    [JtImageMagick_Image]$MyJtImageMagick_Image = New-JtImageMagick_Image -FolderPath_Output $MyFolderPath_Output -Filename_Output $MyFilename_OutputBlank
-
-    [Int16]$IntSizeX = [Int16]$InputFileX1 + [Int16]$InputFileX2
-    $MyJtImageMagick_Image.SetSize($IntSizeX, $InputFileY1)
-    $MyJtImageMagick_Image.SetFont("Arial")
-    $MyJtImageMagick_Image.SetGravity("NorthEast")
-    $MyJtImageMagick_Image.SetPointsize(20)
-    $MyJtImageMagick_Image.SetBackground("green")
-    $MyJtImageMagick_Image.SetFill("yellow")
-    $MyJtImageMagick_Image.SetLabel(".")
-    [String]$MyFilePathWorkImageBlank = $MyJtImageMagick_Image.DoWrite()
-    
-
-    [String]$MyFilename_OutputLeft = $Filename_Output.replace(".jpg", "_left.jpg")
-    $MyParameters = @{
-        FolderPath_Input1 = $MyFolderPath_Input1
-        FolderPath_Input2 = $MyFilePathWorkImageBlank
-        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
-        Filename_Output   = $MyFilename_OutputLeft
-    }
-    
-    [JtImageMagick_Composite]$MyJtImageMagick_Composite = New-JtImageMagick_Composite @MyParameters
-    $MyJtImageMagick_Composite.SetGravity("NorthWest")
-    [String]$MyFilePathWorkImageLeft = $MyJtImageMagick_Composite.DoWrite()
-    
-    [String]$MyFilename_OutputRight = $MyFilename_Output.replace(".jpg", "_east.jpg")
-    $MyParameters = @{
-        FolderPath_Input1 = $MyFolderPath_Input2
-        FolderPath_Input2 = $MyFilePathWorkImageLeft
-        FolderPath_Output = $MyJtIoFolder_Work.GetPath()
-        Filename_Output = $MyFilename_OutputRight
-    }
-
-    [JtImageMagick_Composite]$MyJtImageMagick_Composite = New-JtImageMagick_Composite @MyParameters
-    $MyJtImageMagick_Composite.SetGravity("NorthEast")
-    [String]$MyFilePathWorkImageRight = $MyJtImageMagick_Composite.DoWrite()
-
-    [String]$MyFolderPath_Output = $MyJtIoFolder_Work.GetPath()
-    [String]$MyFilename_Output = $MyFilename_Output
-    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
-    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
-
-    Write-JtLog -Where $This.ClassName -Text "MyFilePathWorkImageRight: $MyFilePathWorkImageRight"
-    Write-JtLog -Where $This.ClassName -Text "MyFilePath_Output: $MyFilePath_Output"
-    Copy-Item $MyFilePathWorkImageRight $MyFilePath_Output
-
-    return $MyFilePath_Output
-}
 
 Export-ModuleMember -Function New-JtImageAttachRight
 

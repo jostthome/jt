@@ -7,7 +7,7 @@ Function Test-JtDataFolder {
 
     [String]$MyFolderPath_Input = Get-JtFolderPath_Index_Betrag
 
-    [JtDataFolder]$MyJtDataFolder = New-JtDataFolder -FolderPath $MyFolderPath_Input
+    [JtDataFolder]$MyJtDataFolder = Get-JtDataFolder -FolderPath $MyFolderPath_Input
     $MyJtDataFolder.DoCheck("c:\_inventory\out")
 }
 
@@ -18,7 +18,7 @@ Function Test-JtDataRepository {
 
     [String]$MyFolderPath_Input = "$env:OneDrive\DATA"
 
-    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    [JtDataRepository]$MyJtDataRepository = Get-JtDataRepository -FolderPath $MyFolderPath_Input
     $MyJtDataRepository.DoReportProblems("C:\_inventory\out")
 }
 

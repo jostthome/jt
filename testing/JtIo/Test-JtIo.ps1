@@ -4,8 +4,22 @@ Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
 
+Function Test-JtIoFile_Meta {
+    $MyParams = @{
+        FolderPath_Input = "%temp%"
+        FolderPath_Output = "%temp%"
+        Prefix = [JtIo]::FilePrefix_Report
+        Label = "test1234"
+        Value = "hallo2b"
+        Extension2 = [JtIo]::FileExtension_Meta_Report
+        OnlyOne = $True
+        Overwrite = $True
+    }
+    Write-JtIoFile_Meta @MyParams
+}
+Test-JtIoFile_Meta
 
-
+return 
 
 Function Test-JtConfig {
 

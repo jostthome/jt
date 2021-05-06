@@ -1,73 +1,34 @@
 using module Jt 
 using module JtIo
 
-Function Get-JtPreisliste {
-    return  New-JtPreisliste_Plotten_2020_07_01
-}
 
+Function Convert-JtFilePath_To_Decimal_JtPreisliste_Preis {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][JtPreisliste]$JtPreisliste
+    )
 
-class JtColRen : JtClass {
+    [String]$MyFunctionName = "Convert-JtFilePath_To_Decimal_JtPreisliste_Preis"
 
-    [String]$Label = ""
-    [String]$Header = ""
+    [JtPreisliste]$MyJtPreisliste = $JtPreisliste
+    [String]$MyFilePath_Input = $FilePath_Input
 
+    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath_Input
+    [String]$MyFilename = $MyJtIoFile.GetName()
 
-    JtColRen([String]$TheLabel) {
-        $This.ClassName = "JtColRen"
-        $This.Label = $TheLabel
-        $This.Header = $TheLabel
-    }
+    [String]$MyPaper = Convert-JtFilename_To_Papier -Filename $MyFilename
+    [Decimal]$MyDecArea = Convert-JtFilename_To_DecQm -Filename $MyFilename
 
-    JtColRen([String]$TheLabel, [String]$TheHeader) {
-        $This.ClassName = "JtColRen"
-        $This.Label = $TheLabel
-        $This.Header = $TheHeader
-        if (!($TheHeader)) {
-            $This.Header = $TheLabel
-        }
-    }
-
-    [Boolean]CheckValid([String]$TheValue) {
-        return $True
-    }
-
-    [String]GetHeader() {
-        return $This.Header
-    }
-
-    [String]GetLabel() {
-        return $This.Label
-    }
-
-    [String]GetName() {
-        return $This.ClassName
-    }
-
-    [String]GetOutput([String]$TheValue) {
-        return $TheValue
-    }
-
-
+    [Decimal]$MyDecBasePrice_Paper = $MyJtPreisliste.GetDecBasePrice_Paper($MyPaper)
+    [Decimal]$MyDecBasePrice_Ink = $MyJtPreisliste.GetDecBasePrice_Ink($MyPaper)
     
-    [Boolean]IsEqual([JtColRen]$TheJtColRen) {
-        [Boolean]$MyResult = $False
-        $MyLabel = $TheJtColRen.GetLabel()
-        if ($MyLabel.Equals($This.GetLabel())) {
-            return $True
-        }
-        else {
-            return $MyResult
-        }
-    }
-
-    [Boolean]IsSummable() {
-        return $False
-    }
+    Write-JtLog -Where $MyFunctionName -Text "MyPaper: $MyPaper - MyDecArea: $MyDecArea - MyDecBasePrice_Paper: $MyDecBasePrice_Paper MyDecBasePrice_Ink: $MyDecBasePrice_Ink"
+    [Decimal]$MyDecResult = ($MyDecArea * $MyDecBasePrice_Ink) + ($MyDecArea * $MyDecBasePrice_Paper)
+    return $MyDecResult
 }
 
 
 Function Get-JtColRen {
-    
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
     )
@@ -77,12 +38,24 @@ Function Get-JtColRen {
     $MyPart = $MyPart.Replace(" ", "")
     $MyPart = $MyPart.ToLower()
 
+
+    if ($MyPart -eq "") {
+        $MyPart = "EMPTY"
+    }
+
+    if ($MyPart -eq "_") {
+        $MyPart = "EMPTY"
+    }
+
     [JtColRen]$MyJtColRen = New-JtColRenInput_Text -Label $MyPart
     if ($MyPart -eq "preis") {
         $MyJtColRen = New-JtColRenInput_Betrag -Label "PREIS"
     }
+    elseif ($MyPart -eq "folder") {
+        $MyJtColRen = New-JtColRenInput_Text -Label "FOLDER"
+    }
     elseif ($MyPart -eq "anzahl") {
-        $MyJtColRen = New-JtColRenInput_Anzahl 
+        $MyJtColRen = New-JtColRenInput_Text -Label "ANZAHL" 
     }
     elseif ($MyPart -eq "datum") {
         $MyJtColRen = New-JtColRenInput_Datum 
@@ -123,176 +96,86 @@ Function Get-JtColRen {
     elseif ($MyPart -eq "euro") {
         $MyJtColRen = New-JtColRenInput_Betrag -Label "EURO"
     }
-    elseif ($MyPart -eq "0000-00") {
-        $MyJtColRen = New-JtColRenInput_MonthId
-    }
     elseif ($MyPart -eq "zahlung") {
         $MyJtColRen = New-JtColRenInput_Betrag -Label "ZAHLUNG"
     }
     return $MyJtColRen
 }
 
-
-class JtColRenFile_Age : JtColRen {
-
-    JtColRenFile_Age() : Base("ALTER") {
-        $This.ClassName = "JtColRenFile_Age"
-    }
-
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-        [String]$MyFilename = $MyJtIoFile.GetName()
-        [String]$MyResult = Convert-JtFilename_To_IntAlter -Filename $MyFilename
-        return $MyResult
-    }
-
-    [Boolean]IsSummable() {
-        return $False
-    }
+Function Get-JtPreisliste {
+    return  New-JtPreisliste_Plotten_2020_07_01
 }
 
 
-Function New-JtColRenFile_Age {
-    [JtColRenFile_Age]::new()
-}
+
+class JtColRen : JtClass {
+
+    [String]$Label = ""
+    [String]$Header = ""
 
 
-class JtColRenFile_Anzahl : JtColRen {
-
-    JtColRenFile_Anzahl() : Base("ANZAHL") {
-        $This.ClassName = "JtColRenFile_Anzahl"
+    JtColRen([String]$TheLabel) {
+        $This.ClassName = "JtColRen"
+        $This.Label = $TheLabel
+        $This.Header = $TheLabel
     }
 
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-        [String]$MyFilename = $MyJtIoFile.GetName()
-        [String]$MyResult = Convert-JtFilename_To_IntAnzahl -Filename $MyFilename
-        return $MyResult
+    JtColRen([String]$TheLabel, [String]$TheHeader) {
+        $This.ClassName = "JtColRen"
+        $This.Label = $TheLabel
+        $This.Header = $TheHeader
+        # if (!($TheHeader)) {
+        #     $This.Header = $TheLabel
+        # }
     }
 
-    [Boolean]IsSummable() {
-        return $False
-    }
-
-}
-
-Function New-JtColRenFile_Anzahl {
-    [JtColRenFile_Anzahl]::new()
-}
-
-
-class JtColRenFile_Area : JtColRen {
-
-    JtColRenFile_Area() : base("DIM") {
-        $This.ClassName = "JtColRenFile_Area"
-    }
-
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-        [String]$MyFilename = $MyJtIoFile.GetName()
-
-        [Decimal]$MyDecResult = Convert-JtFilename_To_DecQm -Filename $MyFilename
-        [String]$MyResult = Convert-JtDecimal_To_String3 -Decimal $MyDecResult
-        return $MyResult
-    }
-
-    [Boolean]IsSummable() {
-        return $False
-    }
-}
-
-Function New-JtColRenFile_Area {
-    [JtColRenFile_Area]::new()
-}
-
-
-class JtColRenFile_Dim : JtColRen {
-
-    JtColRenFile_Dim() : base("DIM") {
-        $This.ClassName = "JtColRenFile_Dim"
-    }
-
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-
-        [String]$MyFilename = $MyJtIoFile.GetName()
-        [String]$MyResult = Convert-JtFilename_To_Dim -Filename $MyFilename
-        return $MyResult
-    }
-
-    [Boolean]IsSummable() {
+    [Boolean]CheckValid([String]$TheValue) {
         return $True
     }
-}
 
-Function New-JtColRenFile_Dim {
-    [JtColRenFile_Dim]::new()
-}
-
-
-class JtColRenFile_Euro : JtColRen {
-
-    JtColRenFile_Euro() : Base("EURO") {
-        $This.ClassName = "JtColRenFile_Euro"
+    [String]GetHeader() {
+        return $This.Header
     }
 
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-        [String]$MyFilename = $MyJtIoFile.GetName()
-        [String]$MyResult = Convert-JtFilename_To_DecBetrag -Filename $MyFilename
-        return $MyResult
+    [String]GetLabel() {
+        return $This.Label
     }
 
-    [Boolean]IsSummable() {
-        return $True
-    }
-}
-
-Function New-JtColRenFile_Euro {
-    [JtColRenFile_Euro]::new()
-}
-
-class JtColRenFile_Name : JtColRen {
-
-    JtColRenFile_Name() : base ("FILE") {
-        $This.ClassName = "JtColRenFile_Name"
+    [String]GetName() {
+        return $This.ClassName
     }
 
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-        [String]$MyResult = $MyJtIoFile.GetName()
-        return $MyResult
+    [String]GetOutput([String]$TheValue) {
+        return $TheValue
     }
 
-    [Boolean]IsSummable() {
-        return $False
+    [Boolean]IsEqual([JtColRen]$TheJtColRen) {
+        [Boolean]$MyResult = $False
+        $MyLabel = $TheJtColRen.GetLabel()
+        if ($MyLabel.Equals($This.GetLabel())) {
+            return $True
+        }
+        else {
+            return $MyResult
+        }
     }
 }
 
-Function New-JtColRenFile_Name {
-    [JtColRenFile_Name]::new()
-}
+Function New-JtColRen {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label,
+        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Header
+    )
 
-class JtColRenFile_Path : JtColRen {
-
-    JtColRenFile_Path() : base ("PATH") {
-        $This.ClassName = "JtColRenFile_Path"
+    [String]$MyLabel = $Label
+    [String]$MyHeader = $Label
+    if ($Header) {
+        $MyHeader = $Header
     }
 
-    [String]GetOutput([String]$TheFilePath) {
-        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $TheFilePath
-        [String]$MyResult = $MyJtIoFile.GetPath()
-        return $MyResult
-    }
-
-    [Boolean]IsSummable() {
-        return $False
-    }
+    [JtColRen]::new($MyLabel, $MyHeader)
 }
 
-Function New-JtColRenFile_Path {
-    [JtColRenFile_Path]::new()
-}
 
 class JtColRenFile_JtPreisliste : JtColRen {
 
@@ -317,9 +200,6 @@ class JtColRenFile_JtPreisliste : JtColRen {
         return $MyResult
     }
 
-    [Boolean]IsSummable() {
-        return $False
-    }
 }
 
 Function New-JtColRenFile_JtPreisliste {
@@ -346,10 +226,6 @@ class JtColRenFile_JtPreisliste_Ink : JtColRenFile_JtPreisliste {
 
         [String]$MyResult = Convert-JtDecimal_To_String2 -Decimal $MyDecResult
         return $MyResult
-    }
-
-    [Boolean]IsSummable() {
-        return $False
     }
 }
 
@@ -383,9 +259,6 @@ class JtColRenFile_JtPreisliste_Paper : JtColRenFile_JtPreisliste {
         return $MyResult
     }
 
-    [Boolean]IsSummable() {
-        return $False
-    }
 }
 
 Function New-JtColRenFile_JtPreisliste_Paper {
@@ -410,9 +283,6 @@ class JtColRenFile_JtPreisliste_Price : JtColRenFile_JtPreisliste {
         return $MyResult
     }
     
-    [Boolean]IsSummable() {
-        return $False
-    }
 }
 
 Function New-JtColRenFile_JtPreisliste_Price {
@@ -421,48 +291,18 @@ Function New-JtColRenFile_JtPreisliste_Price {
     [JtColRenFile_JtPreisliste_Price]::new($MyJtPreisliste)
 }
 
-class JtColRenFile_Year : JtColRen {
 
-    JtColRenFile_Year() : Base("JAHR") {
-        $This.ClassName = "JtColRenFile_Year"
-    }
+Function Convert-JtFilePath_To_Value_Year {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
 
-    [String]GetOutput([String]$TheFilePath) {
-        [String]$MyFilePath = $TheFilePath
-        [String]$MyFilename = Convert-JtFilePath_To_Filename -FilePath $MyFilePath
-        [String]$MyResult = Convert-JtFilename_To_Jahr -Filename $MyFilename
-        return $MyResult
-    }
+    # [String]$MyFunctionName = "Convert-JtFilePath_To_Value_Year"
 
-    [Boolean]IsSummable() {
-        return $False
-    }
-}
-
-Function New-JtColRenFile_Year {
-    
-    [JtColRenFile_Year]::new()
-}
-
-class JtColRenInputAnzahl : JtColRen {
-    
-    JtColRenInputAnzahl() : Base("ANZAHL", "ANZAHL") {
-        $This.ClassName = "JtColRenInputAnzahl"
-    }
-
-    [String]GetOutput([String]$TheValue) {
-        [String]$MyResult = $TheValue
-        return $MyResult
-    }
-
-    [Boolean]IsSummable() {
-        return $True
-    }
-}
-
-
-Function New-JtColRenInput_Anzahl {
-    [JtColRenInputText]::new("Anzahl", "Anzahl")
+    [String]$MyFilePath = $FilePath
+    [String]$MyFilename = Convert-JtFilePath_To_Filename -FilePath $MyFilePath
+    [String]$MyResult = Convert-JtFilename_To_Jahr -Filename $MyFilename
+    return $MyResult
 }
 
 
@@ -473,40 +313,36 @@ class JtColRenInput_Bxh : JtColRen {
     }
 
     [Boolean]CheckValid([String]$TheValue) {
-        return $True
+        [String]$MyValue = $TheValue
+        [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Bxh -Part $MyValue
+        return $MyBlnValid
     }
 
     [String]GetOutput([String]$TheValue) {
         return $TheValue
     }
 
-    [Boolean]IsSummable() {
-        return $False
-    }
 }
 
 Function New-JtColRenInput_Bxh {
     [JtColRenInput_Bxh]::new()
 }
 
-class JtColRenInputCurrency : JtColRen {
+class JtColRenInput_Currency : JtColRen {
 
-    JtColRenInputCurrency([String]$TheLabel) : Base($TheLabel) {
-        $This.ClassName = "JtColRenInputCurrency"
+    JtColRenInput_Currency([String]$TheLabel) : Base($TheLabel) {
+        $This.ClassName = "JtColRenInput_Currency"
     }
 
     [Boolean]CheckValid([String]$TheValue) {
         [String]$MyValue = $TheValue
-        return Test-JtPart_IsValidAs_Betrag -Part $MyValue
+        [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Betrag -Part $MyValue
+        return $MyBlnValid
     }
     
     [String]GetOutput([String]$TheValue) {
         [String]$MyValue = $TheValue
         return Convert-JtString_To_Betrag -Text $MyValue
-    }
-
-    [Boolean]IsSummable() {
-        return $True
     }
 }
 
@@ -522,32 +358,31 @@ Function New-JtColRenInput_Betrag {
         $MyLabel = $Label
     }
 
-    [JtColRenInputCurrency]::new($MyLabel)
+    [JtColRenInput_Currency]::new($MyLabel)
 }
 
 
 
-class JtColRenInputDatum : JtColRen {
+class JtColRenInput_Datum : JtColRen {
     
-    JtColRenInputDatum() : Base("DATUM") {
-        $This.ClassName = "JtColRenInputDatum"
+    JtColRenInput_Datum() : Base("DATUM") {
+        $This.ClassName = "JtColRenInput_Datum"
     }
     
     [Boolean]CheckValid([String]$TheValue) {
-        return $True
+        [String]$MyValue = $TheValue
+        [Boolean]$MyBlnValid = Test-JtPart_IsValidAs_Date -Part $MyValue
+        return $MyBlnValid
     }
     
     [String]GetOutput([String]$TheValue) {
         return $TheValue
     }
     
-    [Boolean]IsSummable() {
-        return $False
-    }
 }
 
 Function New-JtColRenInput_Datum {
-    [JtColRenInputDatum]::new()
+    [JtColRenInput_Datum]::new()
 }
 
 class JtColRen_Input_Betrag : JtColRen {
@@ -577,9 +412,6 @@ class JtColRen_Input_Betrag : JtColRen {
         return $MyResult
     }
     
-    [Boolean]IsSummable() {
-        return $True
-    }
 }
 
 class JtColRen_Input_Stand : JtColRen {
@@ -631,72 +463,25 @@ class JtColRen_Input_Stand : JtColRen {
         [String]$MyResult = $MyValue
         return $MyResult
     }
-    
-    [Boolean]IsSummable() {
-        return $True
-    }
 }
 
-
-class JtColRenInputSum : JtColRen {
-    
-    JtColRenInputSum() : Base("SUMME") {
-        $This.ClassName = "JtColRenInputSum"
-    }
-    
-    [String]GetOutput([String]$TheValue) {
-        [String]$MyValue = $TheValue
-        [String]$MyResult = $MyValue
-        return $MyResult
-    }
-    
-    [Boolean]IsSummable() {
-        return $False
-    }
+Function New-JtColRenInput_Stand {
+    [JtColRen_Input_Stand]::new()
 }
 
-Function New-JtColRenInput_MonthId {
-    [JtColRenInputText]::new("Monat", "Monat")
-}
-
-Function New-JtColRenInput_Sum {
-    [JtColRenInputSum]::new()
-}
-
-class JtColRenInputText : JtColRen {
+class JtColRenInput_Text : JtColRen {
     
-    [String] hidden $Label
-    
-    JtColRenInputText([String]$TheLabel) : Base($TheLabel) {
-        $This.ClassName = "JtColRenInputText"
+    JtColRenInput_Text([String]$TheLabel) : Base($TheLabel) {
+        $This.ClassName = "JtColRenInput_Text"
     }
 
-    JtColRenInputText([String]$TheLabel, [String]$TheHeader) : Base($TheLabel, $TheHeader) {
-        $This.ClassName = "JtColRenInputText"
+    JtColRenInput_Text([String]$TheLabel, [String]$TheHeader) : Base($TheLabel, $TheHeader) {
+        $This.ClassName = "JtColRenInput_Text"
     }
 
     [String]GetOutput([String]$TheValue) {
         return $TheValue
     }
-
-    [Boolean]IsSummable() {
-        return $False
-    }
-}
-
-Function New-JtColRen {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label,
-        [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Header
-    )
-
-    [String]$MyLabel = $Label
-    [String]$MyHeader = $Label
-    if ($Header) {
-        $MyHeader = $Header
-    }
-
-    [JtColRen]::new($MyLabel, $MyHeader)
 }
 
 Function New-JtColRenInput_Text {
@@ -710,16 +495,13 @@ Function New-JtColRenInput_Text {
     if ($Header) {
         $MyHeader = $Header
     }
-    [JtColRenInputText]::new($MyLabel, $MyHeader)
+    [JtColRenInput_Text]::new($MyLabel, $MyHeader)
 }
 
 Function New-JtColRenInput_TextNr {
-    [JtColRenInputText]::new("NR", "NR")
+    [JtColRenInput_Text]::new("NR", "NR")
 }
 
-Function New-JtColRenInput_Stand {
-    [JtColRen_Input_Stand]::new()
-}
 
 class JtDataRepository : JtClass {
 
@@ -791,7 +573,7 @@ class JtDataRepository : JtClass {
         foreach ($File in $MyAlJtIoFiles) {
             [JtIoFile]$MyJtIoFile = $File
             [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
-            [JtDataFolder]$MyJtDataFolder = New-JtDataFolder -FolderPath $MyJtIoFolder_Parent
+            [JtDataFolder]$MyJtDataFolder = Get-JtDataFolder -FolderPath $MyJtIoFolder_Parent
             $MyAlJtDataFolders.Add($MyJtDataFolder) | Out-Null
         }
         [Int16]$MyIntNumber = $MyAlJtDataFolders.Count
@@ -837,33 +619,33 @@ class JtDataRepository : JtClass {
             ForEach ($File in $MyAlJtIoFiles) {
                 [JtIoFile]$MyJtIoFile = $File
                 $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
-            }
-        }
+            }    
+        }   
         return $MyAlJtIoFiles_Result
-    }
-
+    } 
+        
     [String]GetLabel() {
         [String]$MyFolderPath = $This.JtIoFolder.GetPath()
         [String]$MyLabel = Convert-JtDotter -Text $MyFolderPath -PatternOut "1" -SeparatorIn "\" -Reverse
         return $MyLabel
-    }
-}
+    }    
+}    
 
-Function New-JtDataRepository {
+    
+Function Get-JtDataRepository {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
-    )
-        
-    # [String]$MyFunctionName = "New-JtDataFolder"
-        
+    )    
+            
+    # [String]$MyFunctionName = "Get-JtDataFolder"
+            
     [String]$MyFolderPath = $FolderPath
-
-        
+            
+            
     [JtDataRepository]$MyJtDataRepository = [JtDataRepository]::new($MyFolderPath)
-    
+            
     Return , $MyJtDataRepository
-}
-    
+}    
     
 class JtDataFolder : JtClass {
         
@@ -876,38 +658,33 @@ class JtDataFolder : JtClass {
             
         $This.JtIoFolder = $MyJtIoFolder
     }
-        
-    [Boolean]IsValid() {
-        [Boolean]$MyBlnValid = $True
-        if (!($This.JtIoFolder.IsExisting())) {
-            return $False
-        }
 
-        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $This.JtIoFolder
-        if (!($MyJtTemplateFile.IsValid())) {
-            return $False
-        }
-        return $MyBlnValid
-    }
-
-    [JtTemplateFile]GetJtTemplateFile() {
-        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $This.JtIoFolder
-        return $MyJtTemplateFile
-    }
-
-    [System.Collections.ArrayList]GetAlJtIoFiles_Normal() {
-        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $This.JtIoFolder -Normal
-        return $MyAlJtIoFiles
-    }
-
-
-    [Decimal]GetIntFiles() {
-        [JtIoFolder]$MyJtIoFolder = $This.JtIoFolder
-        [Int32]$MyIntFiles = Get-JtFolderPath_Info_FilesCount -FolderPath $MyJtIoFolder
-        Write-JtLog -Where $This.ClassName -Text "Number of files in $This.JtIoFolder  $MyIntFiles"
-        return $MyIntFiles
-    }
+    [Boolean]DoCheck([String]$TheFolderPath_Output) {
+        [String]$MyMethodName = "DoCheck"
     
+        [String]$MyFolderPath_Input = $This.JtIoFolder.GetPath()
+        [String]$MyFolderPath_Output = $TheFolderPath_Output
+        
+        [String]$MyExtension = ".cmd"
+        [String]$MyComputerName = Get-JtComputername
+        [String]$MyFilename_Output = -join ("check", ".", $MyComputername, $MyExtension)
+        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
+        [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
+    
+        $MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
+        ForEach ($File_Content in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile_Content = $File_Content
+    
+            # $MyJtTemplateFile.GetName()
+            Write-JtLog -Where $This.ClassName -Text "$MyMethodName. File_Content: $File_Content"
+            [Boolean]$MyBlnIsFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile_Content -FilePath_Output $MyFilePath_Output
+            if (!($MyBlnIsFileOk)) {
+                Write-JtLog_Error -Where $This.ClassName  -Text "$MyMethodName. Found (at least) one problem in folder... MyFolderPath_Input: $MyFolderPath_Input"
+                Return $False
+            }
+        }
+        Return $True
+    }
 
     DoUpdateMeta() {
         [Boolean]$MyBlnUpdate = $False
@@ -941,50 +718,49 @@ class JtDataFolder : JtClass {
         }
     }
 
-    [Boolean]DoCheck([String]$TheFolderPath_Output) {
-        [String]$MyFunctionName = "Test-JtFolder"
-    
-        [String]$MyFolderPath_Input = $This.JtIoFolder.GetPath()
-        [String]$MyFolderPath_Output = $TheFolderPath_Output
-        
-        [String]$MyExtension = ".cmd"
-        [String]$MyComputerName = Get-JtComputername
-        [String]$MyFilename_Output = -join ("check", ".", $MyComputername, $MyExtension)
-        [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output
-        [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
-    
-    
-        $MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyFolderPath_Input -Normal
-        ForEach ($File_Content in $MyAlJtIoFiles) {
-            [JtIoFile]$MyJtIoFile_Content = $File_Content
-    
-            # $MyJtTemplateFile.GetName()
-            Write-JtLog -Where $MyFunctionName -Text "File_Content: $File_Content"
-            [Boolean]$MyBlnIsFileOk = Test-JtFolder_File -FilePath_Input $MyJtIoFile_Content -FilePath_Output $MyFilePath_Output
-            if (!($MyBlnIsFileOk)) {
-                Write-JtLog_Error -Where $MyFunctionName -Text "Found (at least) one problem in folder... MyFolderPath_Input: $MyFolderPath_Input"
-                Return $False
-            }
+    [System.Collections.ArrayList]GetAlJtIoFiles_Buchung() {
+        [System.Collections.ArrayList]$MyAlJtIoFiles_Result = New-Object System.Collections.ArrayList
+        [String]$MyPrefix = [JtIo]::FilePrefix_Buchung
+        [String]$MyExtension = [JtIo]::FileExtension_Jpg
+        [String]$MyFilter = -join ($MyPrefix, "*", $MyExtension)
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $This.JtIoFolder -Filter $MyFilter
+        ForEach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
         }
-        Return $True
+        return $MyAlJtIoFiles_Result
     }
 
-    [Boolean]GetBlnSum() {
-        [Boolean]$MyBlnSum = $False
-
-        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $This.JtIoFolder
-        [String]$MyFilename_Template = $MyJtTemplateFile.GetName()
-        if ($MyFilename_Template.EndsWith("BETRAG.folder")) {
-            $MyBlnSum = $True
+    [System.Collections.ArrayList]GetAlJtIoFiles_Meta() {
+        [System.Collections.ArrayList]$MyAlJtIoFiles_Result = New-Object System.Collections.ArrayList
+        [String]$MyExtension = [JtIo]::FileExtension_Meta
+        [String]$MyFilter = -join ("*", $MyExtension)
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $This.JtIoFolder -Filter $MyFilter
+        ForEach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIoFile = $File
+            $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
         }
-
-        if ($MyFilename_Template.EndsWith("ZAHLUNG.folder")) {
-            $MyBlnSum = $True
-        }
-
-        return $MyBlnSum
+        return $MyAlJtIoFiles_Result
     }
-        
+
+    [System.Collections.ArrayList]GetAlJtIoFiles_Normal() {
+        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $This.JtIoFolder -Normal
+        return $MyAlJtIoFiles
+    }    
+
+    [System.Collections.ArrayList]GetAlJtDocuments() {
+        [System.Collections.ArrayList]$MyAlJtIoFiles = $This.GetAlJtIoFiles_Normal()
+
+        [System.Collections.ArrayList]$MyAlJtDocuments = New-Object System.Collections.ArrayList
+        ForEach ($File in $MyAlJtIoFiles) {
+            [JtIoFile]$MyJtIofile = $File
+            [JtDocument]$MyJtDocument = New-JtDocument -FilePath $MyJtIofile
+            $MyAlJtDocuments.Add($MyJtDocument) | Out-Null
+        }
+
+        return $MyAlJtDocuments
+    }    
+
     [System.Collections.ArrayList]GetAlYears() {
         [String]$MyFolderPath_Input = $This.JtIoFolder
             
@@ -1081,38 +857,68 @@ class JtDataFolder : JtClass {
         return $MyDecResult
     }
 
-    [System.Collections.ArrayList]GetAlJtIoFiles_Buchung() {
-        [System.Collections.ArrayList]$MyAlJtIoFiles_Result = New-Object System.Collections.ArrayList
-        [String]$MyPrefix = [JtIo]::FilePrefix_Buchung
-        [String]$MyExtension = [JtIo]::FileExtension_Jpg
-        [String]$MyFilter = -join ($MyPrefix, "*", $MyExtension)
-        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $This.JtIoFolder -Filter $MyFilter
-        ForEach ($File in $MyAlJtIoFiles) {
-            [JtIoFile]$MyJtIoFile = $File
-            $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
+    [Boolean]GetBlnSum() {
+        [Boolean]$MyBlnSum = $False
+
+        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $This.JtIoFolder
+        [String]$MyFilename_Template = $MyJtTemplateFile.GetName()
+        if ($MyFilename_Template.EndsWith("BETRAG.folder")) {
+            $MyBlnSum = $True
         }
-        return $MyAlJtIoFiles_Result
+
+        if ($MyFilename_Template.EndsWith("ZAHLUNG.folder")) {
+            $MyBlnSum = $True
+        }
+
+        return $MyBlnSum
     }
 
-    [System.Collections.ArrayList]GetAlJtIoFiles_Meta() {
-        [System.Collections.ArrayList]$MyAlJtIoFiles_Result = New-Object System.Collections.ArrayList
-        [String]$MyExtension = [JtIo]::FileExtension_Meta
-        [String]$MyFilter = -join ("*", $MyExtension)
-        [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $This.JtIoFolder -Filter $MyFilter
-        ForEach ($File in $MyAlJtIoFiles) {
-            [JtIoFile]$MyJtIoFile = $File
-            $MyAlJtIoFiles_Result.Add($MyJtIoFile) | Out-Null
-        }
-        return $MyAlJtIoFiles_Result
+    [Decimal]GetIntFiles() {
+        [JtIoFolder]$MyJtIoFolder = $This.JtIoFolder
+        [Int32]$MyIntFiles = Get-JtFolderPath_Info_FilesCount -FolderPath $MyJtIoFolder
+        Write-JtLog -Where $This.ClassName -Text "Number of files in $This.JtIoFolder  $MyIntFiles"
+        return $MyIntFiles
+    }    
+
+    [JtTemplateFile]GetJtTemplateFile() {
+        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $This.JtIoFolder
+        return $MyJtTemplateFile
+    }        
+        
+    [String]GetName() {
+        [JtIoFolder]$MyJtIoFolder = $This.JtIoFolder
+        [String]$MyFilename = $MyJtIoFolder.GetName()
+        return $MyFilename
     }
+
+    [String]GetPath() {
+        [JtIoFolder]$MyJtIoFolder = $This.JtIoFolder
+        [String]$MyPath = $MyJtIoFolder.GetPath()
+        return $MyPath
+    }
+
+        
+    [Boolean]IsValid() {
+        [Boolean]$MyBlnValid = $True
+        if (!($This.JtIoFolder.IsExisting())) {
+            return $False
+        }    
+
+        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $This.JtIoFolder
+        if (!($MyJtTemplateFile.IsValid())) {
+            return $False
+        }    
+        return $MyBlnValid
+    }    
+
 }
 
-Function New-JtDataFolder {
+Function Get-JtDataFolder {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
     )
 
-    # [String]$MyFunctionName = "New-JtDataFolder"
+    # [String]$MyFunctionName = "Get-JtDataFolder"
 
     [String]$MyFolderPath = $FolderPath
     
@@ -1291,6 +1097,85 @@ Function New-JtPreisliste_Plotten_2022_01_01 {
 
 
 
+
+
+class JtDocument : JtClass {
+
+    [JtIoFile]$JtIoFile = $Null
+    [JtTemplateFile]$JtTemplateFile
+
+
+    JtDocument([String]$TheFilePath) {
+        [String]$MyFilepath = $TheFilePath
+        $This.JtIoFile = New-JtIoFile -FilePath $MyFilepath
+
+        [JtIoFolder]$MyJtIoFolder_Parent = $This.JtIoFile.GetJtIoFolder_Parent()
+
+        [JtDataFolder]$MyJtDataFolder = Get-JtDataFolder -FolderPath $MyJtIoFolder_Parent
+        $This.JtTemplateFile = $MyJtDataFolder.GetJtTemplateFile()
+    }
+
+    [String]GetValueForPart([String]$ThePart) {
+        [String]$MyPart = $ThePart
+        [String]$MyFilename = $ThePart
+        [String]$MyValue = $This.JtTemplateFile.GetValueFromFilenameForPart($MyFilename, $MyPart)
+        return $MyValue
+    }
+
+    [String]GetOutputForPart([String]$ThePart) {
+        [String]$MyPart = $ThePart
+        [String]$MyFilename = $ThePart
+        [String]$MyValue = $This.JtTemplateFile.GetOutputFromFilenameForPart($MyFilename, $MyPart)
+        return $MyValue
+    }
+
+    [String]GetPath() {
+        [String]$MyPath = $This.JtIoFile.GetPath()
+        return $MyPath
+    }
+
+    [String]GetName() {
+        [String]$MyName = $This.JtIoFile.GetName()
+        return $MyName
+    }
+
+    [String]GetPart1() {
+        [String]$MyFilename = $This.GetName()
+        [String]$MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "1"
+        return $MyResult
+    }
+
+    [String]GetPart([Int]$TheIntPos) {
+        [Int]$MyIntPos = $TheIntPos
+        [String]$MyFilename = $This.GetName()
+        [String]$MyResult = Convert-JtDotter -Text $MyFilename -PatternOut "$MyIntPos"
+        return $MyResult
+    }
+
+    [String]GetCol([Int]$TheIntPos) {
+        [Int]$MyIntPos = $TheIntPos
+        [String]$MyFilename_Template = $This.JtTemplateFile.GetName()
+        [String]$MyResult = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$MyIntPos"
+        return $MyResult
+    }
+
+}
+
+
+Function New-JtDocument {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
+    )
+
+    # [String]$MyFunctionName = "New-JtDocument"
+    [String]$MyFilePath = $FilePath
+
+
+    [JtDocument]::new($MyFilePath)
+}
+
+
+
 class JtTemplateFile : JtClass {
 
     [JtIoFile]$JtIoFile
@@ -1323,17 +1208,16 @@ class JtTemplateFile : JtClass {
     }
 
     [String]GetValueFromFilenameForPart([String]$TheFilename, [String]$ThePart) {
+        [String]$MyMethodName = "GetValueFromFilenameForPart"
+
         [String]$MyFilename_Template = $This.GetFilename_template()
         [String]$MyFilename = $TheFilename
         [String]$MyPart = $ThePart
-
-        [String]$MyMethodName = "GetValueFromFilenameForPart"
 
         [String]$MyResult = "ERROR"
         $MyAlParts_Template = $MyFilename_Template.Split(".")
 
         for ([Int16]$i = 0; $i -lt $MyAlParts_Template.Count; $i = $i + 1 ) {
-        
             $MyPartInTemplate = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
 
             if ($MyPart -eq $MyPartInTemplate) {
@@ -1345,10 +1229,33 @@ class JtTemplateFile : JtClass {
         return $MyResult
     }
 
-    [Boolean]IsValid() {
-        return $This.BlnValid
+    [String]GetOutputFromFilenameForPart([String]$TheFilename, [String]$ThePart) {
+        [String]$MyMethodName = "GetOutputFromFilenameForPart"
+
+        [String]$MyFilename_Template = $This.GetFilename_template()
+        [String]$MyFilename = $TheFilename
+        [String]$MyPart = $ThePart
+
+        [String]$MyResult = "ERROR"
+        $MyAlParts_Template = $MyFilename_Template.Split(".")
+
+        for ([Int16]$i = 0; $i -lt $MyAlParts_Template.Count; $i = $i + 1 ) {
+        
+            $MyPartInTemplate = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
+
+            if ($MyPart -eq $MyPartInTemplate) {
+                $MyValue = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
+                
+                [JtColRen]$MyJtColRen = Get-JtColRen -Part $MyPart
+                [String]$MyOutput = $MyJtColRen.GetOutput($MyValue)
+
+                return $MyOutput
+            }
+        }
+        Write-JtLog_Error -Where $This.ClassName -Text "$MyMethodName - Problem. MyFilename: $MyFilename - MyFilename_Template: $MyFilename_Template - MyPart: $MyPart"
+        return $MyResult
     }
-    
+
     [JtColRen]GetJtColRenForColumnNumber([Int16]$IntCol) {
         [System.Collections.ArrayList]$MyAlJtColRens = $This.GetAlJtColRens()
         if ($IntCol -lt $MyAlJtColRens.Count) {
@@ -1376,8 +1283,15 @@ class JtTemplateFile : JtClass {
         foreach ($Part in $MyAlParts_Template) {
             [String]$MyPart = $Part
             # Write-JtLog -Where $This.ClassName -Text "GetAlJtColRens. MyFilename_Template: $MyFilename_Template"
-            [JtColRen]$MyJtColRen = Get-JtColRen -Part $MyPart
-            $MyAlJtColRens.Add($MyJtColRen)
+
+            $MyPart
+            try {
+                [JtColRen]$MyJtColRen = Get-JtColRen -Part $MyPart
+                $MyAlJtColRens.Add($MyJtColRen)
+            }
+            catch {
+                Write-JtLog_Error -Where $This.ClassName -Text "Problem with MyPart: $MyPart"
+            }
         }
         return $MyAlJtColRens
     }
@@ -1443,16 +1357,10 @@ class JtTemplateFile : JtClass {
         }
         return $True
     }
-}
 
-Function Get-JtTemplateFile {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
-    )
-
-    [String]$MyFolderPath_Input = $FolderPath_Input
-        
-    [JtTemplateFile]::new($MyFolderPath_Input)
+    [Boolean]IsValid() {
+        return $This.BlnValid
+    }
 }
 
 Function New-JtTemplateFile {
@@ -1476,70 +1384,85 @@ Function New-JtTemplateFile {
     }
 }
 
-
-Function Convert-JtFilePath_To_Decimal_JtPreisliste_Preis {
+Function Get-JtTemplateFile {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath_Input,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][JtPreisliste]$JtPreisliste
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
     )
 
-    [String]$MyFunctionName = "Convert-JtFilePath_To_Decimal_JtPreisliste_Preis"
+    [String]$MyFolderPath_Input = $FolderPath_Input
+        
+    [JtTemplateFile]::new($MyFolderPath_Input)
+}
 
-    [JtPreisliste]$MyJtPreisliste = $JtPreisliste
-    [String]$MyFilePath_Input = $FilePath_Input
 
-    [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath_Input
-    [String]$MyFilename = $MyJtIoFile.GetName()
 
-    [String]$MyPaper = Convert-JtFilename_To_Papier -Filename $MyFilename
-    [Decimal]$MyDecArea = Convert-JtFilename_To_DecQm -Filename $MyFilename
+Function Convert-JtFilePath_To_Info_For_Part {
+    Param (
+        [CmdletBinding()]
+        [Parameter(Mandatory = $True,ValueFromPipeline = $True)][ValidateNotNullOrEmpty()][String]$FilePath,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
+    )
+        
 
-    [Decimal]$MyDecBasePrice_Paper = $MyJtPreisliste.GetDecBasePrice_Paper($MyPaper)
-    [Decimal]$MyDecBasePrice_Ink = $MyJtPreisliste.GetDecBasePrice_Ink($MyPaper)
-    
-    Write-JtLog -Where $MyFunctionName -Text "MyPaper: $MyPaper - MyDecArea: $MyDecArea - MyDecBasePrice_Paper: $MyDecBasePrice_Paper MyDecBasePrice_Ink: $MyDecBasePrice_Ink"
-    [Decimal]$MyDecResult = ($MyDecArea * $MyDecBasePrice_Ink) + ($MyDecArea * $MyDecBasePrice_Paper)
-    return $MyDecResult
+    process {
+
+        [String]$MyFunctionName = "Convert-JtFilePath_To_Info_For_Part"
+        
+        [String]$MyFilePath = $FilePath
+        [JtIoFile]$MyJtIoFile = New-JtIoFile -FilePath $MyFilePath
+        [String]$MyFilename = $MyJtIoFile.GetName()
+        [JtIoFolder]$MyJtIoFolder_Parent = $MyJtIoFile.GetJtIoFolder_Parent()
+        [JtTemplateFile]$MyJtTemplateFile = Get-JtTemplateFile -FolderPath_Input $MyJtIoFolder_Parent
+        if(!($MyJtTemplateFile.IsValid())) {
+            Write-JtLog_Error -Where $MyFunctionName -Text "Template is not valid. MyFilePath: $MyFilePath"
+            return ""
+        }
+        [String]$MyFilename_Template = $MyJtTemplateFile.GetName()
+        [String]$MyPart = $Part
+        
+        [String]$MyResult = "ERROR"
+        $MyAlParts_Template = $MyFilename_Template.Split(".")
+        
+        for ([Int16]$i = 0; $i -lt $MyAlParts_Template.Count; $i = $i + 1 ) {
+            [String]$MyPart_Template = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
+            
+            if ($MyPart_Template -eq $MyPart) {
+                [String]$MyPart_Filename = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
+                return $MyPart_Filename
+            }
+        }
+        Write-JtLog_Error -Where $MyFunctionName -Text "Problem. MyFilename: $MyFilename - MyFilename_Template: $MyFilename_Template - MyPart: $MyPart"
+        return $MyResult
+    }
 }
 
 
 
 Export-ModuleMember -Function Get-JtColRen
-Export-ModuleMember -Function Get-JtTemplateFile
+Export-ModuleMember -Function Get-JtDataFolder
+Export-ModuleMember -Function Get-JtDataRepository
 Export-ModuleMember -Function Get-JtPreisliste
 
 Export-ModuleMember -Function New-JtPreisliste_Plotten_2022_01_01 
 Export-ModuleMember -Function New-JtPreisliste_Plotten_2020_07_01
 
-
-Export-ModuleMember -Function New-JtColRenFile_Age
-Export-ModuleMember -Function New-JtColRenFile_Anzahl
-Export-ModuleMember -Function New-JtColRenFile_Area
-Export-ModuleMember -Function New-JtColRenFile_Dim
-Export-ModuleMember -Function New-JtColRenFile_Euro
-Export-ModuleMember -Function New-JtColRenFile_Name
-Export-ModuleMember -Function New-JtColRenFile_Path
 Export-ModuleMember -Function New-JtColRenFile_JtPreisliste
 Export-ModuleMember -Function New-JtColRenFile_JtPreisliste_Ink
 Export-ModuleMember -Function New-JtColRenFile_JtPreisliste_Paper
 Export-ModuleMember -Function New-JtColRenFile_JtPreisliste_Price
-Export-ModuleMember -Function New-JtColRenFile_Year
-Export-ModuleMember -Function New-JtColRenInput_Anzahl
+
 Export-ModuleMember -Function New-JtColRenInput_Bxh
 Export-ModuleMember -Function New-JtColRenInput_Betrag
-Export-ModuleMember -Function New-JtColRenInput_Betrag
-Export-ModuleMember -Function New-JtColRenInput_BetragEuro
-Export-ModuleMember -Function New-JtColRenInput_BetragPreis
-Export-ModuleMember -Function New-JtColRenInput_BetragGesamt
 Export-ModuleMember -Function New-JtColRenInput_Datum
 Export-ModuleMember -Function New-JtColRenInput_Stand
 Export-ModuleMember -Function New-JtColRenInput_Sum
 Export-ModuleMember -Function New-JtColRenInput_Text
 Export-ModuleMember -Function New-JtColRenInput_TextNr
-Export-ModuleMember -Function New-JtColRenInput_MonthId
 
-Export-ModuleMember -Function New-JtDataFolder
-Export-ModuleMember -Function New-JtDataRepository
+Export-ModuleMember -Function New-JtDocument
 
+
+Export-ModuleMember -Function Get-JtTemplateFile
 Export-ModuleMember -Function New-JtTemplateFile
 
+Export-ModuleMember -Function Convert-JtFilePath_To_Info_For_Part

@@ -34,102 +34,6 @@ class JtClass {
 
     static [System.Char]$Delimiter = ";"
 
-    # not used? 
-    static [System.Collections.Specialized.OrderedDictionary]GetDic($Hash) {
-        $dictionary = [ordered]@{ }
-        if ($Hash -is [System.Collections.Hashtable]) {
-            $keys = $Hash.keys | Sort-Object
-            foreach ($key in $keys) {
-                $dictionary.add($key, $Hash[$key])
-            }
-            return $dictionary
-        }
-        elseif ($Hash -is [System.Array]) {
-            for ($i = 0; $i -lt $hash.count; $i++) {
-                $dictionary.add($i, $hash[$i])
-            }
-            return $dictionary
-        }
-        elseif ($Hash -is [System.Collections.Specialized.OrderedDictionary]) {
-            return $dictionary
-        }
-
-        elseif ($Null -eq $Hash ) {
-            Write-JtLog_Error -Where "STATIC" -Text "STATIC GetDic. Hash is null!"
-            return $dictionary
-        }
-        else {
-            Write-JtLog_Error -Where "STATIC" -Text "STATIC GetDic. Enter a hash table or an array. GetType: $Hash.getType()"
-            return $dictionary
-        }
-
-        <# 
- .SYNOPSIS
- Converts a hash table or an array to an ordered dictionary. 
- 
- .DESCRIPTION
- ConvertTo-OrderedDictionary takes a hash table or an array and 
- returns an ordered dictionary. 
- 
- If you enter a hash table, the keys in the hash table are ordered 
- alphanumerically in the dictionary. If you enter an array, the keys 
- are integers 0 - n.
- 
- .PARAMETER $hash
- Specifies a hash table or an array. Enter the hash table or array, 
- or enter a variable that contains a hash table or array.
-
- .INPUTS
- System.Collections.Hashtable
- System.Array
-
- .MyOUTPUTS
- System.Collections.Specialized.OrderedDictionary
-
- .EXAMPLE
- PS c:\> $myHash = @{a=1; b=2; c=3}
- PS c:\> .\ConvertTo-OrderedDictionary.ps1 -Hash $myHash
-
- Name Value     
- ---- -----     
- a 1     
- b 2     
- c 3 
-
- .EXAMPLE
- PS c:\> $myHash = @{a=1; b=2; c=3}
- PS c:\> $myHash = .\ConvertTo-OrderedDictionary.ps1 -Hash $myHash
- PS c:\> $myHash
-
- Name Value     
- ---- -----     
- a 1     
- b 2     
- c 3
- 
-
- PS c:\> $myHash | Get-Member
- 
- TypeName: System.Collections.Specialized.OrderedDictionary
- . . .
-
- .EXAMPLE
- PS c:\> $colors = "red", "green", "blue"
- PS c:\> $colors = .\ConvertTo-OrderedDictionary.ps1 -Hash $colors
- PS c:\> $colors
-
- Name Value     
- ---- -----     
- 0 red     
- 1 green     
- 2 blue 
-
- 
- .LINK
- about_hash_tables
-#>
-
-    }
 
     JtClass() {
     }
@@ -559,54 +463,9 @@ Function Convert-JtDotter {
     Return $MyResult
 }
 
-Function Convert-JtFilename_To_DecBetrag {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
 
-    # [String]$MyFunctionName = "Convert-JtFilename_To_DecBetrag"
 
-    [String]$MyFilename = $Filename
 
-    [String]$MyElement = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
-    [Decimal]$MyDecPreis = Convert-JtPart_To_DecBetrag -Part $MyElement
-    return $MyDecPreis
-}
-
-Function Convert-JtFilename_To_IntAlter {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    [String]$MyFunctionName = "Convert-JtFilename_To_IntAlter"
-    [String]$MyFilename = $Filename
-
-    [Int16]$MyIntYear = Convert-JtFilename_To_IntJahr -Filename $MyFilename
-    if ($MyIntYear -gt 0 ) {
-        $MyDateCurrent = Get-Date
-        $MyYearCurrent = $MyDateCurrent.Year
-        [Int16]$MyIntYearCurrent = [Int16]$MyYearCurrent
-
-        [Int16]$MyIntAlter = $MyIntYearCurrent - $MyIntYear
-    }
-    else {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid!!! MyFilename: $MyFilename"
-    }
-    return $MyIntAlter
-}
-
-Function Convert-JtFilename_To_IntAnzahl {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    # [String]$MyFunctionName = "Convert-JtFilename_To_IntAnzahl"
-    
-    # [String]$MyPath = $This.GetPath()
-    [String]$MyFilename = $Filename
-    [String]$MyCount = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
-    return $MyCount
-}
 
 Function Convert-JtInt_To_00 {
     Param (
@@ -647,163 +506,6 @@ Function Convert-JtIp_To_Ip3 {
     }
     return $MyIp3
 }
-
-Function Convert-JtFilename_To_DecQm {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    [String]$MyFunctionName = "Convert-JtFilename_To_DecQm"
-
-    [String]$MyFilename = $Filename
-    try {
-        [String]$MySize = Convert-JtDotter -Text $MyFilename -PatternOut "2" -Reverse
-        $MyAlSizeParts = $MySize.Split("x")
-        if ($MyAlSizeParts.Count -lt 2) {
-            Write-JtLog_Error -Where $MyFunctionName -Text "Problem with FLAECHE. MyFilename: $MyFilename"
-            return 999
-        }
-        else {
-            [String]$MyBreite = $MyAlSizeParts[0]
-            [String]$MyHoehe = $MyAlSizeParts[1]
-            [Int32]$MyIntBreite = [Int32]$MyBreite
-            [Int32]$MyIntHoehe = [Int32]$MyHoehe
-            [Int32]$MyIntFlaeche = $MyIntBreite * $MyIntHoehe
-            [Decimal]$MyDecFlaeche = [Decimal]$MyIntFlaeche / 1000 / 1000
-            [Decimal]$MyDecFlaeche = [math]::round($MyDecFlaeche, 3, 1)
-            # [Decimal]$DecFlaeche = [Decimal]$IntFlaeche
-            # [String]$MyFlaeche = $MyDecFlaeche.ToString("0.000")
-            # [String]$MyFlaeche = $DecFlaeche.ToString("0")
-            # $MyFlaeche = $MyFlaeche.Replace(",", ".")
-        }
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with FLAECHE in file: $MyFilename"
-    }
-    return $MyDecFlaeche
-}
-
-Function Convert-JtFilename_To_Info_With_Template {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename_Template,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Field
-    )
-
-    [String]$MyFunctionName = "Convert-JtFilename_To_Info_With_Template"
-        
-    [String]$MyFilename_Template = $Filename_Template
-    [String]$MyFilename = $Filename
-    [String]$MyField = $Field
-
-    [String]$MyResult = "ERROR"
-    $MyAlParts_Template = $MyFilename_Template.Split(".")
-
-    for ([Int16]$i = 0; $i -lt $MyAlParts_Template.Count; $i = $i + 1 ) {
-        
-        $MyPart = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
-
-        if ($MyPart -eq $MyField) {
-            $MyValue = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
-            return $MyValue
-        }
-    }
-    Write-JtLog_Error -Where $MyFunctionName -Text "Problem. MyFilename: $MyFilename - MyFilename_Template: $MyFilename_Template - MyField: $MyField"
-    return $MyResult
-}
-
-Function Convert-JtFilename_To_IntJahr {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    [String]$MyFunctionName = "Convert-JtFilename_To_IntJahr"
-
-    [String]$MyFilename = $Filename
-
-    if ($MyFilename.Length -lt 4) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Illegal value MyFilename: $MyFilename"
-        return 9999
-    }
-
-    [Int16]$MyIntJahr = 9999
-
-    [String]$MyJahr = $MyFilename.substring(0, 4)
-    
-    try {
-        # Aus "20-04" soll "2020" werden.
-        $MySep = $MyJahr.substring(2, 1)
-        if ($MySep -eq "-") {
-            $MyJahr = -join ("20", $MyJahr.substring(0, 2))
-        } 
-    }
-    catch {
-        $MyJahr = ""
-        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with MyFilename: $MyFilename"
-        return 9998
-    }
-
-    try {
-        [Int16]$MyIntJahr = [Int16]$MyJahr
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Illegal value. Problem with MyFilename: $MyFilename"
-        return 9997
-    }
-    return $MyIntJahr
-}
-
-Function Convert-JtFilename_To_Jahr {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    [Int16]$MyIntJahr = Convert-JtFilename_To_IntJahr -Filename $Filename
-    [String]$MyJahr = -Join ($MyIntJahr, "")
-    return $MyJahr
-}
-
-Function Convert-JtFilename_To_Papier {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename
-    )
-
-    [String]$MyFunctionName = "Convert-JtFilename_To_Papier"
-
-    # [JtIoFile]$TheJtIoFile
-    # [String]$MyPath = $This.GetPath()
-
-    [String]$MyFilename = $Filename
-    [String]$MyPaper = "xxxx"
-    try {
-        [String]$MyPaper = Convert-JtDotter -Text $MyFilename -PatternOut "3" -Reverse
-    }
-    catch {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Problem with PAPIER in file: $MyFilename"
-    }
-    return $MyPaper
-}
-
-Function Convert-JtFilePathExpanded {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
-    )
-
-    [String]$MyResult = $FilePath
-    $MyResult = Convert-JtEnvironmentVariables -Text $MyResult
-    return $MyResult
-} 
-
-Function Convert-JtFolderPathExpanded {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath
-    )
-
-    [String]$MyResult = $FolderPath
-    $MyResult = Convert-JtEnvironmentVariables -Text $MyResult
-    return $MyResult
-} 
-
 
 Function Convert-JtPart_To_Decimal {
     Param (
@@ -1104,7 +806,7 @@ Function Convert-JtText_To_MdOutput {
     [String]$MyOutput = $MyText
 
     if ($MyLabel.StartsWith("url")) {
-        $MyOutput = -join ("<", $MyUrl, ">")
+        $MyOutput = -join ("<", $MyOutput, ">")
     }
     elseif ($MyLabel.StartsWith("path")) {
         $MyOutput = $MyOutput.Replace("\", "/")
@@ -1133,14 +835,13 @@ Function Convert-JtText_Template {
 
         [String]$MyField = Convert-JtText_To_MdOutput -Text $MyValue -Label $MyLabel
 
-        [String]$MyPlaceholder = -join ("<", $MyLabel, ">")
+        [String]$MyPlaceholder = -join ("{", $MyLabel, "}")
         [String]$MyPlaceholder = $MyPlaceholder.ToLower()
         $MyResult = $MyResult.Replace($MyPlaceholder, $MyField)
     }
 
     [String]$MyDate = Get-JtDateNormal
-    $MyResult = $MyResult.Replace("<date>", $MyDate)
-
+    $MyResult = $MyResult.Replace("{date}", $MyDate)
     return $MyResult
 }
 
@@ -1153,23 +854,12 @@ Function Get-JtComputername {
 
 
 Function Get-JtDate {
-    
     $D = Get-Date
     [String]$MyDate = $D.toString("yyyy-MM-dd")
     Return $MyDate
- 
-}
-
-Function Get-JtDate {
-    
-    $D = Get-Date
-    [String]$MyDate = $D.toString("yyyy-MM-dd")
-    Return $MyDate
- 
 }
 
 Function Get-JtDateNormal {
-    
     $D = Get-Date
     [String]$MyDate = $D.toString("dd.MM.yyyy")
     Return $MyDate
@@ -1288,7 +978,7 @@ Function Get-JtTimestamp {
 }
 
 Function Get-JtVersion {
-    return "2021-04-16"
+    return "2021-04-27"
 }
 
 
@@ -1557,6 +1247,71 @@ Function Test-JtFilename_IsContainingValid_Betrag {
     return $MyBlnValid
 }
 
+
+Function Test-JtPart_IsValidAs_Betrag {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
+    )
+    # valid: "23_23", "0_00"
+    # not valid: "23,23", "12.23", "1.234,56", "1,234.56"
+
+    $MyFunctionName = "Test-JtPart_IsValidAs_Betrag"
+  
+    [String]$MyValue = $Part
+
+    # example "12345_67"
+    [Boolean]$MyBlnValid = $MyValue -match '^[-0-9]+[0-9]*[_][0-9][0-9]$'
+    if (! ($MyBlnValid)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid BETRAG. Problem with MyValue: $MyValue"
+        return $False
+    }
+    return $True
+}
+
+Function Test-JtPart_IsValidAs_BxH {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
+    )
+    # valid: "23_23", "0_00"
+    # not valid: "23,23", "12.23", "1.234,56", "1,234.56"
+
+    $MyFunctionName = "Test-JtPart_IsValidAs_BxH"
+  
+    [String]$MyValue = $Part
+
+    # example "12345_67"
+    [Boolean]$MyBlnValid = $MyValue -match '^[0-9]+[0-9]*[x][0-9]+[0-9]$'
+    if (! ($MyBlnValid)) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid BxH. Problem with MyValue: $MyValue"
+        return $False
+    }
+    return $True
+}
+
+
+
+Function Test-JtPart_IsValidAs_Date {
+
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
+    )
+
+
+    [String]$MyFunctionName = "Test-JtPart_IsValidAs_Date"
+
+    [String]$MyValue = $Part
+     
+    try {
+        [DateTime]::ParseExact($MyValue, 'yyyy-MM-dd', $null) | Out-Null
+    }
+    catch {
+        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid as DATE. MyValue: $MyValue"
+        return $False
+    }
+
+    return , $True
+}
+
 Function Test-JtPart_IsValidAs_Decimal {
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
@@ -1576,26 +1331,6 @@ Function Test-JtPart_IsValidAs_Decimal {
         return $False
     }
 
-    return $True
-}
-
-Function Test-JtPart_IsValidAs_Betrag {
-    Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Part
-    )
-    # valid: "23_23", "0_00"
-    # not valid: "23,23", "12.23", "1.234,56", "1,234.56"
-
-    $MyFunctionName = "Test-JtPart_IsValidAs_Betrag"
-  
-    [String]$MyValue = $Part
-
-    # example "12345_67"
-    [Boolean]$MyBlnValid = $MyValue -match '^[-0-9]+[0-9]*[_][0-9][0-9]$'
-    if (! ($MyBlnValid)) {
-        Write-JtLog_Error -Where $MyFunctionName -Text "Not valid BETRAG. Problem with MyValue: $MyValue"
-        return $False
-    }
     return $True
 }
 
@@ -1752,7 +1487,6 @@ Function Write-JtLog_Verbose {
 }
 
 Function Write-JtLog_Message {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Text,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Where,
@@ -1839,15 +1573,10 @@ Export-ModuleMember -Function Convert-JtDecimal_To_String2
 Export-ModuleMember -Function Convert-JtDecimal_To_String3
 Export-ModuleMember -Function Convert-JtDotter
 
-Export-ModuleMember -Function Convert-JtFilename_To_IntAnzahl
-Export-ModuleMember -Function Convert-JtFilename_To_IntAlter
-Export-ModuleMember -Function Convert-JtFilename_To_DecBetrag
-Export-ModuleMember -Function Convert-JtFilename_To_DecQm
-Export-ModuleMember -Function Convert-JtFilename_To_Info_With_Template
-Export-ModuleMember -Function Convert-JtFilename_To_Jahr
-Export-ModuleMember -Function Convert-JtFilename_To_Papier
-Export-ModuleMember -Function Convert-JtFilePathExpanded
-Export-ModuleMember -Function Convert-JtFolderPathExpanded
+
+
+
+
 
 Export-ModuleMember -Function Convert-JtInt_To_00
 Export-ModuleMember -Function Convert-JtInt_To_000
@@ -1881,6 +1610,8 @@ Export-ModuleMember -Function Rename-JtComputerpoolPc
 Export-ModuleMember -Function Test-JtFilename_IsContainingValid_Anzahl
 Export-ModuleMember -Function Test-JtFilename_IsContainingValid_Betrag
 Export-ModuleMember -Function Test-JtPart_IsValidAs_Betrag
+Export-ModuleMember -Function Test-JtPart_IsValidAs_BxH
+Export-ModuleMember -Function Test-JtPart_IsValidAs_Date
 Export-ModuleMember -Function Test-JtPart_IsValidAs_Integer
 
 

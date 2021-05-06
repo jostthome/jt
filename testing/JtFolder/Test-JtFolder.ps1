@@ -39,6 +39,15 @@ Function Test-JtFolder_Betrag {
 Test-JtFolder_Betrag
 
 
+Function Test-UpdateJtFolder_BxH {
+    [String]$MyFolderPath_Test = Get-JtFolderPath_Index_BxH
+    Update-JtFolder_Md -FolderPath_Input $MyFolderPath_Test -FolderPath_Output $MyFolderPath_Test 
+
+}
+Test-UpdateJtFolder_BxH
+
+
+
 Function Test-JtFolder_BxH {
     [String]$MyFolderPath_Test = Get-JtFolderPath_Index_BxH
     

@@ -4,9 +4,9 @@
 ## Plot-Service - Abrechnung
 
 
-Datum: 14.04.2021
+Datum: 27.04.2021
 
-| NR   | PREIS | NACHNAME   | VORNAME | LABEL          | PAPIER   | BxH      | DIM   | PAP. | TINT. | 
+| NR   | PREIS | _NACHNAME  | VORNAME | LABEL          | PAPIER   | BxH      | DIM   | PAP. | TINT. | 
 |------|-------|------------|---------|----------------|----------|----------|-------|------|-------|
 | 1    | 7,75  | musterfrau | max     | projekt_blatt1 | 90g      | 841x1189 | 1,000 | 1,25 | 6,50  | 
 | 2    | 9,00  | musterfrau | max     | projekt_blatt2 | 180g     | 841x1189 | 1,000 | 2,50 | 6,50  | 
@@ -27,9 +27,9 @@ Plot-Service
 
 ---
 
-* Stand: 14.04.2021; Preisliste: JtPreisliste
+* Stand: 27.04.2021; Preisliste: JtPreisliste
 
-* %OneDrive%/jt/1.EXAMPLE/13.DATA.BxH/131.BxH.Beispiel1
+* C:/Users/thome/OneDrive/jt/1.EXAMPLE/13.DATA.BxH/131.BxH.Beispiel1
 
-* <>
+* <https://www.archland.uni-hannover.de/de/fakultaet/ausstattung/plotservice/>
 

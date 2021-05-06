@@ -35,6 +35,8 @@ Function Get-JtAl_Rep_JtTblRow {
     $MyAlJtTblRow.Add($MyJtTblRow)
     [JtTblRow]$MyJtTblRow = Get-JtRep_HardwareSn -JtInfi $MyJtInfi
     $MyAlJtTblRow.Add($MyJtTblRow)
+    [JtTblRow]$MyJtTblRow = Get-JtRep_Logins -JtInfi $MyJtInfi
+    $MyAlJtTblRow.Add($MyJtTblRow)
     [JtTblRow]$MyJtTblRow = Get-JtRep_Net -JtInfi $MyJtInfi
     $MyAlJtTblRow.Add($MyJtTblRow)
     [JtTblRow]$MyJtTblRow = Get-JtRep_Software -JtInfi $MyJtInfi
@@ -560,11 +562,53 @@ Function Get-JtRep_SoftwareVray {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRevit) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_6) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_7) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRhino) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Sketchup) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRaySketchup) | Out-Null 
     return , $MyJtTblRow
 }
+
+
+Function Get-JtRep_Logins {
+    Param (
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][JtInfi]$JtInfi
+    )
+
+    [String]$MyFunctionName = "Get-JtRep_Logins"
+
+    [JtInfi]$MyJtInfi = $JtInfi
+
+    # [Boolean]$BlnHideSpezial = $True
+    [JtTblRow]$MyJtTblRow = Get-JtTblRowDefault -JtInfi $MyJtInfi -Label $MyFunctionName
+    [JtIoFolder]$MyJtIoFolder = $MyJtInfi.GetJtIoFolder()
+    [String]$MyExtension2 = [JtIo]::FileExtension_Meta_Report
+    [String]$MyPrefix = [JtIo]::FilePrefix_Report
+    [String]$MyFilter = -join ($MyPrefix, ".", "login_", "*", $MyExtension2)
+
+    $MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter
+
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().SystemId) | Out-Null
+    ForEach ($i in 0..5) {
+
+        [String]$MyLabel1 = "User$i"
+        [String]$MyLabel2 = "Date$i"
+        [Int16]$MyIntNr = $i + 1
+        [String]$MyValue1 = "---"
+        [String]$MyValue2 = "---"
+        if ($i -lt $MyAlJtIoFiles.Count) {
+            [JtIoFile]$MyJtIoFile = $MyAlJtIoFiles[$i]
+            [String]$MyFilename = $MyJtIoFile.GetName()
+            [String]$MyValue1 = Convert-JtDotter -Text $MyFilename -PatternOut "2"
+            [String]$MyValue2 = Convert-JtDotter -Text $MyFilename -PatternOut "3"
+        }
+        $MyJtTblRow.Add($MyLabel1, $MyValue1) | Out-Null
+        $MyJtTblRow.Add($MyLabel2, $MyValue2) | Out-Null
+    }
+        
+    return , $MyJtTblRow
+}
+
 
 
 Function Get-JtRep_Timestamps {
@@ -642,6 +686,7 @@ Function Get-JtRep_Z_G13 {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Office365) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Seadrive) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Seafile) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Powertoys) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().LibreOffice) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Firefox64) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Thunderbird64) | Out-Null 
@@ -672,6 +717,7 @@ Function Get-JtRep_Z_Iat {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Photoshop_CC) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Office) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_6) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_7) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().SketchUp) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRay3ds) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRevit) | Out-Null 
@@ -735,6 +781,7 @@ Function Get-JtRep_Z_Lab {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Cinema4D) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().SketchUp) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_6) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_7) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRay3ds) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRevit) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRhino) | Out-Null 
@@ -774,25 +821,27 @@ Function Get-JtRep_Z_Pools {
 
     # [Boolean]$BlnHideSpezial = $True
     [JtTblRow]$MyJtTblRow = Get-JtTblRowDefault -JtInfi $MyJtInfi -Label $MyFunctionName
+
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().Timestamp) | Out-Null
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().KlonVersion) | Out-Null
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_AFolder().JtVersion) | Out-Null
+
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Office) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().OfficeStandard) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().CreativeSuite_CS6) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().AutoCAD_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Max_2021) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2021) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Revit_2022) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Allplan_2019) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().ArchiCAD) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Vectorworks) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Cinema4D) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().SketchUp) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_6) | Out-Null 
+    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Rhino_7) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRay3ds) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRevit) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRayRhino) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().vRaySketchup) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().BkiKosten) | Out-Null 
-    $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().BkiPos) | Out-Null 
+    # $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().BkiKosten) | Out-Null 
+    # $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().BkiPos) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().IbpHighend) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Orca) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().GoogleEarth) | Out-Null 
@@ -869,6 +918,7 @@ Export-ModuleMember -Function Get-JtRep_Bitlocker
 Export-ModuleMember -Function Get-JtRep_Folder
 Export-ModuleMember -Function Get-JtRep_Hardware
 Export-ModuleMember -Function Get-JtRep_HardwareSn
+Export-ModuleMember -Function Get-JtRep_Logins
 Export-ModuleMember -Function Get-JtRep_Net
 Export-ModuleMember -Function Get-JtRep_ObjWin32Bios
 Export-ModuleMember -Function Get-JtRep_ObjWin32ComputerSystem

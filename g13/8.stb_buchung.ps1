@@ -21,7 +21,7 @@ Function Update-JtBuchung {
     
     [JtIoFolder]$MyJtIoFolder_Input = New-JtIoFolder -FolderPath $MyFolderPath_Input
     
-    [JtDataRepository]$MyJtDataRepository = New-JtDataRepository -FolderPath $MyFolderPath_Input
+    [JtDataRepository]$MyJtDataRepository = Get-JtDataRepository -FolderPath $MyFolderPath_Input
     
     $MyAlJtIoFolders = $MyJtDataRepository.GetAlJtDataFolders()
     

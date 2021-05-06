@@ -14,6 +14,14 @@ $ErrorActionPreference = "Stop"
 # Convert-JtFolderPath_To_Meta_Betrag -FolderPath_Input $TheFolderPath -FolderPath_Output $TheFolderPath
 # New-JtIndex_Betrag -FolderPath_Input $TheFolderPath -FolderPath_Output $TheFolderPath
 
+# Function Test-MdTest {
+#     [String]$MyFolderPath_Test = Get-JtFolderPath_Index_Files
+#     Convert-JtFolderPath_To_Md_Test -FolderPath_Input $MyFolderPath_Test -FolderPath_Output $MyFolderPath_Test 
+# }
+# Test-MdTest
+# return 
+
+
 Function Test-JtIndex_Datatable {
     [String]$MyFolderPath_Test = Get-JtFolderPath_Index_Anzahl
     $MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Anzahl -FolderPath_Input $MyFolderPath_Test 
