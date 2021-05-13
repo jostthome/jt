@@ -3,7 +3,6 @@ Function Get-JtFolderPath_Example {
     return $MyFolderPath_Test 
 }
 
-
 Function Get-JtFolderPath_Index_Anzahl {
     [String]$MyFolderPath_Test = "%OneDrive%\jt\1.EXAMPLE\11.DATA.ANZAHL\MU.STE.BEISPIEL1.Anzahl.Rechnung1"
     return $MyFolderPath_Test 

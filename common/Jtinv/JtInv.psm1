@@ -1305,7 +1305,6 @@ class JtInvFolder : JtInv {
             # Write-JtLog -Where $This.ClassName -Text "Finding Foldertypes"
 
             Update-JtFolderPath_Md_And_Meta -FolderPath_Input $MyJtIoFolder_Input -FolderPath_Output $MyJtIoFolder_Output
-
         } 
         return $True
     }

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="1" errors="0" failures="1" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2021-05-09" time="21:18:51">
+  <environment clr-version="4.0.30319.42000" user-domain="ARCHLAND" cwd="C:\Users\thome.ARCHLAND\OneDrive\jt" platform="Microsoft Windows 10 Pro|C:\WINDOWS|\Device\Harddisk0\Partition4" machine-name="AL-DEK-NB-DEK05" nunit-version="2.5.8.0" os-version="10.0.19042" user="thome" />
+  <culture-info current-culture="de-DE" current-uiculture="de-DE" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="336.2617" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1" executed="True" result="Failure" success="False" time="4.1705" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Basic Pester Tests" executed="True" result="Failure" success="False" time="1.8899" asserts="0" description="Basic Pester Tests">
+            <results>
+              <test-case description="A test that should be true" name="Basic Pester Tests.A test that should be true" time="1.2774" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected $true, but got $false.
+at $False | Should -Be $true, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1:12</message>
+                  <stack-trace>bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7739
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7677
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1: Zeile 12
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

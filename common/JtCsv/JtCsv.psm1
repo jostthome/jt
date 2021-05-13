@@ -17,7 +17,6 @@ class JtCsv : JtClass {
     }
 }
 
-
 Class JtCsvFolderSummary : JtClass {
     
     [String]$Label = $Null
@@ -25,7 +24,7 @@ Class JtCsvFolderSummary : JtClass {
     [String]$Expected = $Null
     [JtIoFolder]$JtIoFolder_Base = $Null
 
-    JtCsvFolderSummary ([String]$TheLabel, [String]$TheFolderPath, [String]$TheSub, [String]$TheExpected) : Base() {
+    JtCsvFolderSummary([String]$TheLabel, [String]$TheFolderPath, [String]$TheSub, [String]$TheExpected) : Base() {
         $This.ClassName = "JtCsvFolderSummary"
         $This.Label = $TheLabel
         [String]$MyfolderPath = $TheFolderPath
@@ -36,107 +35,6 @@ Class JtCsvFolderSummary : JtClass {
     }
 }
 
-Class JtCsvFolderSummaryAll : JtCsvFolderSummary {
-        
-    JtCsvFolderSummaryAll([String]$TheLabel, [String]$TheFolderPath, [String]$TheSub, [String]$TheExpected) : base($TheLabel, $TheFolderPath, $TheSub, $TheExpected) {
-        $This.ClassName = "JtCsvFolderSummaryAll"
-            
-        [String]$MyLabel = $TheLabel
-        [String]$MySub = $TheSub
-        
-        Write-JtLog -Where $This.ClassName -Text "M<Sub: $MySub"
-        
-        [JtIoFolder]$MyJtIoFolder_Base = $This.JtIoFolder_Base
-        [JtIoFolder]$MyJtIoFolder_Work = $MyJtIoFolder_Base.GetJtIoFolder_Sub($MySub)
-        
-        if (!($MyJtIoFolder_Base.IsExisting())) {
-            Write-JtLog_Error -Where $This.ClassName -Text "The folder is not existing. MySub: $MySub in MyJtIoFolder_Base: $MyJtIoFolder_Base"
-            return
-        }
-
-        [JtTblTable]$MyJtTblTable = $This.GetTable($MyJtIoFolder_Work, $MyLabel)
-        [String]$MyFolderPath_Output = $MyJtIoFolder_Base.GetPath()
-        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
-    }
-    
-    [JtTblTable]GetTable([JtIoFolder]$TheJtIoFolder, [String]$TheLabel) {
-        [JtIoFolder]$MyJtIoFolder = $TheJtIoFolder
-        [JtIoFolder]$MyLabel = $TheLabel
-
-        [System.Collections.ArrayList]$MyAlExtensions_All = $MyJtIoFolder.GetAlExtensions_Recurse()
-
-        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
-        [String]$MyExpected = $This.Expected
-        [Array]$MyAlExtensions_Expected = $MyExpected.Split(",")
-                
-        [System.Collections.ArrayList]$MyAlJtIoSubfolders = $MyJtIoFolder.GetAlJtIoFolders_Sub()
-        foreach ($SubFolder in $MyAlJtIoSubfolders) {
-            [JtTblRow]$MyJtTblRow = New-JtTblRow
-            [JtIoFolder]$MyJtIoFolder = $SubFolder
-            $MyIntFileCountExpected = 0 
-            $MyIntFileCountAll = 0 
-            
-            $MyJtTblRow.Add("Name", $MyJtIoFolder.GetName())
-            # $MyJtTblRow.Add("Label", $MyLabel)
-            
-            foreach ($Extension in $MyAlExtensions_Expected) {
-                [String]$MyExtension = $Extension
-
-                [String]$MyFilter = -join ("*", $MyExtension)
-                [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
-                [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
-                
-                $MyColumnName = Convert-JtString_To_ColHeader -Text $MyExtension -Prefix "X"  
-                $MyColumnValue = $MyIntCountForType
-                $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-                $MyIntFileCountExpected = $MyIntFileCountExpected + $MyIntCountForType
-            }
-
-            $MyColumnName = "CountExpected"
-            $MyColumnValue = $MyIntFileCountExpected
-            $MyJtTblRow.Add($MyColumnName, $MyIntFileCountExpected)
-
-            foreach ($Extension in $MyAlExtensions_All) {
-                [String]$MyExtension = $Extension
-                [String]$MyLabelExtension = $MyExtension.Replace([JtIo]::FileExtension_Meta, "")
-                
-                [String]$MyFilter = -join ("*", $MyExtension)
-                [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
-                [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
-
-
-                $MyColumnName = Convert-JtString_To_ColHeader -Text $MyLabelExtension -Prefix "Z" 
-                $MyColumnValue = $MyIntCountForType
-                $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-                    
-                $MyIntFileCountAll = $MyIntFileCountAll + $MyIntCountForType
-            }
-                
-            $MyColumnName = "CountAll"
-            $MyColumnValue = $MyIntFileCountAll   
-            $MyJtTblRow.Add($MyColumnName, $MyIntFileCountAll)
-                
-            [Boolean]$MySameNumber = $False
-            if (($MyIntFileCountExpected - $MyAlExtensions_Expected.Length) -eq 0) {
-                $MySameNumber = $True
-            }
-            [String]$MyIsExpected = "" 
-            if ($MySameNumber) {
-                $MyIsExpected = "OK"
-            }
-            else {
-                $MyIsExpected = ""
-            }
-                
-            $MyColumnName = "Expected"
-            $MyColumnValue = $MyIsExpected
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-            $MyJtTblTable.AddRow($MyJtTblRow)
-        }
-        return $MyJtTblTable
-    }
-}
 
 
 
@@ -267,130 +165,6 @@ Class JtCsvFolderSummaryMeta : JtCsvFolderSummary {
 }
 
 
-
-
-
-
-
-Class JtCsvFolderSummaryExpected : JtCsvFolderSummary {
-    
-    JtCsvFolderSummaryExpected([String]$TheLabel, [String]$TheFolderPath, [String]$TheSub, [String]$TheExpected) : base($TheLabel, $TheFolderPath, $TheSub, $TheExpected) {
-        $This.ClassName = "JtCsvFolderSummaryExpected"
-
-        [String]$MyLabel = $TheLabel
-        [String]$MySub = $TheSub
-
-        Write-JtLog -Where $This.ClassName -Text "MyLabel: $MyLabel - MySub: $MySub"
-        
-        [JtIoFolder]$MyJtIoFolder_Base = $This.JtIoFolder_Base
-        [JtIoFolder]$MyJtIoFolder_Work = $MyJtIoFolder_Base.GetJtIoFolder_Sub($MySub)
-
-        if (!($MyJtIoFolder_Base.IsExisting())) {
-            Write-JtLog_Error -Where $This.ClassName -Text "The folder is not existing. MySub: $MySub in MyJtIoFolder_Base: $MyJtIoFolder_Base"
-            return
-        }
-
-        [JtTblTable]$MyJtTblTable = $This.GetTable($MyJtIoFolder_Work, $MyLabel)
-        [String]$MyFolderPath_Output = $MyJtIoFolder_Base.GetPath()
-        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
-    }
-
-
-    [JtTblTable]GetTable([JtIoFolder]$TheJtIoFolder, [String]$TheLabel) {
-        [JtIoFolder]$MyJtIoFolder = $TheJtIoFolder
-        [JtIoFolder]$MyLabel = $TheLabel
-
-        $MyJtTblTable = New-JtTblTable -Label $MyLabel
-        
-        [System.Collections.ArrayList]$MyAlJtIoSubfolders = $MyJtIoFolder.GetAlJtIoFolders_Sub()
-        foreach ($SubFolder in $MyAlJtIoSubfolders) {
-            [JtIoFolder]$MyJtIoFolder = $SubFolder
-            [JtTblRow]$MyJtTblRow = New-JtTblRow
-            [Int16]$MyIntFileCountExpected = 0 
-
-            [String]$MyFoldername = $MyJtIoFolder.GetName()
-            $MyJtTblRow.Add("Name", $MyFoldername)
-            $MyJtTblRow.Add("Label", $This.Label)
-
-            [Array]$MyAlExtensions_Expected = $This.Expected.Split(",")
-
-            foreach ($Extension in $MyAlExtensions_Expected) {
-                [String]$MyExtension = $Extension
-                [String]$MyLabelType = $MyExtension
-
-                [String]$MyFilter = -join ("*", $MyExtension)
-                [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
-                [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
-                
-                $MyColumnName = Convert-JtString_To_ColHeader -Text $MyExtension -Prefix "X" 
-                $MyColumnValue = $MyIntCountForType
-                #$MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-                $MyIntFileCountExpected = $MyIntFileCountExpected + $MyIntCountForType
-            }
-
-            [int16]$MyIntExpected = $MyAlExtensions_Expected.Count
-            
-
-            # Is the result ok? ("OK", "")
-            [Int16]$MyIntNumberOk = 0
-            if ($MyIntFileCountExpected -ge $MyIntExpected) {
-                $MyIntNumberOk = 1
-            }
-            
-            $MyColumnName = "OK"
-            $MyColumnValue = $MyIntNumberOk
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-            # Is the result ok? ("OK", "")
-            [String]$MyTextOk = "Nein"
-            if ($MyIntFileCountExpected -ge $MyIntExpected) {
-                $MyTextOk = "Ja"
-            }
-
-            $MyColumnName = "Best"
-            $MyColumnValue = $MyTextOk
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-            $MyColumnName = "Gef_SOLL"
-            $MyColumnValue = $MyAlExtensions_Expected.Count
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-            # How many files were expected? (1)
-            $MyColumnName = "Gef_IST"
-            $MyColumnValue = $MyIntFileCountExpected
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-            
-            # Which filetypes had to be delivered? (".pdf,.txt")
-            $MyColumnName = "Typen_SOLL"
-            $MyColumnValue = $This.Expected
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-            # Which filetypes were delivered? (.pdf,.txt)
-            [System.Collections.ArrayList]$MyAlTypes = $MyJtIoFolder.GetAlExtensions()
-            $MyColumnName = "Typen_IST"
-            $MyColumnValue = $MyAlTypes -join ","
-            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-
-            # Generate columes for each expected type (X_pdf,X_jpg)
-            foreach ($MyType in $MyAlExtensions_Expected) {
-                [String]$MyExtension = [String]$MyType
-                [String]$MyLabelType = $MyExtension
-
-                [String]$MyFilter = -join ("*", $MyExtension)
-                [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
-                [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
-                
-                $MyColumnName = Convert-JtString_To_ColHeader -Text $MyExtension -Prefix "X" 
-                $MyColumnValue = $MyIntCountForType
-                
-                $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
-            }
-            $MyJtTblTable.AddRow($MyJtTblRow)
-        }
-        Return $MyJtTblTable
-    }
-}
 
 
 Function Convert-JtAl_to_FileCsv {
@@ -664,7 +438,7 @@ Function Convert-JtIoFile_To_JtTblRow_Document {
     [Int16]$MyIntParts = ($MyFilename_Template.Split(".")).count
 
                 
-    For($i = 1; $i -lt $MyIntParts; $i++) {
+    For ($i = 1; $i -lt $MyIntParts; $i++) {
         [String]$MyCol = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
         [String]$MyPart = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
         [String]$MyOutput = $MyJtTemplateFile.GetOutputFromFilenameForPart($MyFilename, $MyCol)
@@ -864,7 +638,6 @@ Function New-JtCsv_FolderSummary {
         [String]$Expected
     )
         
-    [JtCsvFolderSummary]::new($Label, $FolderPath, $Sub, $Expected)
 }
 
 Function New-JtCsv_FolderSummaryAll {
@@ -874,9 +647,101 @@ Function New-JtCsv_FolderSummaryAll {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Sub,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Expected
     )
+    [String]$MyFunctionName = "New-JtCsv_FolderSummaryAll"
+    
+    [String]$MyLabel = $Label
+    [String]$MyFolderPath = $FolderPath
+    [String]$MySub = $Sub
+    [String]$MyExpected = $Expected
+                    
+    Write-JtLog -Where $MyFunctionName -Text "Start..."
 
-    [JtCsvFolderSummaryAll]::new($Label, $FolderPath, $Sub, $Expected)
-
+    [JtIoFolder]$MyJtIoFolder_Base = New-JtIoFolder -FolderPath $MyFolderPath
+    [JtIoFolder]$MyJtIoFolder_Work = $MyJtIoFolder_Base.GetJtIoFolder_Sub($MySub)
+                
+    if (!($MyJtIoFolder_Base.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "The folder is not existing. MySub: $MySub in MyJtIoFolder_Base: $MyJtIoFolder_Base"
+        return
+    }
+        
+    [System.Collections.ArrayList]$MyAlExtensions_All = $MyJtIoFolder_Work.GetAlExtensions_Recurse()
+        
+    [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel
+    [String]$MyExpected = $Expected
+    [Array]$MyAlExtensions_Expected = $MyExpected.Split(",")
+                        
+    [System.Collections.ArrayList]$MyAlJtIoSubfolders = $MyJtIoFolder_Work.GetAlJtIoFolders_Sub()
+    foreach ($Folder in $MyAlJtIoSubfolders) {
+        [JtIoFolder]$MyJtIoFolder = $Folder
+        
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+        $MyIntFileCountExpected = 0 
+        $MyIntFileCountAll = 0 
+                    
+        $MyJtTblRow.Add("Name", $MyJtIoFolder.GetName())
+        # $MyJtTblRow.Add("Label", $MyLabel)
+        foreach ($Extension in $MyAlExtensions_Expected) {
+            [String]$MyExtension = $Extension
+        
+            [String]$MyFilter = -join ("*", $MyExtension)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
+            [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
+                        
+            $MyColumnName = Convert-JtString_To_ColHeader -Text $MyExtension -Prefix "X"  
+            $MyColumnValue = $MyIntCountForType
+            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+        
+            $MyIntFileCountExpected = $MyIntFileCountExpected + $MyIntCountForType
+        }
+        
+        $MyColumnName = "CountExpected"
+        $MyColumnValue = $MyIntFileCountExpected
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+        
+        foreach ($Extension in $MyAlExtensions_All) {
+            [String]$MyExtension = $Extension
+            [String]$MyLabelExtension = $MyExtension.Replace([JtIo]::FileExtension_Meta, "")
+        
+            if ($MyLabelExtension.Length -lt 1) {
+                $MyLabelExtension = "EMPTY" 
+            }
+                        
+            
+            [String]$MyFilter = -join ("*", $MyExtension)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
+            [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
+        
+        
+            $MyColumnName = Convert-JtString_To_ColHeader -Text $MyLabelExtension -Prefix "Z" 
+            $MyColumnValue = $MyIntCountForType
+            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+                            
+            $MyIntFileCountAll = $MyIntFileCountAll + $MyIntCountForType
+        }
+                        
+        $MyColumnName = "CountAll"
+        $MyColumnValue = $MyIntFileCountAll   
+        $MyJtTblRow.Add($MyColumnName, $MyIntFileCountAll)
+                        
+        [Boolean]$MySameNumber = $False
+        if (($MyIntFileCountExpected - $MyAlExtensions_Expected.Length) -eq 0) {
+            $MySameNumber = $True
+        }
+        [String]$MyIsExpected = "" 
+        if ($MySameNumber) {
+            $MyIsExpected = "OK"
+        }
+        else {
+            $MyIsExpected = ""
+        }
+                        
+        $MyColumnName = "Expected"
+        $MyColumnValue = $MyIsExpected
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+    [String]$MyFolderPath_Output = $MyJtIoFolder_Base.GetPath()
+    Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
 }
 
 
@@ -899,7 +764,108 @@ Function New-JtCsv_FolderSummaryExpected {
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Expected
     )
 
-    [JtCsvFolderSummaryExpected]::new($Label, $FolderPath, $Sub, $Expected)
+
+    [JtIoFolder]$MyJtIoFolder_Base = $Null
+    
+    [String]$MyFunctionName = "New-JtCsv_FolderSummaryExpected"
+
+    [String]$MyLabel = $Label
+    [String]$MySub = $Sub
+    [String]$MyExpected = $Expected
+
+    [String]$MyFolderPath = $FolderPath
+    [JtIoFolder]$MyJtIoFolder_Base = New-JtIoFolder -FolderPath $MyFolderPath
+
+    Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel - MySub: $MySub"
+        
+    [JtIoFolder]$MyJtIoFolder_Base = $MyJtIoFolder_Base
+    [JtIoFolder]$MyJtIoFolder_Work = $MyJtIoFolder_Base.GetJtIoFolder_Sub($MySub)
+
+    if (!($MyJtIoFolder_Base.IsExisting())) {
+        Write-JtLog_Error -Where $MyFunctionName -Text "The folder is not existing. MySub: $MySub in MyJtIoFolder_Base: $MyJtIoFolder_Base"
+        return
+    }
+
+    $MyJtTblTable = New-JtTblTable -Label $MyLabel
+        
+    [System.Collections.ArrayList]$MyAlJtIoSubfolders = $MyJtIoFolder_Work.GetAlJtIoFolders_Sub()
+    foreach ($Folder in $MyAlJtIoSubfolders) {
+        [JtIoFolder]$MyJtIoFolder = $Folder
+        [JtTblRow]$MyJtTblRow = New-JtTblRow
+        [Int16]$MyIntFileCountExpected = 0 
+
+        [String]$MyFoldername = $MyJtIoFolder.GetName()
+        $MyJtTblRow.Add("Name", $MyFoldername)
+        $MyJtTblRow.Add("Label", $MyLabel)
+
+        [Array]$MyAlExtensions_Expected = $MyExpected.Split(",")
+        foreach ($Extension in $MyAlExtensions_Expected) {
+            [String]$MyExtension = $Extension
+
+            [String]$MyFilter = -join ("*", $MyExtension)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
+            [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
+
+            $MyIntFileCountExpected = $MyIntFileCountExpected + $MyIntCountForType
+        }
+
+        [int16]$MyIntExpected = $MyAlExtensions_Expected.Count
+
+        $MyColumnName = "OK"
+        # Is the result ok? ("OK", "")
+        [Int16]$MyIntNumberOk = 0
+        if ($MyIntFileCountExpected -ge $MyIntExpected) {
+            $MyIntNumberOk = 1
+        }
+        $MyColumnValue = $MyIntNumberOk
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+
+        # Is the result ok? ("OK", "")
+        [String]$MyTextOk = "Nein"
+        if ($MyIntFileCountExpected -ge $MyIntExpected) {
+            $MyTextOk = "Ja"
+        }
+
+        $MyColumnName = "Best"
+        $MyColumnValue = $MyTextOk
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+
+        $MyColumnName = "Gef_SOLL"
+        $MyColumnValue = $MyAlExtensions_Expected.Count
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+
+        # How many files were expected? (1)
+        $MyColumnName = "Gef_IST"
+        $MyColumnValue = $MyIntFileCountExpected
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+            
+        # Which filetypes had to be delivered? (".pdf,.txt")
+        $MyColumnName = "Typen_SOLL"
+        $MyColumnValue = $This.Expected
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+
+        # Which filetypes were delivered? (.pdf,.txt)
+        [System.Collections.ArrayList]$MyAlTypes = $MyJtIoFolder.GetAlExtensions()
+        $MyColumnName = "Typen_IST"
+        $MyColumnValue = $MyAlTypes -join ","
+        $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+
+        # Generate columes for each expected type (X_pdf,X_jpg)
+        foreach ($Type in $MyAlExtensions_Expected) {
+            [String]$MyExtension = [String]$Type
+
+            $MyColumnName = Convert-JtString_To_ColHeader -Text $MyExtension -Prefix "X" 
+            [String]$MyFilter = -join ("*", $MyExtension)
+            [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder -Filter $MyFilter 
+            [Int16]$MyIntCountForType = $MyAlJtIoFiles.Count
+            $MyColumnValue = $MyIntCountForType
+            $MyJtTblRow.Add($MyColumnName, $MyColumnValue)
+        }
+        $MyJtTblTable.AddRow($MyJtTblRow)
+    }
+
+    [String]$MyFolderPath_Output = $MyJtIoFolder_Base.GetPath()
+    Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
 }
 
 

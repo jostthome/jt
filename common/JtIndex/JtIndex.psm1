@@ -2219,13 +2219,14 @@ Function Test-JtFolder_File {
 
 Function Update-JtFolderPath_Md_And_Meta {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output
     )
 
     [String]$MyFunctionName = "Update-JtFolderPath_Md_And_Meta"
     
     [String]$MyFolderPath_Input = $FolderPath_Input
-    # [String]$MyFolderPath_Output = $MyFolderPath_Input
+    [String]$MyFolderPath_Output = $FolderPath_Output
 
     # [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output 
 
@@ -2239,7 +2240,7 @@ Function Update-JtFolderPath_Md_And_Meta {
         Write-JtLog -Where $MyFunctionName -Text "Folder... MyJtIoFolder_Parent: $MyJtIoFolder_Parent"
 
         # Update-JtFolder_Md_And_Meta -FolderPath_Input $MyJtIoFolder_Parent -FolderPath_Output $MyJtIoFolder_Output
-        Update-JtFolder_Md_And_Meta -FolderPath_Input $MyJtIoFolder_Parent -FolderPath_Output $MyJtIoFolder_Parent
+        Update-JtFolder_Md_And_Meta -FolderPath_Input $MyJtIoFolder_Parent -FolderPath_Output $MyFolderPath_Output
     }
 }
 

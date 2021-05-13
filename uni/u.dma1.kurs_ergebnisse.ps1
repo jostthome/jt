@@ -19,6 +19,7 @@ Function New-JtResultsSummary{
 }
 
 New-JtResultsSummary -Label "aufgabe_1a" -FolderPath "D:\Seafile\al-cad-20w\1.ABGABEN" -Sub "111.AUFGABE_1a" -Expected ".pdf"
+pause
 
 New-JtResultsSummary -Label "aufgabe_4c" -FolderPath "D:\Seafile\al-cad-20w\1.ABGABEN" -Sub "143.AUFGABE_4c" -Expected ".pdf,.rvt"
 New-JtResultsSummary -Label "aufgabe_4b" -FolderPath "D:\Seafile\al-cad-20w\1.ABGABEN" -Sub "142.AUFGABE_4b" -Expected ".pdf,.rvt"

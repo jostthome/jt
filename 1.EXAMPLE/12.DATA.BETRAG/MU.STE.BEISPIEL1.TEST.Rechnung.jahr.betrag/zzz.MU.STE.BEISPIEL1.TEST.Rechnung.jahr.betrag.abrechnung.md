@@ -1,7 +1,7 @@
 ﻿# BEISPIEL1 - TEST - Rechnung - jahr - betrag
 
 
-* Stand: 2021-05-04_00-03-06
+* Stand: 2021-05-12_21-52-22
 
 * Pfad: C:/Users/thome.ARCHLAND/OneDrive/jt/1.EXAMPLE/12.DATA.BETRAG
 

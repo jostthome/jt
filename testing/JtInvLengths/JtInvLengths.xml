@@ -1,4 +1,0 @@
-<config>
-	<lengths source="J:\Seafile.readonly\al-dek-prj" label="al-dek-prj" target="c:\_inventory\out\JtInvLengths"></lengths>
-	<lengths source="D:\Seafile\al-it"               label="al-it"      target="c:\_inventory\out\JtInvLengths"></lengths>
-</config>
