@@ -731,7 +731,9 @@ Function Convert-JtFilename_To_DecQm {
             [Int32]$MyIntHoehe = [Int32]$MyHoehe
             [Int32]$MyIntFlaeche = $MyIntBreite * $MyIntHoehe
             [Decimal]$MyDecFlaeche = [Decimal]$MyIntFlaeche / 1000 / 1000
-            [Decimal]$MyDecFlaeche = [math]::round($MyDecFlaeche, 3, 1)
+#            [Decimal]$MyDecFlaeche = [math]::round($MyDecFlaeche, 3, 1)
+            [Decimal]$MyDecFlaeche = [math]::round($MyDecFlaeche, 4, 1)
+
             # [Decimal]$DecFlaeche = [Decimal]$IntFlaeche
             # [String]$MyFlaeche = $MyDecFlaeche.ToString("0.000")
             # [String]$MyFlaeche = $DecFlaeche.ToString("0")
@@ -1008,7 +1010,7 @@ Function Get-JtChildItem {
 
     Param (
         [Cmdletbinding()]
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)][ValidateNotNullOrEmpty()][String]$FolderPath,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][String]$Filter,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Recurse,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Normal
@@ -1712,14 +1714,23 @@ Function Test-JtIoSpecial {
 
 Function Write-JtIoFile {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Filename,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Content,
         [Parameter(Mandatory = $False)][ValidateNotNullOrEmpty()][Switch]$Overwrite
     )
 
     [String]$MyFunctionName = "Write-JtIoFile"
         
-    [String]$MyFilePath_Output = $FilePath_Output
+    [String]$MyFolderPath_Output = $FolderPath_Output
+    $MyFolderPath_Output = Convert-JtFilePathExpanded -FilePath $MyFolderPath_Output
+
+    [JtIoFolder]$MyJtIoFolder_Output = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force 
+
+    [String]$MyFilename = $Filename
+
+
+    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename)
     [String]$MyContent = $Content
     if (Test-JtIoFilePath $MyFilePath_Output) {
         if ($Overwrite) {
@@ -1735,6 +1746,7 @@ Function Write-JtIoFile {
         Write-JtLog_File -Where $MyFunctionName -Text "Writing file." -FilePath $MyFilePath_Output
         $MyContent | Out-File -FilePath $MyFilePath_Output -Encoding utf8
     }
+    Write-Output $MyFilePath_Output
 }
 
 
@@ -1778,10 +1790,10 @@ Function Write-JtIoFile_Md {
     $MyFilename_Output = Convert-JtLabel_To_Filename -Label $MyFilename_Output
     [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
     if ($MyOverwrite -eq $True) {
-        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent -Overwrite
+        Write-JtIoFile -FolderPath_Output $MyFolderPath_Output -Filename $MyFilename_Output -Content $MyContent -Overwrite
     }
     else {
-        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent
+        Write-JtIoFile -FolderPath_Output $MyFolderPath_Output -Filename $MyFilename_Output -Content $MyContent
         
     }
     Convert-JtIoFile_Md_To_Pdf -FolderPath_Input $MyFolderPath_Output -Filename_Input $MyFilename_Output
@@ -1829,18 +1841,19 @@ Function Write-JtIoFile_Meta {
     
     [String]$MyContent = $MyFolderPath_Input
     
-    [String]$MyFilePath_Output = $MyJtIoFolder_Output.GetFilePath($MyFilename_Output)
     
     if ($OnlyOne) {
         [String]$MyFilter = -join ($MyPrefix, ".", $MyLabel, "*", $MyExtension2)
-        $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter)
+        $MyJtIoFolder_Output.DoRemoveFiles_All($MyFilter) | Out-Null
     }
+    [String]$MyResult = $Null
     if ($MyOverwrite) {
-        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent -Overwrite
+        $MyResult = Write-JtIoFile -FolderPath_Output $MyFolderPath_Output -Filename $MyFilename_Output -Content $MyContent -Overwrite
     }
     else {
-        Write-JtIoFile -FilePath_Output $MyFilePath_Output -Content $MyContent
+        $MyResult = Write-JtIoFile -FolderPath_Output $MyFolderPath_Output -Filename $MyFilename_Output -Content $MyContent
     }
+    Write-Output $MyResult
 }
 
 
@@ -1874,7 +1887,8 @@ Function Write-JtIoFile_Meta_Anzahl {
         Extension2        = $MyExtension2
         #        Overwrite         = $True
     }
-    Write-JtIoFile_Meta @MyParams
+    [String]$MyResult = Write-JtIoFile_Meta @MyParams
+    Write-Output $MyResult
 }
     
 Function Write-JtIoFile_Meta_Betrag {

@@ -1,11 +1,13 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvReportsCombine {
+Describe "New-JtInvReportsCombine" {
 
-    New-JtInvReportsCombine
+    It "Should ... JtInvReportsCombine" {
+
+        New-JtInvReportsCombine
+    }
 
 }
 
-Test-JtInvReportsCombine
 

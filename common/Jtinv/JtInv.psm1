@@ -1425,13 +1425,14 @@ class JtInvLines : JtInv {
             return $MyArrayList 
         }
 
-        [String]$MyTagName = "files"
+        [String]$MyTagName = "lines"
         foreach ($Entity in $MyConfigXml.getElementsByTagName($MyTagName)) {
             $MyParams = @{
                 source = $Entity.source
                 target = $Entity.target
+                label = $Entity.label
                 filter = $Entity.filter
-                label  = $Entity.label
+                pattern = $Entity.pattern
             }
             [HashTable]$MyItem = New-JtConfigItem @MyParams
 
@@ -1764,7 +1765,7 @@ class JtInvPoster : JtInv {
     }
 
     [String]GetConfigName() {
-        return "JtInvPOSTER"
+        return "JtInvPoster"
     }
 
     [String]GetReportLabel() {
@@ -2527,14 +2528,30 @@ Function New-JtConfigItem {
 
 Function New-JtInvClient {
 
-    New-JtInvClientClean
-    New-JtInvClientReport
-    New-JtInvClientObjects
-    New-JtInvClientSoftware
-    New-JtInvClientCsvs
-    New-JtInvClientExport
+    [Int32]$MyIntResult = 0
+
+    New-JtInvClientClean | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
+
+    New-JtInvClientReport | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
     
-    New-JtInvClientTimestamp  -Label "client"
+    New-JtInvClientObjects | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
+
+    New-JtInvClientSoftware | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
+
+    New-JtInvClientCsvs | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
+
+    New-JtInvClientExport | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
+    
+    New-JtInvClientTimestamp  -Label "client" | Out-Null
+    $MyIntResult = $MyIntResult + $LASTEXITCODE
+
+    Return $MyIntResult
 }
 
 
@@ -2580,9 +2597,10 @@ Function New-JtInvClientErrors {
 Function New-JtInvClientExport {
 
 
-    [JtInvClientExport]::new()
+    [JtInvClientExport]::new() | Out-Null
     
-    New-JtInvClientTimestamp  -Label "export"
+    New-JtInvClientTimestamp  -Label "export" | Out-Null
+    return $LASTEXITCODE
 }
 
 

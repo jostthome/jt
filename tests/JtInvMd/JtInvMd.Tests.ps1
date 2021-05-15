@@ -2,8 +2,12 @@ Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
 
-Function Test-JtInvMd {
-    New-JtInvMd
+Describe "New-JtInvMd" {
+
+    It "Should ... JtInvMd" {
+
+        New-JtInvMd
+    }
+
 }
 
-Test-JtInvMd

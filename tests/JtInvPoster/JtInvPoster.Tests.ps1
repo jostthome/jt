@@ -3,27 +3,32 @@ using module JtTbl
 Set-StrictMode -version latest
 $ErrorActionPreference = "Stop"
 
-Function Test-JtBxH {
+Describe "Convert-JtFolderPath_To_JtTblTable_BxH" {
 
-    [String]$MyFolderPath_Test = Get-JtFolderPath_Index_BxH
+    It "Should ... JtTblTable_BxH" {
 
-    [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_BxH -FolderPath_Input $MyFolderPath_Test
-    $MyJtTblTable
-
-    Update-JtFolderPath_Md_And_Meta -FolderPath_Input $MyFolderPath_Test
-
-    $MyDataTable = Convert-JtTblTable_To_Datatable -JtTblTable $MyJtTblTable
-    $MyDataTable
+        [String]$MyFolderPath_Test = Get-JtFolderPath_Index_BxH
+        
+        [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_BxH -FolderPath_Input $MyFolderPath_Test
+        $MyJtTblTable | Should -BeOfType JtTblTable
+    }
 }
 
-Test-JtBxH
+Describe "Update-JtFolderPath_Md_And_Meta" {
 
-Return
+    It "Should ..." {
 
-
-Function Test-JtInvPoster {
-
-    New-JtInvPoster
+        [String]$MyFolderPath_Output = -join ((Get-JtFolderPath_TestsOutput), "\", "Update-JtFolderPath_Md_And_Meta")
+        [String]$MyFolderPath_Test = Get-JtFolderPath_Index_BxH
+        Update-JtFolderPath_Md_And_Meta -FolderPath_Input $MyFolderPath_Test -FolderPath_Output $MyFolderPath_Output
+    }
 }
 
-Test-JtInvPoster
+Describe "New-JtInvPoster" {
+
+    It "Should ... poster" {
+
+        New-JtInvPoster
+    }
+
+}

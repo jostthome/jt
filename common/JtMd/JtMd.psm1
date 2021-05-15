@@ -113,13 +113,12 @@ class JtMd : JtClass{
         return $MyList
     }
 
-    static [Boolean]DoWriteJtMdCsv([JtIoFolder]$TheJtIoFolderWork, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabel, [String]$TheFilter, [String]$ThePattern) {
+    static [Boolean]DoWriteJtMdCsv([JtIoFolder]$TheJtIoFolder_Work, [JtIoFolder]$TheJtIoFolder_Output, [String]$TheLabel, [String]$TheFilter, [String]$ThePattern) {
         [System.Collections.ArrayList]$MyAlList = [System.Collections.ArrayList]::new()
-        [String]$MyJtIoFolder_Work = $TheJtIoFolderWork
-        
+        [String]$MyJtIoFolder_Work = $TheJtIoFolder_Work.GetPath()
         [String]$MyFolderPath_Output = $TheJtIoFolder_Output.GetPath()
-        [String]$MyFilter = $TheFilter
         [String]$MyLabel = $TheLabel
+        [String]$MyFilter = $TheFilter
         [String]$MyPattern = $ThePattern
 
         [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Work -Filter $MyFilter -Recurse

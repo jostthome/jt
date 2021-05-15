@@ -35,9 +35,6 @@ Class JtCsvFolderSummary : JtClass {
     }
 }
 
-
-
-
 Class JtCsvFolderSummaryMeta : JtCsvFolderSummary {
     
     JtCsvFolderSummaryMeta([String]$TheLabel, [String]$TheFolderPath, [String]$TheSub, [String]$TheExpected) : base($TheLabel, $TheFolderPath, $TheSub, $TheExpected) {
@@ -171,17 +168,18 @@ Function Convert-JtAl_to_FileCsv {
 
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][System.Collections.ArrayList]$ArrayList,
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][FolderPath_Output]$FolderPath_Output, 
+        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output, 
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
     )
 
     $MyFunctionName = "Convert-JtAl_to_FileCsv"
 
-    $MyAl = $ArrayList
-    $MyLabel = $TheLabel
+    [System.Collections.ArrayList]$MyAl = $ArrayList
+    [String]$MyLabel = $Label
+    [String]$MyFolderPath_Output = $FolderPath_Output
     [String]$MyExtension = [JtIo]::FileExtension_Csv
     [String]$MyFilename_Output = -join ($MyLabel, $MyExtension)
-    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $FolderPath_Output -Force
+    [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath_Output -Force
     [String]$MyFilePath_Csv = $MyJtIoFolder.GetFilePath($MyFilename_Output)
     
     Write-JtLog_File -Where $MyFunctionName -Text "WARNING. Creating file. EXTENSION: $MyExtension" -FilePath $MyFilePath_Csv
@@ -190,7 +188,6 @@ Function Convert-JtAl_to_FileCsv {
 
 
 Function Convert-JtAlJtIoFiles_to_FileCsv {
-    
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][System.Collections.ArrayList]$ArrayList,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output, 
@@ -250,7 +247,8 @@ Function Convert-JtAlJtIoFiles_to_JtTblTable {
 
 Function Convert-JtAlJtIoFiles_to_Documents {
     Param (
-        [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][System.Collections.ArrayList]$ArrayList,
+        [Cmdletbinding()]
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)][ValidateNotNullOrEmpty()][System.Collections.ArrayList]$ArrayList,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$Label
     )
 
@@ -266,7 +264,7 @@ Function Convert-JtAlJtIoFiles_to_Documents {
         [JtIoFile]$MyJtIoFile = $File
 
         [JtTblRow]$MyJtTblRow = Convert-JtIoFile_To_JtTblRow_Document -FilePath $MyJtIoFile
-        $MyJtTblTable.AddRow($MyJtTblRow)  | Out-Null
+        $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
     }
     return $MyJtTblTable
 }
@@ -373,10 +371,8 @@ Function Convert-JtFilePath_To_JtTblRow_Betrag {
         
     return $MyJtTblRow
 }
-    
 
 Function Convert-JtIoFile_To_JtTblRow_Normal {
-        
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
     )
@@ -415,7 +411,6 @@ Function Convert-JtIoFile_To_JtTblRow_Normal {
 }
 
 Function Convert-JtIoFile_To_JtTblRow_Document {
-        
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FilePath
     )
@@ -440,6 +435,7 @@ Function Convert-JtIoFile_To_JtTblRow_Document {
                 
     For ($i = 1; $i -lt $MyIntParts; $i++) {
         [String]$MyCol = Convert-JtDotter -Text $MyFilename_Template -PatternOut "$i"
+        [String]$MyHeader = C
         [String]$MyPart = Convert-JtDotter -Text $MyFilename -PatternOut "$i"
         [String]$MyOutput = $MyJtTemplateFile.GetOutputFromFilenameForPart($MyFilename, $MyCol)
         $MyJtTblRow.Add($MyCol, $MyOutput) | Out-Null
@@ -463,7 +459,6 @@ Function Convert-JtIoFile_To_JtTblRow_Document {
 
 
 Function Convert-JtFolderPath_To_Csv_Filelist {
-
     Param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Input,
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][String]$FolderPath_Output,
@@ -574,8 +569,6 @@ Function Convert-JtTblTable_To_Csv {
     Convert-JtDataTable_To_Csv @MyParams
 }
 
-
-
 Function Convert-JtTblTable_To_Datatable {
     param (
         [Parameter(Mandatory = $True)][ValidateNotNullOrEmpty()][JtTblTable]$JtTblTable
@@ -629,16 +622,6 @@ Function New-JtCsv_ComputerRoomUser {
 }
 
 
-Function New-JtCsv_FolderSummary {
-    
-    Param (
-        [String]$Label,
-        [String]$FolderPath,
-        [String]$Sub,
-        [String]$Expected
-    )
-        
-}
 
 Function New-JtCsv_FolderSummaryAll {
     Param (
@@ -895,30 +878,32 @@ Function New-JtCsvGenerator {
     $MyAl = $MyAlJtTblRow[$MyAlJtTblRow.Count - 1]
     foreach ($JtTblRow in $MyAl) {
         $JtTblRow
-        $JtTblRow.GetType()
 
-        [JtTblRow]$MyJtTblRow = $JtTblRow
-        [String]$MyLabel_Row = $MyJtTblRow.GetLabel()
-        [String]$MyLabel_Rep = $MyLabel_Row.Replace("Get-JtRep_", "")
-        # Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel - MyLabel_Rep: $MyLabel_Rep - MyJtIoFolder_Input: $MyJtIoFolder_Input"
+        if ($JtTblRow) {
 
-        [Boolean]$MyBlnUseLine = $True
-        # test it
+            $JtTblRow.GetType()
             
-        [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Rep
-        if ($MyBlnUseLine) {
-            $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
+            [JtTblRow]$MyJtTblRow = $JtTblRow
+            [String]$MyLabel_Row = $MyJtTblRow.GetLabel()
+            [String]$MyLabel_Rep = $MyLabel_Row.Replace("Get-JtRep_", "")
+            # Write-JtLog -Where $MyFunctionName -Text "MyLabel: $MyLabel - MyLabel_Rep: $MyLabel_Rep - MyJtIoFolder_Input: $MyJtIoFolder_Input"
+            
+            [Boolean]$MyBlnUseLine = $True
+            # test it
+            
+            [JtTblTable]$MyJtTblTable = New-JtTblTable -Label $MyLabel_Rep
+            if ($MyBlnUseLine) {
+                $MyJtTblTable.AddRow($MyJtTblRow) | Out-Null
+            }
+            
+            [JtIoFolder]$MyJtIoFolder_Csv = $MyJtIoFolder_Input.GetJtIoFolder_Sub("csv", $True)
+            [String]$MyFolderPath_Output = $MyJtIoFolder_Csv.GetPath()
+            Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
         }
-
-        [JtIoFolder]$MyJtIoFolder_Csv = $MyJtIoFolder_Input.GetJtIoFolder_Sub("csv", $True)
-        [String]$MyFolderPath_Output = $MyJtIoFolder_Csv.GetPath()
-        Convert-JtTblTable_To_Csv -JtTblTable $MyJtTblTable -FolderPath_Output $MyFolderPath_Output
     }
     return $MyFolderPath_Output
 }
-
-
-
+    
 Export-ModuleMember -Function Convert-JtFilePath_To_JtTblRow_Betrag
 Export-ModuleMember -Function Convert-JtIoFile_To_JtTblRow_Document
 Export-ModuleMember -Function Convert-JtIoFile_To_JtTblRow_Normal
@@ -936,10 +921,9 @@ Export-ModuleMember -Function Convert-JtTblTable_To_Datatable
 Export-ModuleMember -Function Convert-JtTblTable_To_Csv
 
 Export-ModuleMember -Function New-JtCsvGenerator
-Export-ModuleMember -Function New-JtCsv_FolderSummary
+Export-ModuleMember -Function New-JtCsv_FolderSummaryAll
 Export-ModuleMember -Function New-JtCsv_FolderSummaryExpected
 Export-ModuleMember -Function New-JtCsv_FolderSummaryMeta 
-Export-ModuleMember -Function New-JtCsv_FolderSummaryAll
 Export-ModuleMember -Function New-JtCsv_ComputerRoomUser
 
 

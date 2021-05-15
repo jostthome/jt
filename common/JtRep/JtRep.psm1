@@ -124,7 +124,7 @@ Function Get-JtRep_Bitlocker {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Bitlocker().D_EncryptionMethod)
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Bitlocker().D_ProtectionStatus)
 
-    return $MyJtTblRow
+    return , $MyJtTblRow
 }
 
 
@@ -696,7 +696,7 @@ Function Get-JtRep_Z_G13 {
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().DellSuppAs) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Soft().Flash) | Out-Null 
     $MyJtTblRow.Add($MyJtInfi.GetJtInf_Win32OperatingSystem().OsCaption) | Out-Null 
-    return $MyJtTblRow
+    return , $MyJtTblRow
 }
 
 

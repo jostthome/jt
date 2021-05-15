@@ -1,4 +1,4 @@
 <config>
-	<export target="%OneDrive%\jt\testing\1.EXAMPLE\20.REPORTS"></export>
+	<export target="c:\_inventory\tests\JtInvClient\reports"></export>
 </config>
 

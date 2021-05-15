@@ -23,7 +23,6 @@ Set-StrictMode -Version "2.0"
 
 Describe "Convert-JtFolderPath_To_JtTblTable_Anzahl" {
 
-
     It "Should be JtTblTable" {
         [String]$MyFolderPath_Test = Get-JtFolderPath_Index_Anzahl
         $MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Anzahl -FolderPath_Input $MyFolderPath_Test 
@@ -53,13 +52,11 @@ Describe "Convert-JtFolderPath_To_JtTblTable_Anzahl" {
         $MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Zahlung -FolderPath_Input $MyFolderPath_Test 
         $MyJtTblTable | Should -BeOfType JtTblTable
     }
-
 }
 
 Describe "New-JtIndex_Anzahl" {
 
     It "Should be ... Anzahl" {
-
         [String]$MyFolderPath_Test = Get-JtFolderPath_Index_Anzahl
         $o = New-JtIndex_Anzahl -FolderPath_Input $MyFolderPath_Test -FolderPath_Output $MyFolderPath_Test 
         $o | Should -BeOfType JtIndex_Anzahl
@@ -100,7 +97,7 @@ Describe "New-JtIndex_Zahlung" {
     It "Should be ... zahlung" {
         [String]$MyFolderPath_Test = Get-JtFolderPath_Index_Zahlung
         $o = New-JtIndex_Zahlung -FolderPath_Input $MyFolderPath_Test -FolderPath_Output $MyFolderPath_Test 
-        $o | Should -BeOfType JtIndex_Zahlung
+        $o | Should -BeOfType String
     }
     # [JtIoFolder]$MyJtIoFolder = New-JtIoFolder -FolderPath $MyFolderPath_Test 
     # Invoke-Item $MyJtIoFolder

@@ -1,7 +1,7 @@
 ﻿# IMMO - MUSTER - w1_erd - miete - 2018
 
 
-* Stand: 2021-05-12_21-52-47
+* Stand: 2021-05-13_21-55-47
 
 * Pfad: C:/Users/thome.ARCHLAND/OneDrive/jt/1.EXAMPLE/16.DATA.MONAT
 

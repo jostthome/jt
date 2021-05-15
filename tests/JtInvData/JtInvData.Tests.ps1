@@ -1,11 +1,15 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvData {
-    New-JtInvData
+Describe "New-JtInvData" {
+
+    It "Should ... data" {
+
+        New-JtInvData
+    }
 }
 
 
-Test-JtInvData
+
 
 

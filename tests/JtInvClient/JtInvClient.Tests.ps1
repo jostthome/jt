@@ -3,37 +3,32 @@ using module JtInv
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvClient {
+Describe "New-JtInvClient" {
 
-    # New-JtInvClientTimestamp -Label "test2"
-    New-JtInvClient
-
+    It "Should ... JtInvClient" {
+    
+        $o = New-JtInvClient
+        $o | Should -BeLessThan 10
+    }
 }
-Test-JtInvClient
 
-Function Test-JtInvClient2 {
 
-    #    New-JtInvClientClean
-    New-JtInvClientErrors
-    New-JtInvClientExport 
-    New-JtInvClientConfig
-    New-JtInvClientReport
-    New-JtInvClientObjects
-    New-JtInvClientCsvs
-    New-JtInvClientExport 
-    New-JtInvData
-    New-JtInvFiles
-    New-JtInvFolder
-    New-JtInvLengths
-    New-JtInvLines
-    #New-JtInvMd
-    New-JtInvMirror
-    New-JtInvPoster
+Describe "New-JtInvClientExport" {
 
-    New-JtInvReportsUpdate
-    New-JtInvReportsCombine
+    It "Should ... JtInvClientExport" {
+    
+        $o = New-JtInvClientExport
+        $o | Should -BeLessThan 2
+    }
 }
-Test-JtInvClient2
+
+    # New-JtInvClientErrors
+    # New-JtInvClientExport 
+    # New-JtInvClientConfig
+    # New-JtInvClientReport
+    # New-JtInvClientObjects
+    # New-JtInvClientCsvs
+    # New-JtInvClientExport 
 
 
 

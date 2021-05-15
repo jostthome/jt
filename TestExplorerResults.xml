@@ -1,20 +1,68 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="1" errors="0" failures="1" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2021-05-09" time="21:18:51">
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="85" errors="0" failures="49" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2021-05-13" time="21:07:34">
   <environment clr-version="4.0.30319.42000" user-domain="ARCHLAND" cwd="C:\Users\thome.ARCHLAND\OneDrive\jt" platform="Microsoft Windows 10 Pro|C:\WINDOWS|\Device\Harddisk0\Partition4" machine-name="AL-DEK-NB-DEK05" nunit-version="2.5.8.0" os-version="10.0.19042" user="thome" />
   <culture-info current-culture="de-DE" current-uiculture="de-DE" />
-  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="336.2617" asserts="0" description="Pester">
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="389.9814" asserts="0" description="Pester">
     <results>
-      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1" executed="True" result="Failure" success="False" time="4.1705" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1">
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1" executed="True" result="Success" success="True" time="5.4438" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1">
         <results>
-          <test-suite type="TestFixture" name="Basic Pester Tests" executed="True" result="Failure" success="False" time="1.8899" asserts="0" description="Basic Pester Tests">
+          <test-suite type="TestFixture" name="Get-JtVersion" executed="True" result="Success" success="True" time="1.5538" asserts="0" description="Get-JtVersion">
             <results>
-              <test-case description="A test that should be true" name="Basic Pester Tests.A test that should be true" time="1.2774" asserts="0" success="False" result="Failure" executed="True">
+              <test-case description="Returns JtVersion" name="Get-JtVersion.Returns JtVersion" time="0.948" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Convert-JtPart_To_DecBetrag" executed="True" result="Success" success="True" time="1.8145" asserts="0" description="Convert-JtPart_To_DecBetrag">
+            <results>
+              <test-case description="Check values" name="Convert-JtPart_To_DecBetrag.Check values" time="0.0593" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Convert-JtPart_To_DecBetrag.Check values" time="0.0469" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Convert-JtPart_To_DecBetrag.Check values" time="0.0467" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Convert-JtPart_To_DecBetrag.Check values" time="0.0438" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Convert-JtPart_To_DecBetrag.Check values" time="0.0225" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Test-JtPart_IsValidAs_Betrag" executed="True" result="Success" success="True" time="2.1554" asserts="0" description="Test-JtPart_IsValidAs_Betrag">
+            <results>
+              <test-case description="Check values" name="Test-JtPart_IsValidAs_Betrag.Check values" time="0.0815" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Test-JtPart_IsValidAs_Betrag.Check values" time="0.0435" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Test-JtPart_IsValidAs_Betrag.Check values" time="0.0544" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Test-JtPart_IsValidAs_Betrag.Check values" time="0.0401" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Check values" name="Test-JtPart_IsValidAs_Betrag.Check values" time="0.0759" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Convert-JtDotter" executed="True" result="Success" success="True" time="2.253" asserts="0" description="Convert-JtDotter">
+            <results>
+              <test-case description="Testing dotter" name="Convert-JtDotter.Testing dotter" time="0.0435" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Convert-JtFilename_To_Jahr" executed="True" result="Success" success="True" time="2.3347" asserts="0" description="Convert-JtFilename_To_Jahr">
+            <results>
+              <test-case description="Should ... jahr" name="Convert-JtFilename_To_Jahr.Should ... jahr" time="0.0231" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Convert-JtFilename_To_IntAlter" executed="True" result="Success" success="True" time="2.4239" asserts="0" description="Convert-JtFilename_To_IntAlter">
+            <results>
+              <test-case description="Should ... alter Test 1" name="Convert-JtFilename_To_IntAlter.Should ... alter Test 1" time="0.0265" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Should ... alter Test 2" name="Convert-JtFilename_To_IntAlter.Should ... alter Test 2" time="0.0189" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Convert-JtFilename_To_DecQm" executed="True" result="Success" success="True" time="2.5498" asserts="0" description="Convert-JtFilename_To_DecQm">
+            <results>
+              <test-case description="Should .... qm" name="Convert-JtFilename_To_DecQm.Should .... qm" time="0.0808" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1" executed="True" result="Failure" success="False" time="37.2714" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Convert-JtFolderPath_To_JtTblTable_Anzahl" executed="True" result="Failure" success="False" time="3.8164" asserts="0" description="Convert-JtFolderPath_To_JtTblTable_Anzahl">
+            <results>
+              <test-case description="Should be JtTblTable" name="Convert-JtFolderPath_To_JtTblTable_Anzahl.Should be JtTblTable" time="0.5191" asserts="0" success="False" result="Failure" executed="True">
                 <failure>
-                  <message>Expected $true, but got $false.
-at $False | Should -Be $true, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1:12</message>
-                  <stack-trace>bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7739
-bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7677
-bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\Jt\Jt.Tests.ps1: Zeile 12
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 30
 bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
 bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
 bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
@@ -40,6 +88,1754 @@ bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\
 bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
                 </failure>
               </test-case>
+              <test-case description="Should be JtTblTable" name="Convert-JtFolderPath_To_JtTblTable_Anzahl.Should be JtTblTable" time="0.5351" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 36
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should be JtTblTable" name="Convert-JtFolderPath_To_JtTblTable_Anzahl.Should be JtTblTable" time="1.0321" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 42
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should be JtTblTable" name="Convert-JtFolderPath_To_JtTblTable_Anzahl.Should be JtTblTable" time="0.9206" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 48
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should be JtTblTable" name="Convert-JtFolderPath_To_JtTblTable_Anzahl.Should be JtTblTable" time="0.7646" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 54
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtIndex_Anzahl" executed="True" result="Failure" success="False" time="4.4102" asserts="0" description="New-JtIndex_Anzahl">
+            <results>
+              <test-case description="Should be ... Anzahl" name="New-JtIndex_Anzahl.Should be ... Anzahl" time="0.5449" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 65
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtIndex_Betrag" executed="True" result="Failure" success="False" time="12.4396" asserts="0" description="New-JtIndex_Betrag">
+            <results>
+              <test-case description="Should be ... betrag" name="New-JtIndex_Betrag.Should be ... betrag" time="7.9806" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 74
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtIndex_BxH" executed="True" result="Failure" success="False" time="21.1654" asserts="0" description="New-JtIndex_BxH">
+            <results>
+              <test-case description="Should be ... BxH" name="New-JtIndex_BxH.Should be ... BxH" time="8.6737" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 84
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtIndex_Stunden" executed="True" result="Failure" success="False" time="28.4387" asserts="0" description="New-JtIndex_Stunden">
+            <results>
+              <test-case description="Should be ... stunden" name="New-JtIndex_Stunden.Should be ... stunden" time="7.2183" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 93
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtIndex_Zahlung" executed="True" result="Failure" success="False" time="37.0623" asserts="0" description="New-JtIndex_Zahlung">
+            <results>
+              <test-case description="Should be ... zahlung" name="New-JtIndex_Zahlung.Should be ... zahlung" time="8.5794" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected the value to have type [string] or any of its subtypes, but got $true with type [bool].
+at $o | Should -BeOfType String, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1:103</message>
+                  <stack-trace>bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7739
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIndex\JtIndex.Tests.ps1: Zeile 103
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInf\JtInf.Tests.ps1" executed="True" result="Failure" success="False" time="0.3511" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInf\JtInf.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-JtInf_Win32LogicalDisk" executed="True" result="Failure" success="False" time="0.191" asserts="0" description="Get-JtInf_Win32LogicalDisk">
+            <results>
+              <test-case description="Should return Inf" name="Get-JtInf_Win32LogicalDisk.Should return Inf" time="0.1377" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInf\JtInf.Tests.ps1: Zeile 12
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1" executed="True" result="Failure" success="False" time="2.6751" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Inf" executed="True" result="Failure" success="False" time="2.3891" asserts="0" description="Inf">
+            <results>
+              <test-case description="Should return Inf_AFolder" name="Inf.Should return Inf_AFolder" time="0.1465" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 18
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Bitlocker" name="Inf.Should return JtInf_Bitlocker" time="0.1543" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 23
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Soft" name="Inf.Should return JtInf_Soft" time="1.1983" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Should return JtInf_Win32Bios" name="Inf.Should return JtInf_Win32Bios" time="0.1012" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 33
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Win32ComputerSystem" name="Inf.Should return JtInf_Win32ComputerSystem" time="0.1056" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 38
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Win32LogicalDisk" name="Inf.Should return JtInf_Win32LogicalDisk" time="0.1524" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 43
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Win32NetworkAdapter" name="Inf.Should return JtInf_Win32NetworkAdapter" time="0.135" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 48
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Win32OperatingSystem" name="Inf.Should return JtInf_Win32OperatingSystem" time="0.1067" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 53
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Win32Processor" name="Inf.Should return JtInf_Win32Processor" time="0.1062" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 58
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Should return JtInf_Win32VideoController" name="Inf.Should return JtInf_Win32VideoController" time="0.1109" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInfi\JtInfi.Tests.ps1: Zeile 63
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInf_Soft\JtInf_Soft.Tests.ps1" executed="True" result="Success" success="True" time="1.7199" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInf_Soft\JtInf_Soft.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-JtInf_Soft" executed="True" result="Success" success="True" time="1.5537" asserts="0" description="Get-JtInf_Soft">
+            <results>
+              <test-case description="Should return Inf_Soft" name="Get-JtInf_Soft.Should return Inf_Soft" time="1.5074" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvClient\JtInvClient.Tests.ps1" executed="True" result="Success" success="True" time="84.3494" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvClient\JtInvClient.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvClient" executed="True" result="Success" success="True" time="83.8161" asserts="0" description="New-JtInvClient">
+            <results>
+              <test-case description="Should ... JtInvClient" name="New-JtInvClient.Should ... JtInvClient" time="83.7742" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtInvClientExport" executed="True" result="Success" success="True" time="84.1468" asserts="0" description="New-JtInvClientExport">
+            <results>
+              <test-case description="Should ... JtInvClientExport" name="New-JtInvClientExport.Should ... JtInvClientExport" time="0.2864" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvData\JtInvData.Tests.ps1" executed="True" result="Success" success="True" time="0.2942" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvData\JtInvData.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvData" executed="True" result="Success" success="True" time="0.2061" asserts="0" description="New-JtInvData">
+            <results>
+              <test-case description="Should ... data" name="New-JtInvData.Should ... data" time="0.1592" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvDocuments\JtInvDocuments.Tests.ps1" executed="True" result="Success" success="True" time="0.3008" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvDocuments\JtInvDocuments.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvDocuments" executed="True" result="Success" success="True" time="0.2254" asserts="0" description="New-JtInvDocuments">
+            <results>
+              <test-case description="Should ... JtInvDocuments" name="New-JtInvDocuments.Should ... JtInvDocuments" time="0.1786" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvFiles\JtInvFiles.Tests.ps1" executed="True" result="Success" success="True" time="0.2588" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvFiles\JtInvFiles.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvFiles" executed="True" result="Success" success="True" time="0.1852" asserts="0" description="New-JtInvFiles">
+            <results>
+              <test-case description="Should ... JtInvFiles" name="New-JtInvFiles.Should ... JtInvFiles" time="0.139" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvFolder\JtInvFolder.Tests.ps1" executed="True" result="Success" success="True" time="0.2831" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvFolder\JtInvFolder.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvFolder" executed="True" result="Success" success="True" time="0.209" asserts="0" description="New-JtInvFolder">
+            <results>
+              <test-case description="Should JtInvFolder" name="New-JtInvFolder.Should JtInvFolder" time="0.1673" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvLengths\JtInvLengths.Tests.ps1" executed="True" result="Success" success="True" time="0.2826" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvLengths\JtInvLengths.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvLengths" executed="True" result="Success" success="True" time="0.1975" asserts="0" description="New-JtInvLengths">
+            <results>
+              <test-case description="Should ... lengths" name="New-JtInvLengths.Should ... lengths" time="0.145" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvLines\JtInvLines.Tests.ps1" executed="True" result="Success" success="True" time="0.2806" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvLines\JtInvLines.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvLines" executed="True" result="Success" success="True" time="0.2015" asserts="0" description="New-JtInvLines">
+            <results>
+              <test-case description="Should ... JtInvLines" name="New-JtInvLines.Should ... JtInvLines" time="0.1517" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvMd\JtInvMd.Tests.ps1" executed="True" result="Success" success="True" time="0.2549" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvMd\JtInvMd.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvMd" executed="True" result="Success" success="True" time="0.1826" asserts="0" description="New-JtInvMd">
+            <results>
+              <test-case description="Should ... JtInvMd" name="New-JtInvMd.Should ... JtInvMd" time="0.1401" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvPoster\JtInvPoster.Tests.ps1" executed="True" result="Failure" success="False" time="11.3862" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvPoster\JtInvPoster.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Convert-JtFolderPath_To_JtTblTable_BxH" executed="True" result="Failure" success="False" time="1.1745" asserts="0" description="Convert-JtFolderPath_To_JtTblTable_BxH">
+            <results>
+              <test-case description="Should ... JtTblTable_BxH" name="Convert-JtFolderPath_To_JtTblTable_BxH.Should ... JtTblTable_BxH" time="1.1265" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvPoster\JtInvPoster.Tests.ps1: Zeile 13
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Update-JtFolderPath_Md_And_Meta" executed="True" result="Success" success="True" time="11.052" asserts="0" description="Update-JtFolderPath_Md_And_Meta">
+            <results>
+              <test-case description="Should ..." name="Update-JtFolderPath_Md_And_Meta.Should ..." time="9.838" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="New-JtInvPoster" executed="True" result="Success" success="True" time="11.256" asserts="0" description="New-JtInvPoster">
+            <results>
+              <test-case description="Should ... poster" name="New-JtInvPoster.Should ... poster" time="0.1602" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvReportsCombine\JtInvReportsCombine.Tests.ps1" executed="True" result="Success" success="True" time="0.2654" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvReportsCombine\JtInvReportsCombine.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvReportsCombine" executed="True" result="Success" success="True" time="0.1941" asserts="0" description="New-JtInvReportsCombine">
+            <results>
+              <test-case description="Should ... JtInvReportsCombine" name="New-JtInvReportsCombine.Should ... JtInvReportsCombine" time="0.1471" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvReportsUpdate\JtInvReportsUpdate.Tests.ps1" executed="True" result="Success" success="True" time="0.3541" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtInvReportsUpdate\JtInvReportsUpdate.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-JtInvReportsUpdate" executed="True" result="Success" success="True" time="0.2721" asserts="0" description="New-JtInvReportsUpdate">
+            <results>
+              <test-case description="Should ... JtInvReportsUpdate" name="New-JtInvReportsUpdate.Should ... JtInvReportsUpdate" time="0.2244" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIo\JtIo.Tests.ps1" executed="True" result="Success" success="True" time="1.3351" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtIo\JtIo.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Write-JtIoFile" executed="True" result="Success" success="True" time="0.1333" asserts="0" description="Write-JtIoFile">
+            <results>
+              <test-case description="Should write file" name="Write-JtIoFile.Should write file" time="0.0869" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Write-JtIoFile_Meta" executed="True" result="Success" success="True" time="0.2722" asserts="0" description="Write-JtIoFile_Meta">
+            <results>
+              <test-case description="Should write meta file" name="Write-JtIoFile_Meta.Should write meta file" time="0.0915" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1" executed="True" result="Failure" success="False" time="4.0442" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="JtRep" executed="True" result="Failure" success="False" time="3.7672" asserts="0" description="JtRep">
+            <results>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1416" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 20
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1108" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 25
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.203" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 30
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1254" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 35
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1178" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 40
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0723" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 44
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1111" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 48
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1105" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 53
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.1461" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 58
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0474" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 63
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0461" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 68
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.04" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 73
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="1.733" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 78
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0473" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 83
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0326" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 88
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0392" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 93
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0365" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 98
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0639" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 103
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0502" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 108
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0394" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 113
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0857" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 118
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0448" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 123
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0592" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 128
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0598" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 133
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0607" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 138
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0352" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 143
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="Get-JtRep_Folder" name="JtRep.Get-JtRep_Folder" time="0.0351" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtRep\JtRep.Tests.ps1: Zeile 148
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtSnapshot\JtSnapshot.Tests.ps1" executed="True" result="Success" success="True" time="0.1741" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtSnapshot\JtSnapshot.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="JtSnapshot" executed="True" result="Success" success="True" time="0.0572" asserts="0" description="JtSnapshot">
+            <results>
+              <test-case description="Should ... snapshot" name="JtSnapshot.Should ... snapshot" time="0.0156" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtTbl\JtTbl.Tests.ps1" executed="True" result="Failure" success="False" time="0.353" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtTbl\JtTbl.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="JtTblTable" executed="True" result="Failure" success="False" time="0.1042" asserts="0" description="JtTblTable">
+            <results>
+              <test-case description="Should ... JtTblTable" name="JtTblTable.Should ... JtTblTable" time="0.0301" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>ArgumentException: Could not find type []. Make sure that the assembly that contains that type is loaded.</message>
+                  <stack-trace>bei Should-BeOfType, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 6448
+bei Invoke-Assertion, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7731
+bei Should&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 7681
+bei &lt;ScriptBlock&gt;, C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtTbl\JtTbl.Tests.ps1: Zeile 13
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2097
+bei Invoke-TestItem, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1172
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 823
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 878
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1975
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1936
+bei Invoke-ScriptBlock, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2100
+bei Invoke-Block, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 923
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1649
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.ps1: Zeile 3
+bei &lt;ScriptBlock&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3128
+bei Invoke-InNewScriptScope, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 3135
+bei Run-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 1652
+bei Invoke-Test, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 2443
+bei Invoke-Pester&lt;End&gt;, C:\Program Files\WindowsPowerShell\Modules\Pester\5.2.0\Pester.psm1: Zeile 5088
+bei &lt;ScriptBlock&gt;, &lt;Keine Datei&gt;: Zeile 50</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="JtTblRow" executed="True" result="Success" success="True" time="0.1871" asserts="0" description="JtTblRow">
+            <results>
+              <test-case description="Should ... JtTblRow" name="JtTblRow.Should ... JtTblRow" time="0.0399" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtTest\JtTest.Tests.ps1" executed="True" result="Success" success="True" time="0.2303" asserts="0" description="C:\Users\thome.ARCHLAND\OneDrive\jt\tests\JtTest\JtTest.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="JtTest" executed="True" result="Success" success="True" time="0.0741" asserts="0" description="JtTest">
+            <results>
+              <test-case description="Should ... paths..." name="JtTest.Should ... paths..." time="0.0353" asserts="0" success="True" result="Success" executed="True" />
             </results>
           </test-suite>
         </results>

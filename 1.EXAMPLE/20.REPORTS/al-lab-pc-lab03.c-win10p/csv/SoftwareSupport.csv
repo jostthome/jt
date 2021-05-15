@@ -1,2 +1,2 @@
-"SystemId";"Org1";"Org2";"Type";"Computername";"LabelC";"DaysAgo";"Herst";"Modell";"LenovoSysUp";"DellCommand";"DellSuppAs";"OPSI";"Seadrive";"Seafile";"DokanLibrary";"CiscoAnyConnect";"OsCaption";"OsVersion"
-"al-lab-pc-lab03.c-win10p";"al";"lab";"pc";"al-lab-pc-lab03";"c-win10p";"262";"TAROX";"Basic PC System";"";"";"";"v4.1.0.0-40";"";"v7.0.8";"v1.3.0.1000";"v4.8.03043";"Microsoft Windows 10 Pro";"10.0.18363"
+"SystemId";"Org1";"Org2";"Type";"Computername";"LabelC";"DaysAgo";"Herst";"Modell";"Win3";"Win4";"OPSI";"LenovoSysUp";"DellCommand";"DellSuppAs";"Seadrive";"Seafile";"CiscoAnyConnect";"DokanLibrary";"OsCaption"
+"al-lab-pc-lab03.c-win10p";"al";"lab";"pc";"al-lab-pc-lab03";"c-win10p";"324";"TAROX";"Basic PC System";"xxx";"xxx";"v4.1.0.0-40";"";"";"";"";"v7.0.8";"v4.8.03043";"v1.3.0.1000";"Microsoft Windows 10 Pro"

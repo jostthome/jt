@@ -1,3 +1,3 @@
 <config>
-	<folder source="%OneDrive%\jt\tests\JtInvFolder" target="%OneDrive%\jt\tests\JtInvFolder"></folder>
+	<folder source="%OneDrive%\jt\tests\JtInvFolder" target="c:\_inventory\tests\JtInvFolder"></folder>
 </config>

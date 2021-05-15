@@ -1,8 +1,11 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvLengths {
-    New-JtInvLengths
+Describe "New-JtInvLengths" {
+
+    It "Should ... lengths" {
+
+        New-JtInvLengths
+    }
 }
 
-Test-JtInvLengths

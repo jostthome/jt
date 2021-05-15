@@ -66,21 +66,4 @@ Describe "Inf" {
 }
 
 
-Function Test-JtInfi {
-    # New-JtInf
-
-    # Get-JtInf_AFolder -FolderPath "D:\backup\oslo\reports\al-dek-nb-dek03.c-win10p"
-    # Get-JtInf_AFolder -FolderPath "D:\backup\oslo\reports\al-dek-nb-dek03.c-win10p"
-
-    [String]$MyTestPath = "D:\backup\oslo\reports\al-dek-nb-dek03.c-win10p"
-    [JtInfi]$MyJtInfi = New-JtInfi -FolderPath $MyTestPath
-
-    $MyJtInfi 
-
-    $MyJtInfi.GetJtInf_Win32Bios()
-    $MyJtInfi.GetJtInf_Soft()
-}
-
-Test-JtInfi
-
    

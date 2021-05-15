@@ -1,9 +1,13 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvDocuments {
+Describe "New-JtInvDocuments" {
 
-    New-JtInvDocuments
+    It "Should ... JtInvDocuments" {
+        
+        New-JtInvDocuments
+
+    }
+
 }
 
-Test-JtInvDocuments

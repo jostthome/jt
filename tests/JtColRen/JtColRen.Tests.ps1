@@ -3,82 +3,107 @@ using module JtColRen
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-Get_JtColRen {
+Describe "Get-JtColRen" {
 
-    Get-JtColRen -Part "_"
-    Get-JtColRen -Part "_____DATUM"
-    Get-JtColRen -Part "__MONAT"
-    Get-JtColRen -Part "_ART"
-    Get-JtColRen -Part "_DATUM"
-    Get-JtColRen -Part "_DOKUMENT"
-    Get-JtColRen -Part "_LABEL"
-    Get-JtColRen -Part "_W"
-    Get-JtColRen -Part "ABRECHNUNG"
-    Get-JtColRen -Part "ART"
-    Get-JtColRen -Part "BEGINN"
-    Get-JtColRen -Part "BETRAG"
-    Get-JtColRen -Part "BUCHUNG"
-    Get-JtColRen -Part "DETAIL"
-    Get-JtColRen -Part "ESSEN"
-    Get-JtColRen -Part "folder"
-    Get-JtColRen -Part "JAHR"
-    Get-JtColRen -Part "KAT"
-    Get-JtColRen -Part "KONTO"
-    Get-JtColRen -Part "LABEL"
-    Get-JtColRen -Part "LITER"
-    Get-JtColRen -Part "MIETER"
-    Get-JtColRen -Part "OBJEKT"
-    Get-JtColRen -Part "OBJEKt"
-    Get-JtColRen -Part "SOLL"
-    Get-JtColRen -Part "STAND"
-    Get-JtColRen -Part "THEMA"
-    Get-JtColRen -Part "UHR"
-    Get-JtColRen -Part "UHRZEIT"
-    Get-JtColRen -Part "VEREIN"
-    Get-JtColRen -Part "VORAUS"
-    Get-JtColRen -Part "WAS"
-    Get-JtColRen -Part "WER"
-    Get-JtColRen -Part "WHG"
-    Get-JtColRen -Part "WO"
-    Get-JtColRen -Part "WOHNUNG"
-    Get-JtColRen -Part "ZAEHLER"
-    Get-JtColRen -Part "ZAHLUNG"
+    It "Should be ... ColRen" {
+
+        Get-JtColRen -Part "_" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "_____DATUM" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "__MONAT" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "_ART" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "_DATUM" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "_DOKUMENT" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "_LABEL" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "_W" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "ABRECHNUNG" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "ART" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "BEGINN" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "BETRAG" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "BUCHUNG" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "DETAIL" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "ESSEN" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "folder" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "JAHR" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "KAT" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "KONTO" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "LABEL" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "LITER" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "MIETER" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "OBJEKT" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "OBJEKt" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "SOLL" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "STAND" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "THEMA" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "UHR" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "UHRZEIT" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "VEREIN" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "VORAUS" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "WAS" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "WER" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "WHG" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "WO" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "WOHNUNG" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "ZAEHLER" | Should -BeOfType JtColRen
+        Get-JtColRen -Part "ZAHLUNG" | Should -BeOfType JtColRen
+    }
 }
-
-Test-Get_JtColRen
-
-Return
-
-Function Test-JtColRen {
-
-    New-JtColRenInput_Betrag -Label "Label_ColRenInputCurrency" 
-    New-JtColRenInput_Betrag
-    New-JtColRenInput_Datum
-    New-JtColRenInput_Stand 
-    New-JtColRenInput_Sum 
-    New-JtColRenInput_Text   -Label "Label_ColRenInputText" -Header "Header_ColRenInputText" 
-    New-JtColRenInput_TextNr
     
-    Write-Host "---"
-    $t = Get-JtColRen -Part "LABEL"
-    $t
-    
-}
+Describe "New-JtColRenInput_Betrag" {
 
-Test-JtColRen
+    It "Should be ... betrag" {
+        New-JtColRenInput_Betrag -Label "Label_ColRenInputCurrency" | Should -BeOfType JtColRen
 
-
-Function Test-JtPreisliste {
-
-    $MyJtPreisliste = New-JtPreisliste_Plotten_2022_01_01
-    $MyJtPreisliste = New-JtPreisliste_Plotten_2020_07_01
-    
-    $MyJtPreisliste.GetDecBasePrice_Paper("90g")
-    $MyJtPreisliste.GetDecBasePrice_Ink("90g")
-    
-    $MyJtPreisliste
+        New-JtColRenInput_Betrag | Should -BeOfType JtColRen
+    }
 
 }
 
+Describe "New-JtColRenInput_Datum" {
 
-Test-JtPreisliste
+    It "Should be ... betrag" {
+
+    New-JtColRenInput_Datum | Should -BeOfType JtColRen
+    }
+}
+
+Describe "New-JtColRenInput_Stand" {
+
+    It "Should be ... stand" {
+        New-JtColRenInput_Stand | Should -BeOfType JtColRen 
+    }
+}
+
+Describe "New-JtColRenInput_Text" {
+
+    It "Should be ... JtColRen" {
+
+        New-JtColRenInput_Text   -Label "Label_ColRenInputText" -Header "Header_ColRenInputText" | Should -BeOfType JtColRen
+    }
+}
+
+Describe "New-JtColRenInput_TextNr" {
+
+    It "Should be ... JtColRen" {
+
+        New-JtColRenInput_TextNr | Should -BeOfType JtColRen
+    }
+
+}
+
+
+Describe "New-JtPreisliste_Plotten_2022_01_01" {
+
+    It "Should be ... preis" {
+        $MyJtPreisliste = New-JtPreisliste_Plotten_2022_01_01
+        $MyJtPreisliste.GetDecBasePrice_Paper("90g") | Should -Be 1.25
+        $MyJtPreisliste.GetDecBasePrice_Ink("90g") | Should -Be 7.5
+    }
+}
+
+Describe "New-JtPreisliste_Plotten_2020_07_01" {
+    It "Should be ... preis" {
+        $MyJtPreisliste = New-JtPreisliste_Plotten_2020_07_01
+        $MyJtPreisliste.GetDecBasePrice_Paper("90g") | Should -Be 1.25
+        $MyJtPreisliste.GetDecBasePrice_Ink("90g") | Should -Be 6.5
+    }
+}

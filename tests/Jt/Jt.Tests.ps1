@@ -7,149 +7,132 @@ Import-Module JtColRen
 
 
 
-Describe 'Basic Pester Tests' {
-    It 'A test that should be true' {
-        $False | Should -Be $true
-    }
-}
-
-
-
 
 Describe "Get-JtVersion" {
-    Context "Basic testing" {
-        It "Returns JtVersion" {
-            $version = Get-JtVersion
-            $version | Should -Be "2021-04-27"
+    It "Returns JtVersion" {
+        $version = Get-JtVersion
+        $version | Should -Be "2021-05-12"
         
-        }
     }
 }
 
+
+Describe "Convert-JtPart_To_DecBetrag" {
+    It "Check values" {
+        $output = Convert-JtPart_To_DecBetrag -Part "Apples"
+        $output | Should -Be 999999
+    }
+    It "Check values" {
+        $output = Convert-JtPart_To_DecBetrag -Part "Apples10"
+        $output | Should -Be 999999
+    }
+    It "Check values" {
+        $output = Convert-JtPart_To_DecBetrag -Part "00000"
+        $output | Should -Be 999999
+    }
+    It "Check values" {
+        $output = Convert-JtPart_To_DecBetrag -Part "2356323"
+        $output | Should -Be 999999
+    }
+    It "Check values" {
+        $output = Convert-JtPart_To_DecBetrag -Part "23563_23"
+        $output | Should -Be 23563.23
+    }
+}
 
 Describe "Test-JtPart_IsValidAs_Betrag" {
-    Context "Basic testing" {
-        It "Check values" {
-            $output = Test-JtPart_IsValidAs_Betrag -Part "Apples"
-            $output | Should -Be "0,00"
-        }
-        It "Check values" {
-            $output = Test-JtPart_IsValidAs_Betrag -Part "Apples10"
-            $output | Should -Be "0,00"
-        }
-        It "Check values" {
-            $output = Test-JtPart_IsValidAs_Betrag -Part "00000"
-            $output | Should -Be "0,00"
-        }
-        It "Check values" {
-            $output = Test-JtPart_IsValidAs_Betrag -Part "2356323"
-            $output | Should -Be "0,00"
-        }
-        It "Check values" {
-            $output = Test-JtPart_IsValidAs_Betrag -Part "23563_23"
-            $output | Should -Be "23563,23"
-        }
+    It "Check values" {
+        $output = Test-JtPart_IsValidAs_Betrag -Part "Apples"
+        $output | Should -BeFalse
+    }
+    It "Check values" {
+        $output = Test-JtPart_IsValidAs_Betrag -Part "Apples10"
+        $output | Should -BeFalse
+    }
+    It "Check values" {
+        $output = Test-JtPart_IsValidAs_Betrag -Part "00000"
+        $output | Should -BeFalse
+    }
+    It "Check values" {
+        $output = Test-JtPart_IsValidAs_Betrag -Part "2356323"
+        $output | Should -BeFalse
+    }
+    It "Check values" {
+        $output = Test-JtPart_IsValidAs_Betrag -Part "23563_23"
+        $output | Should -BeTrue
     }
 }
-
-Return 
-
-
-
-
-
-
-
-
-
-
-
-
-Function Get-JtInfo {
-
-    [CmdletBinding()]
-
-    Param(
-
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True, ValueFromPipelinebyPropertyName = $True)]
-        
-        [string[]]$computername
-
-        # [string]$logfile = "c:\temp\retries.txt"
-    )
-
-    BEGIN {
-        # Remove-Item $logfile -erroraction silentlycontinue
-    }
-
-    PROCESS {
-        $obj = New-Object -typename PSObject
-
-        $obj | Add-Member -membertype NoteProperty -name ComputerName -value ("hallo1") -passthru |
-        Add-Member -membertype NoteProperty -name OSVersion -value ("hallo2") -passthru |
-        Add-Member -membertype NoteProperty -name OSBuild -value ("hallo3") -passthru |
-        Add-Member -membertype NoteProperty -name BIOSSerial -value ("hallo4") -passthru |
-        Add-Member -membertype NoteProperty -name SPVersion -value ("hallo5")   
-
-        
-        Write-Output $obj
-    }
-}
-
-# $Computers = @("1", "2", "3")
-# $Os = $Computers | Get-JtInfo 
-
 
 
 
 Describe "Convert-JtDotter" {
-    Context "Basic testing" {
-        It "Testing dotter" {
-            $MyValue = "_zzz.Das.ist.ein.Testwert.pdf"
+    It "Testing dotter" {
+        $MyValue = "_zzz.Das.ist.ein.Testwert.pdf"
 
-            $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "1.2"
-            $MyResult | Should -Be "_zzz"
-            $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "1.2" -Reverse
-            $MyResult | Should -Be "pdf"
-        }
+        $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "1"
+        $MyResult | Should -Be "_zzz"
+
+        $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "1.2"
+        $MyResult | Should -Be "_zzz.Das"
+
+        $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "1" -Reverse
+        $MyResult | Should -Be "pdf"
+
+        $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "2.1" -Reverse
+        $MyResult | Should -Be "Testwert.pdf"
+
+        $MyResult = Convert-JtDotter -Text $MyValue -PatternOut "1.2" -Reverse
+        $MyResult | Should -Be "pdf.Testwert"
     }
 }
 
 
-Function Test-Jt {
-    $MyVar = @{
-        "2012.Hallo Welt" = "2012"
-        "2005-12-23"      = "2005"
-    }    
+Describe "Convert-JtFilename_To_Jahr" {
 
-    ForEach ($Element in $MyVar.Keys) {
-        $MyCheck = "Convert-JtFilename_To_Jahr"
-        $MyResult = Convert-JtFilename_To_Jahr -Filename $Element
-        $MyValue = $MyVar.$Element
-        Write-JtLog -Text "MyCheck: $MyCheck ... MyValue: $MyValue ...  MyResult: $MyResult"
+    It "Should ... jahr" {
+        Convert-JtFilename_To_Jahr -Filename "2012.Hallo Welt" | Should -Be "2012"
+        Convert-JtFilename_To_Jahr -Filename "2005-12-23" | Should -Be "2005"
+    }
+}
+
+Describe "Convert-JtFilename_To_IntAlter" {
+    
+    It "Should ... alter Test 1" {
+        [String]$MyFilename = "2012.Hallo Welt" 
+        [Int32]$MyIntYear = 2012
+        [Int32]$MyIntShould = (Get-Date).Year - $MyIntYear 
+        Convert-JtFilename_To_IntAlter -Filename $MyFilename | Should -Be $MyIntShould
+    }
+    
+    It "Should ... alter Test 2" {
+        [String]$MyFilename = "2005-12-23.hallo.label.pdf" 
+        [Int32]$MyIntYear = 2005
+        [Int32]$MyIntShould = (Get-Date).Year - $MyIntYear 
+        Convert-JtFilename_To_IntAlter -Filename $MyFilename | Should -Be $MyIntShould
     }
 
-    ForEach ($Element in $MyVar.Keys) {
-        $MyCheck = "Convert-JtFilename_To_IntAlter"
-        $MyResult = Convert-JtFilename_To_IntAlter -Filename $Element
-        $MyValue = $MyVar.$Element
-        Write-JtLog -Text "MyCheck: $MyCheck ... MyValue: $MyValue ...  MyResult: $MyResult"
+}
+
+
+Describe "Convert-JtFilename_To_DecQm" {
+
+    It "Should .... qm" {
+        $MyVar = @{
+            "halllo"                   = 999
+            "mustermann.500x1000.pdf"  = 0.5
+            "mustermann.1000x1000.pdf" = 1
+            "mustermann.210x297.pdf"   = 0.0624
+            "mustermann.297x420.pdf"   = 0.1247
+        }   
+
+        ForEach ($Element in $MyVar.Keys) {
+            $MyResult = Convert-JtFilename_To_DecQm -Filename $Element
+            $MyShould = $MyVar.$Element
+            $MyResult | Should -Be $MyShould
+        }
+
     }
 
-    $MyVar = @{
-        "halllo"                   = 0
-        "mustermann.500x1000.pdf"  = 0.5
-        "mustermann.1000x1000.pdf" = 1
-        "mustermann.210x297.pdf"   = 0.0625
-        "mustermann.297x420.pdf"   = 0.125
-    }    
-
-    ForEach ($Element in $MyVar.Keys) {
-        $MyCheck = "Convert-JtFilename_To_DecQm"
-        $MyResult = Convert-JtFilename_To_DecQm -Filename $Element
-        $MyValue = $MyVar.$Element
-        Write-JtLog -Text "MyCheck: $MyCheck ... MyValue: $MyValue ...  MyResult: $MyResult"
-    }
 }
 # Test-Jt
 

@@ -1,8 +1,14 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvLines {
-    New-JtInvLines
+
+
+
+Describe "New-JtInvLines" {
+
+    It "Should ... JtInvLines" {
+
+        $MyJtInv = New-JtInvLines
+    }
 }
 
-Test-JtInvLines

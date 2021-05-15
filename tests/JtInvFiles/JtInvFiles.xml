@@ -1,4 +1,4 @@
 <config>
-	<files label="OneDrive_Meta"             source="%OneDrive%"                      filter="*.meta"     target="%OneDrive%\0.INVENTORY\01.OUTPUT\files"></files>
-	<files label="Testing-JtInvFiles.folder" source="%OneDrive%\jt\testing\1.EXAMPLE" filter="*.folder"   target="c:\_inventory\out\Test-JtInvFiles"></files>
+	<files label="OneDrive_Meta"             source="%OneDrive%"                      filter="*.meta"     target="c:\_inventory\tests\JtInvFiles\OneDrive_meta"></files>
+	<files label="OneDrive_example_folder"   source="%OneDrive%\jt\testing\1.EXAMPLE" filter="*.folder"   target="c:\_inventory\tests\JtInvFiles\OneDrive_example_folder"></files>
 </config>

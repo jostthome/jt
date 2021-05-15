@@ -1,11 +1,14 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvReportsUpdate{
+Describe "New-JtInvReportsUpdate" {
 
-    New-JtInvReportsUpdate
+    It "Should ... JtInvReportsUpdate" {
+        New-JtInvReportsUpdate
+
+    }
+
 
 }
 
-Test-JtInvReportsUpdate
 

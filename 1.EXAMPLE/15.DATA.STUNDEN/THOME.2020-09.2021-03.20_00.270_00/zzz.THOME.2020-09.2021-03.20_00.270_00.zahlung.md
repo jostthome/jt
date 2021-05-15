@@ -1,7 +1,7 @@
 ﻿# THOME - 2020-09 - 2021-03 - 20_00 - 270_00
 
 
-* Stand: 2021-05-12_21-52-39
+* Stand: 2021-05-13_21-55-38
 
 * Pfad: C:/Users/thome.ARCHLAND/OneDrive/jt/1.EXAMPLE/15.DATA.STUNDEN
 

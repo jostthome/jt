@@ -1,4 +1,4 @@
 <config>
-	<md source="C:\apps\Documents\markdown" target="%OneDrive%\jt\testing\JtInvMd"></md>
+	<md source="C:\apps\Documents\markdown" target="c:\_inventory\tests\JtInvMd"></md>
 </config>
 

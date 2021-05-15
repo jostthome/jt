@@ -888,6 +888,10 @@ Function Get-JtFolderPath_Base() {
     Return Get-Location
 }
 
+Function Get-JtFolderPath_TestsOutput() {
+    Return "C:\_inventory\tests"
+}
+
 
 Function Get-JtMac {
 
@@ -978,7 +982,7 @@ Function Get-JtTimestamp {
 }
 
 Function Get-JtVersion {
-    return "2021-04-27"
+    return "2021-05-12"
 }
 
 
@@ -1597,6 +1601,7 @@ Export-ModuleMember -Function Get-JtDate
 Export-ModuleMember -Function Get-JtDateNormal
 Export-ModuleMember -Function Get-JtDevMode
 Export-ModuleMember -Function Get-JtFolderPath_Base
+Export-ModuleMember -Function Get-JtFolderPath_TestsOutput
 Export-ModuleMember -Function Get-JtMac
 Export-ModuleMember -Function Get-JtRandom6
 Export-ModuleMember -Function Get-JtTimestamp

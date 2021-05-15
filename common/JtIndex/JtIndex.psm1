@@ -443,12 +443,13 @@ Function Convert-JtFolderPath_To_Meta_Anzahl {
         FolderPath_Output = $MyFolderPath_Output
         Anzahl            = $MyValue
     }
-    Write-JtIoFile_Meta_Anzahl @MyParams
+    [String]$MyResult = Write-JtIoFile_Meta_Anzahl @MyParams
 
     # [System.Collections.ArrayList]$MyAlJtIoFiles = Get-JtChildItem -FolderPath $MyJtIoFolder_Input -Normal
     
-    [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Anzahl -FolderPath_Input $MyFolderPath_Input
-    [System.Data.Datatable]$MyDataTable = Convert-JtTblTable_To_DataTable -JtTblTable $MyJtTblTable
+    # [JtTblTable]$MyJtTblTable = Convert-JtFolderPath_To_JtTblTable_Anzahl -FolderPath_Input $MyFolderPath_Input
+    # [System.Data.Datatable]$MyDataTable = Convert-JtTblTable_To_DataTable -JtTblTable $MyJtTblTable
+    Write-Output $MyResult
 }
 
 Function Convert-JtFolderPath_To_Meta_Betrag {

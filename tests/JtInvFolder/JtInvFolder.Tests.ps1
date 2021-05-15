@@ -1,8 +1,11 @@
 Set-StrictMode -Version "2.0"
 $ErrorActionPreference = "Stop"
 
-Function Test-JtInvFolder {
-    New-JtInvFolder
-}
+Describe "New-JtInvFolder" {
 
-Test-JtInvFolder
+    It "Should JtInvFolder" {
+
+        New-JtInvFolder
+    }
+
+}

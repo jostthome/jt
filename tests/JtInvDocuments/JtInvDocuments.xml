@@ -1,3 +1,4 @@
 <config>
-	<documents label="Testing-JtInvdocuments" source="%OneDrive%\jt\1.EXAMPLE\12.DATA.BETRAG\MU.STE.BEISPIEL2.TEST.Rechnung.2018.betrag" filter="*.pdf"   target="c:\_inventory\out\Test-JtInvdocuments"></documents>
+	<documents label="MU.STE.BEISPIEL1.TEST.Rechnung.jahr.betrag" source="%OneDrive%\jt\1.EXAMPLE\12.DATA.BETRAG\MU.STE.BEISPIEL1.TEST.Rechnung.jahr.betrag" filter="*.pdf"   target="c:\_inventory\tests\JtInvDocuments"></documents>
+	<documents label="MU.STE.BEISPIEL2.TEST.Rechnung.2018.betrag" source="%OneDrive%\jt\1.EXAMPLE\12.DATA.BETRAG\MU.STE.BEISPIEL2.TEST.Rechnung.2018.betrag" filter="*.pdf"   target="c:\_inventory\tests\JtInvDocuments"></documents>
 </config>
